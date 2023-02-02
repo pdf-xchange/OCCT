@@ -9,6 +9,10 @@ if { ![checkplatform -windows] } {
   return
 }
 
+if { ![regexp HAVE_D3D [dversion]] } {
+  error "OCCT is built without Direct3D support"
+}
+
 pload MODELING VISUALIZATION
 vdriver -load D3DHOST
 vclear

@@ -5,6 +5,10 @@ if { $::tcl_platform(os) == "Darwin" } {
   return -code 1 "Skipping testgrid 'opengles3': not configured for macOS"
 }
 
+if { ![regexp HAVE_GLES2 [dversion]] } {
+  error "OCCT is built without Open GL ES support"
+}
+
 pload VISUALIZATION
 vdriver -load GLES
 vgldebug -glslWarn 1

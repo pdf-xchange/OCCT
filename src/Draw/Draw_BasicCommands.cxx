@@ -386,6 +386,13 @@ static Standard_Integer dversion(Draw_Interpretor& di, Standard_Integer, const c
 #else
   di << "OpenVR disabled\n";
 #endif
+#ifdef _WIN32
+  #ifdef HAVE_D3D
+    di << "Direct3D enabled (HAVE_D3D)\n";
+  #else
+    di << "Direct3D disabled\n";
+  #endif
+#endif
 #ifdef HAVE_RAPIDJSON
   di << "RapidJSON enabled (HAVE_RAPIDJSON)\n";
 #else

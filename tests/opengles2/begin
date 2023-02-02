@@ -1,7 +1,12 @@
 cpulimit 300
+
 if { ![checkplatform -windows] } {
   puts "TEST COMPLETED"
   return -code 1 "Skipping testgrid 'opengles2': OpenGL ES can be reliably fixed to 2.0 only by ANGLE library"
+}
+
+if { ![regexp HAVE_GLES2 [dversion]] } {
+  error "OCCT is built without Open GL ES support"
 }
 
 pload VISUALIZATION

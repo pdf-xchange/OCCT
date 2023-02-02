@@ -3,6 +3,10 @@ puts "0032206: Visualization, TKOpenGl - move out OpenGL ES support to dedicated
 puts "============"
 puts ""
 
+if { ![regexp HAVE_GLES2 [dversion]] } {
+  error "OCCT is built without Open GL ES support"
+}
+
 set to_dump_screen 0
 pload MODELING VISUALIZATION
 vdriver -load GLES
