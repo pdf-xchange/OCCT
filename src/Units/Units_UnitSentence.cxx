@@ -17,7 +17,6 @@
 
 #include <TCollection_AsciiString.hxx>
 #include <Units.hxx>
-#include <Units_Operators.hxx>
 #include <Units_Quantity.hxx>
 #include <Units_Token.hxx>
 #include <Units_Unit.hxx>

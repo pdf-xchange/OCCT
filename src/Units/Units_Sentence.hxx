@@ -44,10 +44,10 @@ public:
   Standard_EXPORT void SetConstants();
   
   //! Returns <thesequenceoftokens>.
-    Handle(Units_TokensSequence) Sequence() const;
+  Handle(Units_TokensSequence) Sequence() const { return thesequenceoftokens; }
   
   //! Sets the field <thesequenceoftokens> to <asequenceoftokens>.
-    void Sequence (const Handle(Units_TokensSequence)& asequenceoftokens);
+  void Sequence(const Handle(Units_TokensSequence)& asequenceoftokens) { thesequenceoftokens = asequenceoftokens; }
   
   //! Computes and  returns in a   token the result  of  the
   //! expression.
@@ -55,34 +55,13 @@ public:
   
   //! Return True if number of created tokens > 0
   //! (i.e creation of sentence is successful)
-    Standard_Boolean IsDone() const;
+  Standard_Boolean IsDone() const { return thesequenceoftokens->Length() > 0; }
   
   //! Useful for debugging.
-    void Dump() const;
-
-
-
-
-protected:
-
-
-
-
+  Standard_EXPORT void Dump() const;
 
 private:
-
-
-
   Handle(Units_TokensSequence) thesequenceoftokens;
-
-
 };
-
-
-#include <Units_Sentence.lxx>
-
-
-
-
 
 #endif // _Units_Sentence_HeaderFile

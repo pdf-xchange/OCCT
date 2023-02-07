@@ -28,7 +28,6 @@
 #include <Units_ShiftedToken.hxx>
 #include <Standard_NoSuchObject.hxx>
 #include <TColStd_HSequenceOfHAsciiString.hxx>
-#include <Units_Operators.hxx>
 
 #include <stdlib.h>
 

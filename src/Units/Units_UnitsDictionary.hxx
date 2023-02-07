@@ -29,9 +29,7 @@ DEFINE_STANDARD_HANDLE(Units_UnitsDictionary, Standard_Transient)
 //! you want to know.
 class Units_UnitsDictionary : public Standard_Transient
 {
-
 public:
-
   
   //! Returns an empty instance of UnitsDictionary.
   Standard_EXPORT Units_UnitsDictionary();
@@ -43,7 +41,7 @@ public:
   
   //! Returns   the  head   of   the  sequence  of  physical
   //! quantities.
-  Handle(Units_QuantitiesSequence) Sequence() const;
+  const Handle(Units_QuantitiesSequence)& Sequence() const { return thequantitiessequence; }
 
   //! Returns for <aquantity> the active unit.
   Standard_EXPORT TCollection_AsciiString ActiveUnit (const Standard_CString aquantity) const;
@@ -52,35 +50,16 @@ public:
   //! units  if  <alevel> is  equal  to zero,  and  for each
   //! quantity all the units stored if <alevel>  is equal to
   //! one.
-    void Dump (const Standard_Integer alevel) const;
+  Standard_EXPORT void Dump (const Standard_Integer alevel) const;
   
   //! Dumps  for a     designated  physical       dimensions
   //! <adimensions> all the previously stored units.
-    void Dump (const Handle(Units_Dimensions)& adimensions) const;
-
-
-
+  Standard_EXPORT void Dump (const Handle(Units_Dimensions)& adimensions) const;
 
   DEFINE_STANDARD_RTTIEXT(Units_UnitsDictionary,Standard_Transient)
 
-protected:
-
-
-
-
 private:
-
-
   Handle(Units_QuantitiesSequence) thequantitiessequence;
-
-
 };
-
-
-#include <Units_UnitsDictionary.lxx>
-
-
-
-
 
 #endif // _Units_UnitsDictionary_HeaderFile

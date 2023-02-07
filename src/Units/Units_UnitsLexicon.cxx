@@ -47,3 +47,14 @@ void Units_UnitsLexicon::Creates(const Standard_Boolean amode)
   if(amode)unitsdictionary = Units::DictionaryOfUnits(amode);
 
 }
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void Units_UnitsLexicon::Dump() const
+{
+  std::cout << " UNITSLEXICON : " << std::endl;
+  Units_Lexicon::Dump();
+}

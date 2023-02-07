@@ -73,26 +73,26 @@ public:
   Standard_EXPORT Standard_Integer Length() const;
   
   //! Returns the string <theword>
-    TCollection_AsciiString Word() const;
+  TCollection_AsciiString Word() const { return theword; }
   
   //! Sets the field <theword> to <aword>.
-    void Word (const Standard_CString aword);
+  void Word(const Standard_CString aword) { theword = aword; }
   
   //! Returns the significance of the word  <theword>, which
   //! is in the field <themean>.
-    TCollection_AsciiString Mean() const;
+  TCollection_AsciiString Mean() const { return themean; }
   
   //! Sets the field <themean> to <amean>.
-    void Mean (const Standard_CString amean);
+  void Mean(const Standard_CString amean) { themean = amean; }
   
   //! Returns the value stored in the field <thevalue>.
-    Standard_Real Value() const;
+  Standard_Real Value() const { return thevalue; }
   
   //! Sets the field <thevalue> to <avalue>.
-    void Value (const Standard_Real avalue);
+  void Value(const Standard_Real avalue) { thevalue = avalue; }
   
   //! Returns the dimensions of the token <thedimensions>.
-    Handle(Units_Dimensions) Dimensions() const;
+  Handle(Units_Dimensions) Dimensions() const { return thedimensions; }
   
   //! Sets the field <thedimensions> to <adimensions>.
   Standard_EXPORT void Dimensions (const Handle(Units_Dimensions)& adimensions);
@@ -153,61 +153,193 @@ public:
   
   //! Returns false if  the field <theword>  and the  string
   //! <astring> are the same, true otherwise.
-    Standard_Boolean IsNotEqual (const Standard_CString astring) const;
+  Standard_EXPORT Standard_Boolean IsNotEqual (const Standard_CString astring) const;
   
   //! Returns false if  the field <theword>  and the  string
   //! <theword> contained  in the  token  <atoken>  are  the
   //! same, true otherwise.
-    Standard_Boolean IsNotEqual (const Handle(Units_Token)& atoken) const;
+  Standard_EXPORT Standard_Boolean IsNotEqual (const Handle(Units_Token)& atoken) const;
   
   //! Returns   true  if the   field <theword>  is  strictly
   //! contained at  the beginning  of the string  <astring>,
   //! false otherwise.
-    Standard_Boolean IsLessOrEqual (const Standard_CString astring) const;
+  Standard_EXPORT Standard_Boolean IsLessOrEqual (const Standard_CString astring) const;
   
   //! Returns false  if   the field   <theword> is  strictly
   //! contained at  the  beginning  of the string <astring>,
   //! true otherwise.
-    Standard_Boolean IsGreater (const Standard_CString astring) const;
+  Standard_EXPORT Standard_Boolean IsGreater (const Standard_CString astring) const;
   
   //! Returns false  if   the field   <theword> is  strictly
   //! contained at  the  beginning  of the string <astring>,
   //! true otherwise.
-    Standard_Boolean IsGreater (const Handle(Units_Token)& atoken) const;
+  Standard_EXPORT Standard_Boolean IsGreater (const Handle(Units_Token)& atoken) const;
   
   //! Returns true  if  the string <astring>   is   strictly
   //! contained   at the  beginning  of  the field <theword>
   //! false otherwise.
-    Standard_Boolean IsGreaterOrEqual (const Handle(Units_Token)& atoken) const;
+  Standard_EXPORT Standard_Boolean IsGreaterOrEqual (const Handle(Units_Token)& atoken) const;
   
   //! Useful for debugging
   Standard_EXPORT virtual void Dump (const Standard_Integer ashift, const Standard_Integer alevel) const;
 
-
-
   DEFINE_STANDARD_RTTIEXT(Units_Token,Standard_Transient)
 
-protected:
-
-
-
-
 private:
-
-
   TCollection_AsciiString theword;
   TCollection_AsciiString themean;
   Standard_Real thevalue;
   Handle(Units_Dimensions) thedimensions;
-
-
 };
 
+//=======================================================================
+//function : operator +
+//purpose  : 
+//=======================================================================
 
-#include <Units_Token.lxx>
+inline Handle(Units_Token) operator +(const Handle(Units_Token)& atoken, const Standard_Integer aninteger)
+{
+  return atoken->Add(aninteger);
+}
 
+//=======================================================================
+//function : operator +
+//purpose  : 
+//=======================================================================
 
+inline Handle(Units_Token) operator +(const Handle(Units_Token)& atoken1, const Handle(Units_Token)& atoken2)
+{
+  return atoken1->Add(atoken2);
+}
 
+//=======================================================================
+//function : operator -
+//purpose  : 
+//=======================================================================
 
+inline Handle(Units_Token) operator -(const Handle(Units_Token)& atoken1, const Handle(Units_Token)& atoken2)
+{
+  return atoken1->Subtract(atoken2);
+}
+
+//=======================================================================
+//function : operator *
+//purpose  : 
+//=======================================================================
+
+inline Handle(Units_Token) operator *(const Handle(Units_Token)& atoken1, const Handle(Units_Token)& atoken2)
+{
+  return atoken1->Multiply(atoken2);
+}
+
+//=======================================================================
+//function : operator /
+//purpose  : 
+//=======================================================================
+
+inline Handle(Units_Token) operator /(const Handle(Units_Token)& atoken1, const Handle(Units_Token)& atoken2)
+{
+  return atoken1->Divide(atoken2);
+}
+
+//=======================================================================
+//function : pow
+//purpose  : 
+//=======================================================================
+
+inline Handle(Units_Token) pow(const Handle(Units_Token)& atoken1, const Handle(Units_Token)& atoken2)
+{
+  return atoken1->Power(atoken2);
+}
+
+//=======================================================================
+//function : pow
+//purpose  : 
+//=======================================================================
+
+inline Handle(Units_Token) pow(const Handle(Units_Token)& atoken, const Standard_Real areal)
+{
+  return atoken->Power(areal);
+}
+
+//=======================================================================
+//function : operator ==
+//purpose  : 
+//=======================================================================
+
+inline Standard_Boolean operator ==(const Handle(Units_Token)& atoken, const Standard_CString astring)
+{
+  return atoken->IsEqual(astring);
+}
+
+//=======================================================================
+//function : operator ==
+//purpose  : 
+//=======================================================================
+
+//inline Standard_Boolean operator ==(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
+//{
+//  return atoken1->IsEqual(atoken2);
+//}
+
+//=======================================================================
+//function : operator !=
+//purpose  : 
+//=======================================================================
+
+inline Standard_Boolean operator !=(const Handle(Units_Token)& atoken, const Standard_CString astring)
+{
+  return atoken->IsNotEqual(astring);
+}
+
+//=======================================================================
+//function : operator !=
+//purpose  : 
+//=======================================================================
+
+//inline Standard_Boolean operator !=(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
+//{
+//  return atoken1->IsNotEqual(atoken2);
+//}
+
+//=======================================================================
+//function : operator <=
+//purpose  : 
+//=======================================================================
+
+inline Standard_Boolean operator <=(const Handle(Units_Token)& atoken, const Standard_CString astring)
+{
+  return atoken->IsLessOrEqual(astring);
+}
+
+//=======================================================================
+//function : operator >
+//purpose  : 
+//=======================================================================
+
+inline Standard_Boolean operator >(const Handle(Units_Token)& atoken, const Standard_CString astring)
+{
+  return atoken->IsGreater(astring);
+}
+
+//=======================================================================
+//function : operator >
+//purpose  : 
+//=======================================================================
+
+inline Standard_Boolean operator >(const Handle(Units_Token)& atoken1, const Handle(Units_Token)& atoken2)
+{
+  return atoken1->IsGreater(atoken2);
+}
+
+//=======================================================================
+//function : operator >=
+//purpose  : 
+//=======================================================================
+
+inline Standard_Boolean operator >=(const Handle(Units_Token)& atoken1, const Handle(Units_Token)& atoken2)
+{
+  return atoken1->IsGreaterOrEqual(atoken2);
+}
 
 #endif // _Units_Token_HeaderFile

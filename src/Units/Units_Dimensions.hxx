@@ -47,37 +47,31 @@ public:
   Standard_EXPORT Units_Dimensions(const Standard_Real amass, const Standard_Real alength, const Standard_Real atime, const Standard_Real anelectriccurrent, const Standard_Real athermodynamictemperature, const Standard_Real anamountofsubstance, const Standard_Real aluminousintensity, const Standard_Real aplaneangle, const Standard_Real asolidangle);
   
   //! Returns the power of mass stored in the dimensions.
-    Standard_Real Mass() const;
+  Standard_Real Mass() const { return themass; }
   
   //! Returns the power of length stored in the dimensions.
-    Standard_Real Length() const;
+  Standard_Real Length() const { return thelength; }
   
   //! Returns the power of time stored in the dimensions.
-    Standard_Real Time() const;
+  Standard_Real Time() const { return thetime; }
   
-  //! Returns the  power of  electrical  intensity (current)
-  //! stored in the dimensions.
-    Standard_Real ElectricCurrent() const;
+  //! Returns the power of electrical intensity (current) stored in the dimensions.
+  Standard_Real ElectricCurrent() const { return theelectriccurrent; }
   
-  //! Returns  the  power  of   temperature stored  in   the
-  //! dimensions.
-    Standard_Real ThermodynamicTemperature() const;
+  //! Returns the power of temperature stored in the dimensions.
+  Standard_Real ThermodynamicTemperature() const { return thethermodynamictemperature; }
   
-  //! Returns  the power   of quantity   of  material (mole)
-  //! stored in the dimensions.
-    Standard_Real AmountOfSubstance() const;
+  //! Returns the power of quantity of material (mole) stored in the dimensions.
+  Standard_Real AmountOfSubstance() const { return theamountofsubstance; }
   
-  //! Returns the  power of light   intensity stored  in the
-  //! dimensions.
-    Standard_Real LuminousIntensity() const;
+  //! Returns the power of light intensity stored in the dimensions.
+  Standard_Real LuminousIntensity() const { return theluminousintensity; }
   
-  //! Returns  the power   of plane   angle  stored  in  the
-  //! dimensions.
-    Standard_Real PlaneAngle() const;
+  //! Returns the power of plane angle stored in the dimensions.
+  Standard_Real PlaneAngle() const { return theplaneangle; }
   
-  //! Returns the   power   of  solid angle stored   in  the
-  //! dimensions.
-    Standard_Real SolidAngle() const;
+  //! Returns the power of solid angle stored in the dimensions.
+  Standard_Real SolidAngle() const { return thesolidangle; }
   
   //! Returns the quantity string of the dimension
   Standard_EXPORT Standard_CString Quantity() const;
@@ -127,19 +121,9 @@ public:
   //! Returns the basic dimensions.
   Standard_EXPORT static Handle(Units_Dimensions) ASolidAngle();
 
-
-
-
   DEFINE_STANDARD_RTTIEXT(Units_Dimensions,Standard_Transient)
 
-protected:
-
-
-
-
 private:
-
-
   Standard_Real themass;
   Standard_Real thelength;
   Standard_Real thetime;
@@ -149,15 +133,61 @@ private:
   Standard_Real theluminousintensity;
   Standard_Real theplaneangle;
   Standard_Real thesolidangle;
-
-
 };
 
+//=======================================================================
+//function : operator *
+//purpose  : 
+//=======================================================================
 
-#include <Units_Dimensions.lxx>
+inline Handle(Units_Dimensions) operator *(const Handle(Units_Dimensions)& adimension1,
+                                           const Handle(Units_Dimensions)& adimension2)
+{
+  return adimension1->Multiply(adimension2);
+}
 
+//=======================================================================
+//function : operator /
+//purpose  : 
+//=======================================================================
 
+inline Handle(Units_Dimensions) operator /(const Handle(Units_Dimensions)& adimension1,
+                                           const Handle(Units_Dimensions)& adimension2)
+{
+  return adimension1->Divide(adimension2);
+}
 
+//=======================================================================
+//function : pow
+//purpose  : 
+//=======================================================================
 
+inline Handle(Units_Dimensions) pow(const Handle(Units_Dimensions)& adimension,
+                                    const Standard_Real areal)
+{
+  return adimension->Power(areal);
+}
+
+//=======================================================================
+//function : operator ==
+//purpose  : 
+//=======================================================================
+
+//inline Standard_Boolean operator ==(const Handle(Units_Dimensions)& adimension1,
+//                                    const Handle(Units_Dimensions)& adimension2)
+//{
+//  return adimension1->IsEqual(adimension2);
+//}
+
+//=======================================================================
+//function : operator !=
+//purpose  : 
+//=======================================================================
+
+//inline Standard_Boolean operator !=(const Handle(Units_Dimensions)& adimension1,
+//	                              const Handle(Units_Dimensions)& adimension2)
+//{
+//  return adimension1->IsNotEqual(adimension2);
+//}
 
 #endif // _Units_Dimensions_HeaderFile

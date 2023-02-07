@@ -36,9 +36,7 @@ DEFINE_STANDARD_HANDLE(Units_Unit, Standard_Transient)
 //! a physical quantity.
 class Units_Unit : public Standard_Transient
 {
-
 public:
-
   
   //! Creates  and returns a  unit.  <aname> is  the name of
   //! the  unit, <asymbol> is the  usual abbreviation of the
@@ -56,26 +54,26 @@ public:
   Standard_EXPORT Units_Unit(const Standard_CString aname);
   
   //! Returns the name of the unit <thename>
-    TCollection_AsciiString Name() const;
+  TCollection_AsciiString Name() const { return thename->String(); }
   
   //! Adds a new symbol <asymbol> attached to <me>.
   Standard_EXPORT void Symbol (const Standard_CString asymbol);
   
   //! Returns the  value in relation  with the International
   //! System of Units.
-    Standard_Real Value() const;
+  Standard_Real Value() const { return thevalue; }
   
   //! Returns <thequantity> contained in <me>.
-    Handle(Units_Quantity) Quantity() const;
+  Handle(Units_Quantity) Quantity() const { return thequantity; }
   
   //! Returns the sequence of symbols <thesymbolssequence>
-    Handle(TColStd_HSequenceOfHAsciiString) SymbolsSequence() const;
+  Handle(TColStd_HSequenceOfHAsciiString) SymbolsSequence() const { return thesymbolssequence; }
   
   //! Sets the value <avalue> to <me>.
-    void Value (const Standard_Real avalue);
+  void Value(const Standard_Real avalue) { thevalue = avalue; }
   
   //! Sets the physical Quantity <aquantity> to <me>.
-    void Quantity (const Handle(Units_Quantity)& aquantity);
+  void Quantity(const Handle(Units_Quantity)& aquantity) { thequantity = aquantity; }
   
   //! Starting with <me>, returns a new Token object.
   Standard_EXPORT virtual Handle(Units_Token) Token() const;
@@ -88,32 +86,25 @@ public:
   //! Useful for debugging
   Standard_EXPORT virtual void Dump (const Standard_Integer ashift, const Standard_Integer alevel) const;
 
-
-
-
   DEFINE_STANDARD_RTTIEXT(Units_Unit,Standard_Transient)
 
 protected:
-
-
   Handle(TColStd_HSequenceOfHAsciiString) thesymbolssequence;
   Standard_Real thevalue;
 
-
 private:
-
-
   Handle(TCollection_HAsciiString) thename;
   Handle(Units_Quantity) thequantity;
-
-
 };
 
+//=======================================================================
+//function : operator ==
+//purpose  : 
+//=======================================================================
 
-#include <Units_Unit.lxx>
-
-
-
-
+inline Standard_Boolean operator ==(const Handle(Units_Unit)& aunit, const Standard_CString astring)
+{
+  return aunit->IsEqual(astring);
+}
 
 #endif // _Units_Unit_HeaderFile

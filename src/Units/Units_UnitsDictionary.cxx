@@ -25,8 +25,8 @@
 #include <TColStd_HSequenceOfHAsciiString.hxx>
 #include <Units.hxx>
 #include <Units_Dimensions.hxx>
+#include <Units_Explorer.hxx>
 #include <Units_MathSentence.hxx>
-#include <Units_Operators.hxx>
 #include <Units_QuantitiesSequence.hxx>
 #include <Units_Quantity.hxx>
 #include <Units_ShiftedUnit.hxx>
@@ -351,4 +351,49 @@ TCollection_AsciiString Units_UnitsDictionary::ActiveUnit(const Standard_CString
 
   std::cout<<" La grandeur physique "<<aquantity<<" n'existe pas."<<std::endl;
   return "";
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void Units_UnitsDictionary::Dump(const Standard_Integer alevel) const
+{
+  Standard_Integer index;
+  switch (alevel) {
+  case 2:
+    if (!thequantitiessequence.IsNull()) {
+      for (index = 1; index <= thequantitiessequence->Length(); index++)
+        thequantitiessequence->Value(index)->Dump(0, 1);
+    }
+    break;
+
+  case 1:
+  default:
+    Units_Explorer explorer(this);
+    std::cout << " UNITS DICTIONARY : " << std::endl;
+    for (; explorer.MoreQuantity(); explorer.NextQuantity())
+    {
+      std::cout << explorer.Quantity() << std::endl;
+      for (; explorer.MoreUnit(); explorer.NextUnit())
+        std::cout << "  " << explorer.Unit() << std::endl;
+    }
+
+
+  }
+}
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void Units_UnitsDictionary::Dump(const Handle(Units_Dimensions)& adimensions) const
+{
+  Standard_Integer index;
+  for (index = 1; index <= thequantitiessequence->Length(); index++)
+  {
+    if (thequantitiessequence->Value(index)->Dimensions()->IsEqual(adimensions))
+      thequantitiessequence->Value(index)->Dump(0, 1);
+  }
 }

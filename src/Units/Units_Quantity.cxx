@@ -15,7 +15,6 @@
 // commercial license or contractual agreement.
 
 
-#include <Units_Operators.hxx>
 #include <Units_Quantity.hxx>
 #include <Units_Unit.hxx>
 
@@ -48,14 +47,4 @@ void Units_Quantity::Dump(const Standard_Integer ashift,
       for(index=1;index<=theunitssequence->Length();index++)
 	theunitssequence->Value(index)->Dump(ashift+1,0);
     }
-}
-
-//=======================================================================
-//function : operator ==
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean operator ==(const Handle(Units_Quantity)& aquantity,const Standard_CString astring)
-{
-  return aquantity->IsEqual(astring);
 }

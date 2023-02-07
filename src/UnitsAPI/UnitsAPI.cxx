@@ -17,6 +17,7 @@
 #include <Resource_Manager.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <Units.hxx>
+#include <Units_Dimensions.hxx>
 #include <Units_UnitsSystem.hxx>
 #include <UnitsAPI.hxx>
 

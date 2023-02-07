@@ -18,7 +18,6 @@
 #include <Standard_Type.hxx>
 #include <Units.hxx>
 #include <Units_Dimensions.hxx>
-#include <Units_Operators.hxx>
 #include <Units_UnitsDictionary.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Units_Dimensions,Standard_Transient)
@@ -203,61 +202,6 @@ void Units_Dimensions::Dump(const Standard_Integer ashift) const
   for(i=0; i<ashift; i++)std::cout<<"  ";
   std::cout<<"         solid angle               : "<<thesolidangle<<std::endl;
 }
-
-//=======================================================================
-//function : operator *
-//purpose  : 
-//=======================================================================
-
-Handle(Units_Dimensions) operator *(const Handle(Units_Dimensions)& adimension1,
-				    const Handle(Units_Dimensions)& adimension2)
-{
-  return adimension1->Multiply(adimension2);
-}
-
-//=======================================================================
-//function : operator /
-//purpose  : 
-//=======================================================================
-
-Handle(Units_Dimensions) operator /(const Handle(Units_Dimensions)& adimension1,
-				    const Handle(Units_Dimensions)& adimension2)
-{
-  return adimension1->Divide(adimension2);
-}
-
-//=======================================================================
-//function : pow
-//purpose  : 
-//=======================================================================
-
-Handle(Units_Dimensions) pow(const Handle(Units_Dimensions)&adimension,
-			     const Standard_Real areal)
-{
-  return adimension->Power(areal);
-}
-
-//=======================================================================
-//function : operator ==
-//purpose  : 
-//=======================================================================
-
-//Standard_Boolean operator ==(const Handle(Units_Dimensions)& adimension1,
-//			     const Handle(Units_Dimensions)& adimension2)
-//{
-//  return adimension1->IsEqual(adimension2);
-//}
-
-//=======================================================================
-//function : operator !=
-//purpose  : 
-//=======================================================================
-
-//Standard_Boolean operator !=(const Handle(Units_Dimensions)& adimension1,
-//			     const Handle(Units_Dimensions)& adimension2)
-//{
-//  return adimension1->IsNotEqual(adimension2);
-//}
 
 Handle(Units_Dimensions)    Units_Dimensions::ALess() {
   static Handle(Units_Dimensions) aDim;

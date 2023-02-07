@@ -161,3 +161,16 @@ void Units_Lexicon::AddToken(const Standard_CString aword,
     thesequenceoftokens->Append(token);
   }
 }
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void Units_Lexicon::Dump() const
+{
+  Standard_Integer index;
+  std::cout << " LEXICON : " << std::endl;
+  for (index = 1; index <= thesequenceoftokens->Length(); index++)
+    thesequenceoftokens->Value(index)->Dump(1, 0);
+}

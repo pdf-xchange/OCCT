@@ -17,7 +17,6 @@
 
 #include <Units_Lexicon.hxx>
 #include <Units_NoSuchType.hxx>
-#include <Units_Operators.hxx>
 #include <Units_Sentence.hxx>
 #include <Units_ShiftedToken.hxx>
 #include <Units_Token.hxx>
@@ -374,4 +373,17 @@ Handle(Units_Token) Units_Sentence::Evaluate()
   //rtoken->Dump(0,1);
 
   return rtoken;
+}
+
+//=======================================================================
+//function : Dump
+//purpose  : 
+//=======================================================================
+
+void Units_Sentence::Dump() const
+{
+  Standard_Integer index;
+  std::cout << " UNIT SENTENCE with : " << std::endl;
+  for (index = 1; index <= thesequenceoftokens->Length(); index++)
+    thesequenceoftokens->Value(index)->Dump(1, 1);
 }

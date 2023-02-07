@@ -129,13 +129,3 @@ void Units_Unit::Dump(const Standard_Integer /*ashift*/,
     }
   std::cout<< "		Name:  " <<Name().ToCString()<<"		(= " << thevalue << " SI)" <<std::endl;
 }
-
-//=======================================================================
-//function : operator ==
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean operator ==(const Handle(Units_Unit)& aunit,const Standard_CString astring)
-{
-  return aunit->IsEqual(astring);
-}

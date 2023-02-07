@@ -37,9 +37,7 @@ DEFINE_STANDARD_HANDLE(Units_Lexicon, Standard_Transient)
 //! tokens.
 class Units_Lexicon : public Standard_Transient
 {
-
 public:
-
   
   //! Creates an empty instance of Lexicon.
   Standard_EXPORT Units_Lexicon();
@@ -49,7 +47,7 @@ public:
   Standard_EXPORT void Creates ();
   
   //! Returns the first item of the sequence of tokens.
-    Handle(Units_TokensSequence) Sequence() const;
+  Handle(Units_TokensSequence) Sequence() const { return thesequenceoftokens; }
 
   //! Adds to the lexicon a new token with <aword>, <amean>,
   //! <avalue>  as  arguments.  If there is  already a token
@@ -58,30 +56,12 @@ public:
   Standard_EXPORT void AddToken (const Standard_CString aword, const Standard_CString amean, const Standard_Real avalue);
   
   //! Useful for debugging.
-    virtual void Dump() const;
-
-
-
+  Standard_EXPORT virtual void Dump() const;
 
   DEFINE_STANDARD_RTTIEXT(Units_Lexicon,Standard_Transient)
 
-protected:
-
-
-
-
 private:
-
   Handle(Units_TokensSequence) thesequenceoftokens;
-
-
 };
-
-
-#include <Units_Lexicon.lxx>
-
-
-
-
 
 #endif // _Units_Lexicon_HeaderFile

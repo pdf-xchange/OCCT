@@ -25,7 +25,7 @@
 //		plantatoire sur HP.
 
 #include <Standard_Type.hxx>
-#include <Units_Operators.hxx>
+#include <Units_Dimensions.hxx>
 #include <Units_Token.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Units_Token,Standard_Transient)
@@ -374,151 +374,90 @@ void Units_Token::Dump(const Standard_Integer ashift,
 }
 
 //=======================================================================
-//function : operator +
+//function : IsNotEqual
 //purpose  : 
 //=======================================================================
 
-Handle(Units_Token) operator +(const Handle(Units_Token)& atoken,const Standard_Integer aninteger)
+Standard_Boolean Units_Token::IsNotEqual(const Standard_CString astring) const
 {
-  return atoken->Add(aninteger);
+  TCollection_AsciiString string = Word();
+  Standard_Integer length = string.Length();
+  if (strlen(astring) == (unsigned int)length)
+    return (strncmp(string.ToCString(), astring, unsigned(length)) != 0)
+    ? Standard_True : Standard_False;
+  else
+    return Standard_True;
 }
 
 //=======================================================================
-//function : operator +
+//function : IsNotEqual
 //purpose  : 
 //=======================================================================
 
-Handle(Units_Token) operator +(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
+Standard_Boolean Units_Token::IsNotEqual(const Handle(Units_Token)& atoken) const
 {
-  return atoken1->Add(atoken2);
+  TCollection_AsciiString string1 = Word();
+  TCollection_AsciiString string2 = atoken->Word();
+  Standard_Integer length = string1.Length();
+  if (length == atoken->Length())
+    return (strcmp(string1.ToCString(), string2.ToCString()) != 0) ? Standard_True : Standard_False;
+  else
+    return Standard_True;
 }
 
 //=======================================================================
-//function : operator -
+//function : IsLessOrEqual
 //purpose  : 
 //=======================================================================
 
-Handle(Units_Token) operator -(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
+Standard_Boolean Units_Token::IsLessOrEqual(const Standard_CString astring) const
 {
-  return atoken1->Subtract(atoken2);
+  TCollection_AsciiString string = Word();
+  Standard_Integer length = string.Length();
+  if (strlen(astring) >= (unsigned int)length)
+    return (strncmp(string.ToCString(), astring, unsigned(length)) == 0)
+    ? Standard_True : Standard_False;
+  else
+    return Standard_False;
 }
 
 //=======================================================================
-//function : operator *
+//function : IsGreater
 //purpose  : 
 //=======================================================================
 
-Handle(Units_Token) operator *(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
+Standard_Boolean Units_Token::IsGreater(const Standard_CString astring) const
 {
-  return atoken1->Multiply(atoken2);
+  TCollection_AsciiString string = Word();
+  Standard_Integer length = string.Length();
+  return (strncmp(string.ToCString(), astring, unsigned(length)) > 0)
+    ? Standard_True : Standard_False;
 }
 
 //=======================================================================
-//function : operator /
+//function : IsGreater
 //purpose  : 
 //=======================================================================
 
-Handle(Units_Token) operator /(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
+Standard_Boolean Units_Token::IsGreater(const Handle(Units_Token)& atoken) const
 {
-  return atoken1->Divide(atoken2);
+  TCollection_AsciiString string1 = Word();
+  TCollection_AsciiString string2 = atoken->Word();
+  Standard_Integer length = string1.Length();
+  return (strncmp(string1.ToCString(), string2.ToCString(), unsigned(length)) > 0)
+    ? Standard_True : Standard_False;
 }
 
 //=======================================================================
-//function : pow
+//function : IsGreaterOrEqual
 //purpose  : 
 //=======================================================================
 
-Handle(Units_Token) pow(const Handle(Units_Token)& atoken1, const Handle(Units_Token)& atoken2)
+Standard_Boolean Units_Token::IsGreaterOrEqual(const Handle(Units_Token)& atoken) const
 {
-  return atoken1->Power(atoken2);
-}
-
-//=======================================================================
-//function : pow
-//purpose  : 
-//=======================================================================
-
-Handle(Units_Token) pow(const Handle(Units_Token)& atoken,const Standard_Real areal)
-{
-  return atoken->Power(areal);
-}
-
-//=======================================================================
-//function : operator ==
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean operator ==(const Handle(Units_Token)& atoken,const Standard_CString astring)
-{
-  return atoken->IsEqual(astring);
-}
-
-//=======================================================================
-//function : operator ==
-//purpose  : 
-//=======================================================================
-
-//Standard_Boolean operator ==(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
-//{
-//  return atoken1->IsEqual(atoken2);
-//}
-
-//=======================================================================
-//function : operator !=
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean operator !=(const Handle(Units_Token)& atoken,const Standard_CString astring)
-{
-  return atoken->IsNotEqual(astring);
-}
-
-//=======================================================================
-//function : operator !=
-//purpose  : 
-//=======================================================================
-
-//Standard_Boolean operator !=(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
-//{
-//  return atoken1->IsNotEqual(atoken2);
-//}
-
-//=======================================================================
-//function : operator <=
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean operator <=(const Handle(Units_Token)& atoken,const Standard_CString astring)
-{
-  return atoken->IsLessOrEqual(astring);
-}
-
-//=======================================================================
-//function : operator >
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean operator >(const Handle(Units_Token)& atoken,const Standard_CString astring)
-{
-  return atoken->IsGreater(astring);
-}
-
-//=======================================================================
-//function : operator >
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean operator >(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
-{
-  return atoken1->IsGreater(atoken2);
-}
-
-//=======================================================================
-//function : operator >=
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean operator >=(const Handle(Units_Token)& atoken1,const Handle(Units_Token)& atoken2)
-{
-  return atoken1->IsGreaterOrEqual(atoken2);
+  TCollection_AsciiString string1 = Word();
+  TCollection_AsciiString string2 = atoken->Word();
+  Standard_Integer length = string1.Length();
+  return (strncmp(string1.ToCString(), string2.ToCString(), unsigned(length)) >= 0)
+    ? Standard_True : Standard_False;
 }
