@@ -39,9 +39,7 @@ namespace
   //! Original table (UnitsAPI/Lexi_Expr.dat) used symbols from extended ASCII,
   //! which should not be used within UTF-8 text.
   //!
-  //! This table preserves these codes for compatibility.
-  //! UTF-8 items might be uncommented after updating UnitsAPI/Units.dat
-  //! and analysis of further consequences.
+  //! This table preserves these codes for compatibility along with UTF-8 variants.
   static const LexiconItem THE_LEXICON[] =
   {
     // scope
@@ -56,12 +54,12 @@ namespace
     {        "**", "O", 0.0 },
     // ^2, power of two
     {      "\xB2", "P", 2.0 }, // ISO 8859-1/ISO Latin-1 (extended ASCII)
-    //{  "\xC2\xB2", "P", 2.0 }, // UTF-8
+    {  "\xC2\xB2", "P", 2.0 }, // UTF-8
     {        "p2", "P", 2.0 },
     {       "sq.", "P", 2.0 },
     // ^3, power of three
     {      "\xB3", "P", 3.0 }, // ISO 8859-1/ISO Latin-1 (extended ASCII)
-    //{  "\xC2\xB3", "P", 3.0 }, // UTF-8
+    {  "\xC2\xB3", "P", 3.0 }, // UTF-8
     {       "cu.", "P", 3.0 },
     // multipliers
     {         "y", "M", 1.E-24 }, // yocto
@@ -71,7 +69,10 @@ namespace
     {         "p", "M", 1.E-12 }, // pico
     {         "n", "M", 1.E-09 }, // nano
     {      "\xB5", "M", 1.E-06 }, // micro, ISO 8859-1/ISO Latin-1 (extended ASCII)
-    //{  "\xC2\xB5", "M", 1.E-06 }, // micro, UTF-8
+    {  "\xC2\xB5", "M", 1.E-06 }, // micro sign, UTF-8
+    {  "\xCE\xBC", "M", 1.E-06 }, // micro as Greek letter mu, UTF-8 (preferred to micro sign)
+    {        "mc", "M", 1.E-06 }, // fallback replacement for micro, conventional
+    {         "u", "M", 1.E-06 }, // fallback replacement for micro, allowed by some standards (ISO 2955, DIN 66030, BS 6430)
     {         "m", "M", 1.E-03 }, // milli
     {         "c", "M", 1.E-02 }, // centi
     {         "d", "M", 1.E-01 }, // deci
@@ -86,8 +87,8 @@ namespace
     {         "Z", "M", 1.E+21 }, // zetta
     {         "Y", "M", 1.E+24 }, // yotta
     // Pi constant
-    {       "\xB6", "",  M_PI }, // Pilcrow sign, ISO 8859-1/ISO Latin-1 (extended ASCII)
-    //{   "\xCF\x80", "",  M_PI }, // UTF-8
+    {       "\xB6", "",  M_PI }, // legacy variant, actually a Pilcrow sign, ISO 8859-1/ISO Latin-1 (extended ASCII)
+    {   "\xCF\x80", "",  M_PI }, // UTF-8
     {         "Pi", "",  M_PI },
   };
 

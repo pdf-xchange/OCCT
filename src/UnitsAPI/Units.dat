@@ -30,11 +30,11 @@ ton                                                ton                          
 LENGTH                                           0         1         0         0         0         0         0         0         0
 ....................................................................................................................................
 meter                                              m
-angstrom                                           \xC5                                   1.E-10            m
+angstrom                                           \xE2\x84\xAB                                 1.E-10            m
                                                    angstrom
 brasse                                             brasse                              1.8288            m
 arpent (Quebec)                                    arpent_longueur                    58.47131           m
-micron                                             \xB5                               10000                 \xC5
+micron                                             \xC2\xB5m                             1E-6                  m
                                                    micron
 
 mille                                              mille                            1852                 m
@@ -70,21 +70,21 @@ ELECTRIC CURRENT                                 0         0         0         1
 ....................................................................................................................................
 ampere                                             A                                                                                
 biot                                               Bi                                 10                 A                          
-gilbert                                            gilbert                    (10/4*\xB6)                   A
+gilbert                                            gilbert                    (10/4/\xCF\x80)                  A
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
 THERMODYNAMIC TEMPERATURE                        0         0         0         0         1         0         0         0         0
 ....................................................................................................................................
-Kelvin degree of temperature                       \260K
+Kelvin degree of temperature                       \xC2\260K
                                                    deg.K
 
-Celsius degree of temperature                      \260C                         [273.15]                   \260K
+Celsius degree of temperature                      \xC2\260C                        [273.15]                   \xC2\260K
                                                    deg.C
 
-Rankine degree of temperature                      \260R                         (5/9)                      \260K
+Rankine degree of temperature                      \xC2\260R                        (5/9)                      \xC2\260K
                                                    deg.R
 
-Fahrenheit degree of temperature                   \260F                         [(1379/3)]                 \260R
+Fahrenheit degree of temperature                   \xC2\260F                        [(1379/3)]                 \xC2\260R
                                                    deg.F
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
@@ -105,44 +105,44 @@ radian                                             rad
 second of angle                                    "
 minute of angle                                    '                                  60                 "
 
-degre of angle                                     \xB0                                  60                 '
+degree of angle                                    \xC2\xB0                                 60                 '
                                                    deg
 
-right angle                                        L                                  90                 \xB0
-revolution                                         tr                                360                 \xB0
-                                                                              (2*\xB6)                      rad
+right angle                                        L                                  90                 \xC2\xB0
+revolution                                         tr                                360                 \xC2\xB0
+                                                                              (2*\xCF\x80)                     rad
 grade                                              gra                                54                 '
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
 SOLID ANGLE                                      0         0         0         0         0         0         0         0         1
 ....................................................................................................................................
 steradian                                          sr
-spat                                               sp                         (4*\xB6)                      sr
+spat                                               sp                         (4*\xCF\x80)                     sr
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
 AREA                                             0         2         0         0         0         0         0         0         0
 ....................................................................................................................................
-barn                                               b                                   1.E-28            m\xB2
-are                                                a                                 100                 m\xB2
-arpent (Quebec)                                    arpent_superficie                3418.894             m\xB2
+barn                                               b                                   1.E-28            m\xC2\xB2
+are                                                a                                 100                 m\xC2\xB2
+arpent (Quebec)                                    arpent_superficie                3418.894             m\xC2\xB2
 acre                                               acre                             4840                 sq.yd.                    
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
 VOLUME                                           0         3         0         0         0         0         0         0         0
 ....................................................................................................................................
-liter                                              l                                    .001             m\xB3
-stere of wood                                      st                                  1                 m\xB3
+liter                                              l                                    .001             m\xC2\xB3
+stere of wood                                      st                                  1                 m\xC2\xB3
 
 liquid pint (U.S.)                                 liq.pt.                            28.87429           cu.in.
 liquid quart (U.S.)                                liq.quart(U.S.)                     2                 liq.pt.
 dry quart (U.S.)                                   dry_quart(U.S.)                    67.1989            cu.in.
 gallon (U.S.)                                      gal(U.S.)                           4                 liq.quart(U.S.)  
 bushel (U.S.)                                      bu(U.S.)                            1.244430          cu.ft.
-fluid ounce (U.S.)                                 fl.oz(U.S.)                        29.5729            cm\xB3
+fluid ounce (U.S.)                                 fl.oz(U.S.)                        29.5729            cm\xC2\xB3
 baril (U.S.)                                       baril(U.S.)                        42                 gal(U.S.)
-barrel (U.S.)                                      barrel(U.S.)                         .158987          m\xB3
+barrel (U.S.)                                      barrel(U.S.)                         .158987          m\xC2\xB3
 
-dry barrel (U.S.)                                  bbl                                  .115627          m\xB3
+dry barrel (U.S.)                                  bbl                                  .115627          m\xC2\xB3
 
 pint (U.K.)                                        pt.                                34.67636           cu.in.
                                                    pt
@@ -150,10 +150,10 @@ pint (U.K.)                                        pt.                          
 quart (U.K.)                                       quart(U.K.)                         2                 pt.
 gallon (U.K.)                                      gal(U.K.)                           4                 quart(U.K.)
 bushel (U.K.)                                      bu(U.K.)                            1.284315          cu.ft.
-fluid ounce (U.K.)                                 fl.oz(U.K.)                        28.4122            cm\xB3
+fluid ounce (U.K.)                                 fl.oz(U.K.)                        28.4122            cm\xC2\xB3
 baril (U.K.)                                       baril(U.K.)                        36                 gal(U.K.)
 
-board foot                                         board_foot                          2.36E-03          m\xB3
+board foot                                         board_foot                          2.36E-03          m\xC2\xB3
 registered ton                                     regis.ton                         100                 cu.ft.
 shipping ton                                       shipp.ton                          40                 cu.ft.
 tonneau                                            tonneau                             1                 regis.ton
@@ -179,7 +179,7 @@ noeud                                              noeud                        
                                                  M         L         T         I         K         N         J         P         S
 ACCELERATION                                     0         1        -2         0         0         0         0         0         0
 ....................................................................................................................................
-gal                                                Gal                                  .01              m/s\xB2
+gal                                                Gal                                  .01              m/s\xC2\xB2
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
 FREQUENCY                                        0         0        -1         0         0         0         0         0         0
@@ -252,8 +252,8 @@ barye                                              barye                        
 millimeter of water                                mm_CE                               9.80665           Pa
 millimeter of mercury                              mm_Hg                             133.322             Pa
 pieze                                              pz                               1000                 Pa
-inch of water                                      in.H\xB2O                            249.089             Pa
-foot of water                                      ft.H\xB2O                           2989                 Pa
+inch of water                                      in.H\xE2\x82\x82O                          249.089             Pa
+foot of water                                      ft.H\xE2\x82\x82O                         2989                 Pa
 inch of mercury                                    in.Hg                            3386.39              Pa
 pound force per square inch                        psi                                 0.0689476         bar
 ....................................................................................................................................
@@ -266,7 +266,7 @@ poiseuille                                         Pl                           
                                                  M         L         T         I         K         N         J         P         S
 KINETIC VISCOSITY                                0         2        -1         0         0         0         0         0         0
 ....................................................................................................................................
-stoke                                              St                                   .00001           m\xB2/s
+stoke                                              St                                   .00001           m\xC2\xB2/s
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
 TENSION SUPERFICIELLE                            1         0        -2         0         0         0         0         0         0
@@ -351,8 +351,8 @@ lumen                                              Lu
                                                  M         L         T         I         K         N         J         P         S
 LUMINANCE                                        0        -2         0         0         0         0         1         0         0
 ....................................................................................................................................
-stilb                                              sb                                  1.E+04            cd/m\xB2
-apostilb                                           asb                                 0.318             cd/m\xB2
+stilb                                              sb                                  1.E+04            cd/m\xC2\xB2
+apostilb                                           asb                                 0.318             cd/m\xC2\xB2
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
 EXITANCE                                         0        -2         0         0         0         0         1         0         1
@@ -387,7 +387,7 @@ farad                                              F
                                                  M         L         T         I         K         N         J         P         S
 MAGNETIC FIELD                                   0        -1         0         1         0         0         0         0         0
 ....................................................................................................................................
-oersted                                            oersted                    (1000/4*\xB6)                 A/m
+oersted                                            oersted                    (1000/4/\xCF\x80)                A/m
 ....................................................................................................................................
                                                  M         L         T         I         K         N         J         P         S
 MAGNETIC FLUX                                    1         2        -2        -1         0         0         0         0         0

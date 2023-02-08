@@ -1,0 +1,42 @@
+puts {
+==================================
+Check that unit conversions work for units that involve Unicode symbols
+
+Note: to see Unicode symbols in terminal on Windows, select Unicode font,
+e.g. NSimSun
+==================================
+}
+
+set micro_sign [encoding convertfrom utf-8 \xc2\xb5]
+checkreal "Micrometer (sign)" [unit 1. ${micro_sign}m m] 0.000001 1e-12 1e-12
+checkreal "Microgramm (sign)" [unit 1. ${micro_sign}g kg] 1.e-9 1e-12 1e-12
+
+set micro_letter [encoding convertfrom utf-8 \xc2\xb5]
+checkreal "Micrometer (letter)" [unit 1. ${micro_sign}m m] 0.000001 1e-12 1e-12
+checkreal "Microgramm (letter)" [unit 1. ${micro_sign}g kg] 1.e-9 1e-12 1e-12
+
+checkreal "Micrometer (u)" [unit 1. um m] 0.000001 1e-12 1e-12
+checkreal "Microgramm (u)" [unit 1. ug kg] 1.e-9 1e-12 1e-12
+
+checkreal "Micrometer (mc)" [unit 1. mcm m] 0.000001 1e-12 1e-12
+checkreal "Microgramm (mc)" [unit 1. mcg kg] 1.e-9 1e-12 1e-12
+
+set angstrom [encoding convertfrom utf-8 \xE2\x84\xAB]
+checkreal "Angstrom" [unit 1. $angstrom m] 1.e-10 1e-12 1e-12
+
+set degree [encoding convertfrom utf-8 \xC2\260]
+checkreal "Angle degree" [unit 1. $degree rad] [expr [dval pi] / 180.] 1e-12 1e-12
+checkreal "Kelvin degree" [unit 0. ${degree}K ${degree}C] -273.15 1e-12 1e-12
+
+set PI [encoding convertfrom utf-8 \xCF\x80]
+checkreal "Pi (text)" [unit 1. Pi 1] [dval pi] 1e-12 1e-12
+checkreal "Pi (symbol)" [unit 1. $PI 1] [dval pi] 1e-12 1e-12
+
+checkreal "Oersted" [unit 1. oersted A/m] [expr 1000. / (4. * [dval pi])] 1e-12 1e-12
+checkreal "Gilbert" [unit 1. gilbert A] [expr 10. / (4. * [dval pi])] 1e-12 1e-12
+
+set pow2 [encoding convertfrom utf-8 \xc2\xb2]
+checkreal "Square mm" [unit 1. mm$pow2 m**2] 1.e-6 1e-12 1e-12
+
+
+puts "TEST COMPLETED"
