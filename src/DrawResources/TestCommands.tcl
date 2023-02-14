@@ -22,9 +22,6 @@
 # inside the test system.
 ############################################################################
 
-# Default verbose level for command _run_test
-set _tests_verbose 0
-
 # regexp for parsing test case results in summary log
 set _test_case_regexp {^CASE\s+([\w.-]+)\s+([\w.-]+)\s+([\w.-]+)\s*:\s*([\w]+)(.*)}
 
@@ -134,6 +131,7 @@ help testgrid {
   Run all tests, or specified group, or one grid
   Use: testgrid [groupmask [gridmask [casemask]]] [options...]
   Allowed options are:
+  -verbose [0-2]: verbose level, 1 by default, 2 if option is given without value
   -exclude N: exclude group, subgroup or single test case from executing, where
               N is name of group, subgroup or case. Excluded items should be separated by comma.
               Option should be used as the first argument after list of executed groups, grids, and test cases.
@@ -151,7 +149,7 @@ help testgrid {
   masks, separated by spaces or comma; default is all (*).
 }
 proc testgrid {args} {
-    global env tcl_platform _tests_verbose
+    global env tcl_platform
 
     ######################################################
     # check arguments
@@ -170,6 +168,7 @@ proc testgrid {args} {
     set overwrite 0
     set xmlfile ""
     set signal 0
+    set verbose 1
     set exc_group 0
     set exc_grid 0
     set exc_case 0
@@ -180,6 +179,17 @@ proc testgrid {args} {
     set nbskip 0
     for {set narg 0} {$narg < [llength $args]} {incr narg} {
         set arg [lindex $args $narg]
+
+        # verbose level
+        if { $arg == "-verbose" } {
+            incr narg
+            if { $narg < [llength $args] && ! [regexp {^-} [lindex $args $narg]] } { 
+                set verbose [expr [lindex $args $narg]]
+            } else {
+                set verbose 100
+            }
+            continue
+        }
 
         # parallel execution
         if { $arg == "-parallel" } {
@@ -322,6 +332,9 @@ proc testgrid {args} {
         }
     }
 
+    # whether to list SKIPPED cases at the end of the log
+    set list_skipped [expr $verbose > 0]
+
     # check that target log directory is empty or does not exist
     set logdir [file normalize [string trim $logdir]]
     if { $logdir == "" } {
@@ -405,7 +418,7 @@ proc testgrid {args} {
             set dir [string trim $dir]
             if { $dir == "" } { continue }
 
-            if { $_tests_verbose > 0 } { _log_and_puts log "Examining tests directory $dir" }
+            if { $verbose > 1 } { _log_and_puts log "Examining tests directory $dir" }
 
             # check that directory exists
             if { ! [file isdirectory $dir] } {
@@ -429,9 +442,9 @@ proc testgrid {args} {
             }
 
             # iterate by groups
-            if { $_tests_verbose > 0 } { _log_and_puts log "Groups to be executed: $groups" }
+            if { $verbose > 1 } { _log_and_puts log "Groups to be executed: $groups" }
             foreach group [lsort -dictionary $groups] {
-                if { $_tests_verbose > 0 } { _log_and_puts log "Examining group directory $group" }
+                if { $verbose > 1 } { _log_and_puts log "Examining group directory $group" }
 
                 # file grids.list must exist: it defines sequence of grids in the group
                 if { ! [file exists $dir/$group/grids.list] } {
@@ -576,7 +589,7 @@ proc testgrid {args} {
             # suspend the pool until all jobs are posted, to prevent blocking of the process
             # of starting / processing jobs by running threads
             catch {tpool::suspend $worker}
-            if { $_tests_verbose > 0 } { _log_and_puts log "Executing tests in (up to) $parallel threads" }
+            if { $verbose > 1 } { _log_and_puts log "Executing tests in (up to) $parallel threads" }
             # limit number of jobs in the queue by reasonable value
             # to prevent slowdown due to unnecessary queue processing
             set nbpooled 0
@@ -696,7 +709,7 @@ proc testgrid {args} {
     # output summary logs and exit
     ######################################################
 
-    _log_summarize $logdir $log $time
+    _log_summarize $logdir $log $time $list_skipped
     if { $logdir != "" } {
         puts "Detailed logs are saved in $logdir"
     }
@@ -1298,8 +1311,6 @@ proc _run_test {scriptsdir group gridname casefile echo} {
         dlog on
         rename puts puts-saved
         proc puts args { 
-            global _tests_verbose
-
             # log only output to stdout and stderr, not to file!
             if {[llength $args] > 1} {
                 set optarg [lindex $args end-1]
@@ -1871,7 +1882,7 @@ proc _log_html_summary {logdir log totals regressions improvements skipped total
 }
 
 # Procedure to dump summary logs of tests
-proc _log_summarize {logdir log {total_time {}}} {
+proc _log_summarize {logdir log {total_time {}} {list_skipped t}} {
 
     # sort log records alphabetically to have the same behavior on Linux and Windows 
     # (also needed if tests are run in parallel)
@@ -1910,7 +1921,7 @@ proc _log_summarize {logdir log {total_time {}}} {
         if { [llength $regressions] > 1 } {
             _log_and_puts log [join $regressions "\n  "]
         }
-        if { [llength $skipped] > 1 } {
+        if { [llength $skipped] > 1 && $list_skipped } {
             _log_and_puts log [join $skipped "\n  "]
         }
         if { [llength $improvements] == 1 && [llength $regressions] == 1 } {
