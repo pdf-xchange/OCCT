@@ -48,7 +48,9 @@ class StepData_Factors;
 //! Also supports multifile writing
 class STEPCAFControl_Writer
 {
+public:
   DEFINE_STANDARD_ALLOC
+
 public:
 
   //! Creates a writer with an empty
