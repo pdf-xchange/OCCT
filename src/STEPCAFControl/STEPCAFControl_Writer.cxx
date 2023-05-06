@@ -322,7 +322,7 @@ IFSelect_ReturnStatus STEPCAFControl_Writer::Write (const Standard_CString theFi
   for (NCollection_DataMap<TCollection_AsciiString, Handle(STEPCAFControl_ExternFile)>::Iterator anExtFileIter (myFiles);
        anExtFileIter.More(); anExtFileIter.Next())
   {
-    Handle(STEPCAFControl_ExternFile) anExtFile = anExtFileIter.Value();
+    const Handle(STEPCAFControl_ExternFile)& anExtFile = anExtFileIter.Value();
     if (anExtFile->GetWriteStatus() != IFSelect_RetVoid)
     {
       continue;
@@ -1099,7 +1099,7 @@ static void MakeSTEPStyles (STEPConstruct_Styles &Styles,
   XCAFPrs_Style style;
   if ( inherit ) style = *inherit;
   if ( settings.Contains(S) ) {
-    XCAFPrs_Style own = settings.FindFromKey(S);
+    const XCAFPrs_Style& own = settings.FindFromKey(S);
     if ( !own.IsVisible() ) style.SetVisibility ( Standard_False );
     if ( own.IsSetColorCurv() ) style.SetColorCurv ( own.GetColorCurv() );
     if ( own.IsSetColorSurf() ) style.SetColorSurf ( own.GetColorSurfRGBA() );
@@ -2316,7 +2316,7 @@ static StepBasic_Unit GetUnit(const Handle(StepRepr_RepresentationContext)& theR
 //purpose  : auxiliary
 //======================================================================
 static Handle(StepRepr_ReprItemAndMeasureWithUnit) CreateDimValue(const Standard_Real theValue,
-                                                                  const StepBasic_Unit theUnit,
+                                                                  const StepBasic_Unit& theUnit,
                                                                   const Handle(TCollection_HAsciiString)& theName,
                                                                   const Standard_CString theMeasureName,
                                                                   const Standard_Boolean isAngle,
@@ -2371,7 +2371,7 @@ static Handle(StepRepr_ReprItemAndMeasureWithUnit) CreateDimValue(const Standard
 
 Handle(StepRepr_ShapeAspect) STEPCAFControl_Writer::WriteShapeAspect (const Handle(XSControl_WorkSession) &WS,
                                                                       const TDF_Label theLabel,
-                                                                      const TopoDS_Shape theShape,
+                                                                      const TopoDS_Shape& theShape,
                                                                       Handle(StepRepr_RepresentationContext)& theRC,
                                                                       Handle(StepAP242_GeometricItemSpecificUsage)& theGISU)
 {
@@ -2425,7 +2425,7 @@ Handle(StepRepr_ShapeAspect) STEPCAFControl_Writer::WriteShapeAspect (const Hand
   Interface_EntityIterator subs = aGraph.Sharings(aPDS);
   Handle(StepShape_ShapeDefinitionRepresentation) aSDR;
   for (subs.Start(); subs.More() && aSDR.IsNull(); subs.Next()) {
-    Handle(Standard_Transient) anEntity = subs.Value();
+    const Handle(Standard_Transient)& anEntity = subs.Value();
     aSDR = Handle(StepShape_ShapeDefinitionRepresentation)::DownCast(anEntity);
   }
   if (aSDR.IsNull())
@@ -2777,7 +2777,7 @@ static void WriteDimValues(const Handle(XSControl_WorkSession) &WS,
   // Get working data
   const Handle(Interface_InterfaceModel) &aModel = WS->Model();
   XCAFDimTolObjects_DimensionModifiersSequence aModifiers = theObject->GetModifiers();
-  Handle(Standard_Transient) aDim = theDimension.Value();
+  const Handle(Standard_Transient)& aDim = theDimension.Value();
   Standard_Boolean isAngle = aDim->IsKind(STANDARD_TYPE(StepShape_AngularLocation)) ||
                              aDim->IsKind(STANDARD_TYPE(StepShape_AngularSize));
 
@@ -2975,7 +2975,7 @@ static void WriteDimValues(const Handle(XSControl_WorkSession) &WS,
 //======================================================================
 static void WriteDerivedGeometry (const Handle(XSControl_WorkSession) &WS,
                                   const Handle(XCAFDimTolObjects_DimensionObject)& theObject,
-                                  const Handle(StepRepr_ConstructiveGeometryRepresentation) theRepr,
+                                  const Handle(StepRepr_ConstructiveGeometryRepresentation)& theRepr,
                                   Handle(StepRepr_ShapeAspect)& theFirstSA,
                                   Handle(StepRepr_ShapeAspect)& theSecondSA,
                                   NCollection_Vector<Handle(StepGeom_CartesianPoint)>& thePnts)

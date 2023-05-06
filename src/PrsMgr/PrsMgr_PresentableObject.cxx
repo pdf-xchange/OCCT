@@ -346,6 +346,7 @@ void PrsMgr_PresentableObject::SetTransformPersistence (const Handle(Graphic3d_T
 //=======================================================================
 void PrsMgr_PresentableObject::AddChild (const Handle(PrsMgr_PresentableObject)& theObject)
 {
+  // Make copy to expand lifetime
   Handle(PrsMgr_PresentableObject) aHandleGuard = theObject;
   if (theObject->myParent != NULL)
   {

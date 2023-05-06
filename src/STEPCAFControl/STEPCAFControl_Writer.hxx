@@ -223,7 +223,7 @@ protected:
 private:
 
   Standard_EXPORT Handle(StepRepr_ShapeAspect) WriteShapeAspect(const Handle(XSControl_WorkSession) &WS,
-    const TDF_Label theLabel, const TopoDS_Shape theShape, Handle(StepRepr_RepresentationContext)& theRC,
+    const TDF_Label theLabel, const TopoDS_Shape& theShape, Handle(StepRepr_RepresentationContext)& theRC,
     Handle(StepAP242_GeometricItemSpecificUsage)& theGISU);
 
   Standard_EXPORT void WritePresentation(const Handle(XSControl_WorkSession)&    WS,

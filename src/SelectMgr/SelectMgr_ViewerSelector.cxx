@@ -1044,6 +1044,7 @@ void SelectMgr_ViewerSelector::MoveSelectableObject (const Handle(SelectMgr_Sele
 //=======================================================================
 void SelectMgr_ViewerSelector::RemoveSelectableObject (const Handle(SelectMgr_SelectableObject)& theObject)
 {
+  // Make copy to expand lifetime (theObject might be reference to an item of the myMapOfObjectSensitives map)
   Handle(SelectMgr_SelectableObject) anObj = theObject;
   if (myMapOfObjectSensitives.UnBind (theObject))
   {
