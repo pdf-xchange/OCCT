@@ -308,11 +308,15 @@ Standard_Boolean BRepTools_GTrsfModification::NewTriangulation(const TopoDS_Face
   // modify normals
   if (theTriangulation->HasNormals())
   {
-    for (Standard_Integer anInd = 1; anInd <= theTriangulation->NbTriangles(); ++anInd)
+    for (Standard_Integer anInd = 1; anInd <= theTriangulation->NbNodes(); ++anInd)
     {
       gp_Dir aNormal = theTriangulation->Normal(anInd);
-      aNormal.Transform(aGTrsf.Trsf());
-      theTriangulation->SetNormal(anInd, aNormal);
+      // Normal is transformed by transposed inverse of the applied matrix,
+      // see the OpenGL Red Book, Appendix F
+      gp_Mat aMat = aGTrsf.VectorialPart();
+      aMat.Invert();
+      aMat.Transpose();
+      theTriangulation->SetNormal(anInd, aNormal.XYZ().Multiplied(aMat));
     }
   }
 
