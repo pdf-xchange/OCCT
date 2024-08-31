@@ -27,7 +27,7 @@ if (WIN32)
 
   # Below, we have correct 3RDPARTY_DIR.
 
-  # Initialize TBB folder in connectin with 3RDPARTY_DIR.
+  # Initialize TBB folder in connection with 3RDPARTY_DIR.
   if (("${3RDPARTY_TBB_DIR}" STREQUAL "") OR (NOT EXISTS "${3RDPARTY_TBB_DIR}"))
     FIND_PRODUCT_DIR ("${3RDPARTY_DIR}" TBB TBB_DIR_NAME)
     if (TBB_DIR_NAME)
@@ -44,7 +44,7 @@ if (WIN32)
       REQUIRED
       CONFIG)
 
-    # Achive include directory
+    # Archive include directory
     get_target_property (TBB_INCLUDE_DIR TBB::tbb INTERFACE_INCLUDE_DIRECTORIES)
     if (NOT DEFINED 3RDPARTY_TBB_INCLUDE_DIR)
       set (3RDPARTY_TBB_INCLUDE_DIR "" CACHE PATH "The directory containing headers of the TBB")
@@ -61,7 +61,7 @@ if (WIN32)
       string(TOLOWER "${LIB}" LIB_LOWER)
       string(TOUPPER "${LIB}" LIB_UPPER)
 
-      # Achive *.lib files and directory containing it.
+      # Archive *.lib files and directory containing it.
       get_target_property (TBB_LIB_FILE "TBB::${LIB_LOWER}" IMPORTED_IMPLIB_RELEASE)
       # Reserve cache variable for *.lib.
       if (NOT DEFINED 3RDPARTY_${LIB_UPPER}_LIBRARY)
@@ -88,7 +88,7 @@ if (WIN32)
         list (APPEND 3RDPARTY_NO_LIBS 3RDPARTY_${LIB_UPPER}_LIBRARY_DIR)
       endif()
 
-      # Achive *.dll files and directory containing it.
+      # Archive *.dll files and directory containing it.
       get_target_property (TBB_DLL_FILE "TBB::${LIB_LOWER}" IMPORTED_LOCATION_RELEASE)
       # Reserve cache variable for *.dll.
       if (NOT DEFINED 3RDPARTY_${LIB_UPPER}_DLL)
@@ -171,9 +171,9 @@ else ()
     REQUIRED
     CONFIG)
   endif()
-  # TBB has been configured (in other case FATAL_ERROR occures).
+  # TBB has been configured (in other case FATAL_ERROR occurs).
 
-  # Achive include directory.
+  # Archive include directory.
   get_target_property (TBB_INCLUDE_DIR TBB::tbb INTERFACE_INCLUDE_DIRECTORIES)
   if (NOT DEFINED 3RDPARTY_TBB_INCLUDE_DIR)
     set (3RDPARTY_TBB_INCLUDE_DIR "" CACHE PATH "The directory containing headers of the TBB")
@@ -190,7 +190,7 @@ else ()
     string(TOLOWER "${LIB}" LIB_LOWER)
     string(TOUPPER "${LIB}" LIB_UPPER)
 
-    # Achive *.so files and directory containing it.
+    # Archive *.so files and directory containing it.
     get_target_property (TBB_SO_FILE "TBB::${LIB_LOWER}" IMPORTED_LOCATION_RELEASE)
     # Reserve cache variable for *.so.
     if (NOT DEFINED 3RDPARTY_${LIB_UPPER}_LIBRARY)
