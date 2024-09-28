@@ -16,9 +16,16 @@
 #define _Standard_Real_HeaderFile
 
 #include <cmath>
+#include <climits>
 #include <float.h>
-#include <Standard_values.h>
-#include <Standard_math.hxx>
+
+#ifdef _MSC_VER
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
+#endif
+
 #include <Standard_TypeDef.hxx>
 
 // ===============================================
@@ -56,7 +63,7 @@ Standard_EXPORT Standard_Real    Sqrt        (const Standard_Real );
 //-------------------------------------------------------------------
 // RealSmall : Returns the smallest positive real
 //-------------------------------------------------------------------
-inline Standard_Real     RealSmall() 
+constexpr Standard_Real     RealSmall()
 { return DBL_MIN; }
 
 //-------------------------------------------------------------------
@@ -84,60 +91,60 @@ inline Standard_Boolean  IsEqual (const Standard_Real Value1,
 //-------------------------------------------------------------------
 // RealDigit : Returns the number of digits of precision in a real
 //-------------------------------------------------------------------
-inline Standard_Integer  RealDigits() 
+constexpr Standard_Integer  RealDigits()
 { return DBL_DIG; }
 
 //-------------------------------------------------------------------
 // RealEpsilon : Returns the minimum positive real such that 
 //               1.0 + x is not equal to 1.0
 //-------------------------------------------------------------------
-inline Standard_Real     RealEpsilon() 
+constexpr Standard_Real     RealEpsilon()
 { return DBL_EPSILON; }
 
 //-------------------------------------------------------------------
 // RealFirst : Returns the minimum negative value of a real
 //-------------------------------------------------------------------
-inline Standard_Real     RealFirst() 
+constexpr Standard_Real     RealFirst()
 { return -DBL_MAX; }
   
 //-------------------------------------------------------------------
 // RealFirst10Exp : Returns the minimum value of exponent(base 10) of
 //                  a real.
 //-------------------------------------------------------------------
-inline Standard_Integer  RealFirst10Exp() 
+constexpr Standard_Integer  RealFirst10Exp()
 { return DBL_MIN_10_EXP; }
 
 //-------------------------------------------------------------------
 // RealLast : Returns the maximum value of a real
 //-------------------------------------------------------------------
-inline Standard_Real     RealLast() 
+constexpr Standard_Real     RealLast()
 { return  DBL_MAX; }
 
 //-------------------------------------------------------------------
 // RealLast10Exp : Returns the maximum value of exponent(base 10) of
 //                 a real.
 //-------------------------------------------------------------------
-inline Standard_Integer  RealLast10Exp() 
+constexpr Standard_Integer  RealLast10Exp()
 { return  DBL_MAX_10_EXP; }
 
 //-------------------------------------------------------------------
 // RealMantissa : Returns the size in bits of the matissa part of a 
 //                real.
 //-------------------------------------------------------------------
-inline Standard_Integer  RealMantissa() 
+constexpr Standard_Integer  RealMantissa()
 { return  DBL_MANT_DIG; }
 
 //-------------------------------------------------------------------
 // RealRadix : Returns the radix of exponent representation
 //-------------------------------------------------------------------
-inline Standard_Integer  RealRadix() 
+constexpr Standard_Integer  RealRadix()
 { return  FLT_RADIX; }
 
 //-------------------------------------------------------------------
 // RealSize : Returns the size in bits of an integer
 //-------------------------------------------------------------------
-inline Standard_Integer  RealSize() 
-{ return BITS(Standard_Real); }
+constexpr Standard_Integer  RealSize()
+{ return CHAR_BIT * sizeof(Standard_Real); }
 
 
 
@@ -181,16 +188,10 @@ inline Standard_Real     Cos (const Standard_Real Value)
 //           If 'Value' is 0 then returns minimal positive value
 //           of Standard_Real type.
 //-------------------------------------------------------------------
-inline Standard_Real     Epsilon (const Standard_Real Value) 
+inline Standard_Real     Epsilon (const Standard_Real Value)
 {
-  Standard_Real aEpsilon;
-
-  if (Value>=0.0){
-    aEpsilon = NextAfter(Value, RealLast()) - Value;
-  } else {
-    aEpsilon = Value - NextAfter(Value, RealFirst());
-  }
-  return aEpsilon;
+  return Value >= 0.0 ? (NextAfter(Value, RealLast()) - Value)
+                      : (Value - NextAfter(Value, RealFirst()));
 }
 
 //-------------------------------------------------------------------
@@ -221,7 +222,7 @@ inline Standard_Real     Log10 (const Standard_Real Value)
 //-------------------------------------------------------------------
 // Max : Returns the maximum value of two reals
 //-------------------------------------------------------------------
-inline Standard_Real     Max (const Standard_Real Val1, 
+constexpr Standard_Real  Max (const Standard_Real Val1, 
                               const Standard_Real Val2) 
 {
   return Val1 >= Val2 ? Val1 : Val2;
@@ -230,7 +231,7 @@ inline Standard_Real     Max (const Standard_Real Val1,
 //-------------------------------------------------------------------
 // Min : Returns the minimum value of two reals
 //-------------------------------------------------------------------
-inline Standard_Real     Min (const Standard_Real Val1, 
+constexpr Standard_Real  Min (const Standard_Real Val1, 
                               const Standard_Real Val2)
 {
   return Val1 <= Val2 ? Val1 : Val2;
@@ -253,7 +254,7 @@ inline  Standard_Real    RealPart (const Standard_Real Value)
 //             If input value is out of valid range for integers,
 //             minimal or maximal possible integer is returned.
 //-------------------------------------------------------------------
-inline Standard_Integer RealToInt (const Standard_Real theValue)
+constexpr Standard_Integer RealToInt (const Standard_Real theValue)
 { 
   // Note that on WNT under MS VC++ 8.0 conversion of double value less 
   // than INT_MIN or greater than INT_MAX to integer will cause signal 
@@ -272,7 +273,7 @@ inline Standard_Integer RealToInt (const Standard_Real theValue)
 //            for Standard_ShortReal, minimal or maximal
 //            Standard_ShortReal is returned.
 // =======================================================================
-inline Standard_ShortReal RealToShortReal (const Standard_Real theVal)
+constexpr Standard_ShortReal RealToShortReal (const Standard_Real theVal)
 {
   return theVal < -FLT_MAX ? -FLT_MAX
     : theVal > FLT_MAX ? FLT_MAX
@@ -305,7 +306,7 @@ inline Standard_Real     ASinh(const Standard_Real Value)
 //-------------------------------------------------------------------
 // Square : Returns a real to the power 2
 //-------------------------------------------------------------------
-inline Standard_Real     Square(const Standard_Real Value) 
+constexpr Standard_Real     Square(const Standard_Real Value) 
 { return Value * Value; }
 
 //-------------------------------------------------------------------
