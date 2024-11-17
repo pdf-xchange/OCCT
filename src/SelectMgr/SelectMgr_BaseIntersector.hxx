@@ -61,10 +61,10 @@ public:
   Standard_EXPORT virtual void SetPixelTolerance (const Standard_Integer theTol);
 
   //! Note that this method does not perform any checks on type of the frustum.
-  //! @param theScaleFactor [in] scale factor for new intersector or negative value if undefined;
+  //! @param[in] theScaleFactor  scale factor for new intersector or negative value if undefined;
   //!                            IMPORTANT: scaling makes sense only for scalable ::IsScalable() intersectors (built on a single point)!
-  //! @param theTrsf [in] transformation for new intersector or gp_Identity if undefined
-  //! @param theBuilder [in] an optional argument that represents corresponding settings for re-constructing transformed frustum from scratch;
+  //! @param[in] theTrsf  transformation for new intersector or gp_Identity if undefined
+  //! @param[in] theBuilder  an optional argument that represents corresponding settings for re-constructing transformed frustum from scratch;
   //!                        could be NULL if reconstruction is not expected furthermore
   //! @return a copy of the frustum resized according to the scale factor given and transforms it using the matrix given
   virtual Handle(SelectMgr_BaseIntersector) ScaleAndTransform (const Standard_Integer theScaleFactor,

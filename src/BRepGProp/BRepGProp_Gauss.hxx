@@ -77,9 +77,9 @@ public: //! @name public API
   //! @param theLocation - location of the point or the plane;
   //! @param theCoeff - plane coefficients;
   //! @param theIsByPoint - flag of restricition (point/plane);
-  //! @param theOutMass[out] - mass (volume) of region;
-  //! @param theOutGravityCenter[out] - garvity center of region;
-  //! @param theOutInertia[out] - matrix of inertia;
+  //! @param[out] theOutMass - mass (volume) of region;
+  //! @param[out] theOutGravityCenter - garvity center of region;
+  //! @param[out] theOutInertia - matrix of inertia;
   Standard_EXPORT void Compute(
     const BRepGProp_Face&  theSurface,
     const gp_Pnt&          theLocation,
@@ -96,9 +96,9 @@ public: //! @name public API
   //! Error of the computation is not calculated.
   //! @param theSurface - bounding surface of the region;
   //! @param theLocation - surface location;
-  //! @param theOutMass[out] - mass (volume) of region;
-  //! @param theOutGravityCenter[out] - garvity center of region;
-  //! @param theOutInertia[out] - matrix of inertia;
+  //! @param[out] theOutMass - mass (volume) of region;
+  //! @param[out] theOutGravityCenter - garvity center of region;
+  //! @param[out] theOutInertia - matrix of inertia;
   Standard_EXPORT void Compute(
     const BRepGProp_Face&  theSurface,
     const gp_Pnt&          theLocation,
@@ -117,9 +117,9 @@ public: //! @name public API
   //! @param theLocation - location of the point or the plane;
   //! @param theCoeff - plane coefficients;
   //! @param theIsByPoint - flag of restricition (point/plane);
-  //! @param theOutMass[out] - mass (volume) of region;
-  //! @param theOutGravityCenter[out] - garvity center of region;
-  //! @param theOutInertia[out] - matrix of inertia;
+  //! @param[out] theOutMass - mass (volume) of region;
+  //! @param[out] theOutGravityCenter - garvity center of region;
+  //! @param[out] theOutInertia - matrix of inertia;
   Standard_EXPORT void Compute(
     BRepGProp_Face&        theSurface,
     BRepGProp_Domain&      theDomain,
@@ -138,9 +138,9 @@ public: //! @name public API
   //! @param theSurface - bounding surface of the region;
   //! @param theDomain - surface boundings;
   //! @param theLocation - surface location;
-  //! @param theOutMass[out] - mass (volume) of region;
-  //! @param theOutGravityCenter[out] - garvity center of region;
-  //! @param theOutInertia[out] - matrix of inertia;
+  //! @param[out] theOutMass - mass (volume) of region;
+  //! @param[out] theOutGravityCenter - garvity center of region;
+  //! @param[out] theOutInertia - matrix of inertia;
   Standard_EXPORT void Compute(
     BRepGProp_Face&        theSurface,
     BRepGProp_Domain&      theDomain,
@@ -159,9 +159,9 @@ public: //! @name public API
   //! @param theEps - maximal relative error of computed mass (volume) for face;
   //! @param theCoeff - plane coefficients;
   //! @param theIsByPoint - flag of restricition (point/plane);
-  //! @param theOutMass[out] - mass (volume) of region;
-  //! @param theOutGravityCenter[out] - garvity center of region;
-  //! @param theOutInertia[out] - matrix of inertia;
+  //! @param[out] theOutMass - mass (volume) of region;
+  //! @param[out] theOutGravityCenter - garvity center of region;
+  //! @param[out] theOutInertia - matrix of inertia;
   //! @return value of error which is calculated as
   //! Abs((M(i+1)-M(i))/M(i+1)), M(i+1) and M(i) are values
   //! for two successive steps of adaptive integration.
@@ -182,9 +182,9 @@ public: //! @name public API
   //! @param theDomain - surface boundings;
   //! @param theLocation - surface location;
   //! @param theEps - maximal relative error of computed mass (square) for face;
-  //! @param theOutMass[out] - mass (volume) of region;
-  //! @param theOutGravityCenter[out] - garvity center of region;
-  //! @param theOutInertia[out] - matrix of inertia;
+  //! @param[out] theOutMass - mass (volume) of region;
+  //! @param[out] theOutGravityCenter - garvity center of region;
+  //! @param[out] theOutInertia - matrix of inertia;
   //! @return value of error which is calculated as
   //! Abs((M(i+1)-M(i))/M(i+1)), M(i+1) and M(i) are values
   //! for two successive steps of adaptive integration.
