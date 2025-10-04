@@ -326,14 +326,8 @@ proc testgrid {args} {
     set logdir [file normalize [string trim $logdir]]
     if { $logdir == "" } {
         # if specified logdir is empty string, generate unique name like 
-        # results/<branch>_<timestamp>
-        set prefix ""
-        if { ! [catch {exec git branch} gitout] &&
-             [regexp {[*] ([\w-]+)} $gitout res branch] } {
-            set prefix "${branch}_"
-        }
-        set logdir "results/${prefix}[clock format [clock seconds] -format {%Y-%m-%dT%H%M}]"
-
+        # results/<branch>_<hash>_<timestamp>
+        set logdir "results/[_get_git_branch_and_hash][clock format [clock seconds] -format {%Y-%m-%dT%H%M}]"
         set logdir [file normalize $logdir]
     }
     if { [file isdirectory $logdir] && ! $overwrite && ! [catch {glob -directory $logdir *}] } {
@@ -2708,6 +2702,39 @@ proc _testgrid_process_jobs {worker {nb_ok 0}} {
         }
     }
     catch {tpool::suspend $worker}
+}
+
+# If Git is accessible and current folder is either a Git working directory,
+# of CMake build directory with reference to Git source directory, 
+# generate  string consisting of name of current Git branch and commit hash,
+# for use as part of the default name of the results directory
+proc _get_git_branch_and_hash {} {
+    # if current directory is CMake build directory, parse CMake cache file
+    # to find path to source
+    if { ! [catch {set fd [open "./CMakeCache.txt" r]}] } {
+        set cachetext [read $fd]
+        close $fd
+        if { [regexp {OCCT_SOURCE_DIR\:STATIC=([^\n]*)} $cachetext res src_dir] } {
+            set cur_dir [pwd]
+            catch {cd $src_dir}
+        }
+    }
+
+    set prefix ""
+    if { ! [catch {exec git rev-parse --abbrev-ref HEAD} branch] } {
+        set prefix "${branch}_"
+    }
+    if { ! [catch {exec git rev-parse --short HEAD} hash] } {
+        set prefix "${prefix}${hash}_"
+    }
+    if { ! [catch {exec git status -s} modifs] && $modifs != "" } {
+        set prefix "${prefix}dirty_"
+    }
+
+    # restore current path
+    if { [info exists cur_dir] } { catch {cd $cur_dir} }
+
+    return $prefix
 }
 
 help checkcolor {
