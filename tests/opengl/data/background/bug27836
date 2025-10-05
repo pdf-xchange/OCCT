@@ -19,6 +19,13 @@ vfit
 
 vviewparams -scale 6.66 -eye 48 43 -210 -at 50 45 -95
 
-if { [vreadpixel 100 300 -rgb -name] != "GRAY75" } { puts "Error: gradient background is not displayed" }
+if { [vreadpixel 100   1 -rgb -hex] != "#B4C8FF" ||
+     [vreadpixel 100 408 -rgb -hex] != "#B4B4B4" } {
+    puts "Error: gradient background is not displayed"
+}
+if { [vreadpixel 100 300 -rgb -name] != "GRAY74" &&
+     [vreadpixel 100 300 -rgb -name] != "GRAY75" } {
+    puts "Error: gradient background is not smooth"
+}
 
 vdump $imagedir/${casename}.png
