@@ -185,10 +185,6 @@ Standard_Boolean BRepTools_GTrsfModification::NewPoint(const TopoDS_Vertex& V,
   gp_Pnt Pnt = BRep_Tool::Pnt(V);
   Tol        = BRep_Tool::Tolerance(V);
   Tol *= myGScale;
-  gp_XYZ coor(Pnt.Coord());
-  myGTrsf.Transforms(coor);
-  P.SetXYZ(coor);
-
   return Standard_True;
 }
 
@@ -265,7 +261,7 @@ Standard_Boolean BRepTools_GTrsfModification::NewTriangulation(
   for (Standard_Integer anInd = 1; anInd <= theTriangulation->NbNodes(); ++anInd)
   {
     gp_Pnt aP = theTriangulation->Node(anInd);
-    aGTrsf.Transforms(aP.ChangeCoord());
+    aP.Transform(aGTrsf);
     theTriangulation->SetNode(anInd, aP);
   }
   // modify triangles orientation in case of mirror transformation
@@ -286,12 +282,7 @@ Standard_Boolean BRepTools_GTrsfModification::NewTriangulation(
     for (Standard_Integer anInd = 1; anInd <= theTriangulation->NbNodes(); ++anInd)
     {
       gp_Dir aNormal = theTriangulation->Normal(anInd);
-      gp_Mat aMat    = aGTrsf.VectorialPart();
-      aMat.SetDiagonal(1., 1., 1.);
-      gp_Trsf aTrsf;
-      aTrsf.SetForm(gp_Rotation);
-      (gp_Mat&)aTrsf.HVectorialPart() = aMat;
-      aNormal.Transform(aTrsf);
+      aNormal.Transform(aGTrsf);
       theTriangulation->SetNormal(anInd, aNormal);
     }
   }
@@ -323,7 +314,7 @@ Standard_Boolean BRepTools_GTrsfModification::NewPolygon(const TopoDS_Edge&     
   for (Standard_Integer anId = aNodesArray.Lower(); anId <= aNodesArray.Upper(); ++anId)
   {
     gp_Pnt& aP = aNodesArray.ChangeValue(anId);
-    aGTrsf.Transforms(aP.ChangeCoord());
+    aP.Transform(aGTrsf);
   }
   return Standard_True;
 }
