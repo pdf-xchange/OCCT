@@ -985,6 +985,13 @@ Handle(Geom_Curve) IGESToBRep_BasicCurve::TransferBSplineCurve
   }
 
   // Mise a jour du tableau des poles lors de la correction de la multiplicite
+  if (newNbPoles < 2)
+  {
+    Message_Msg msg1195("IGES_1195");
+    SendFail(start, msg1195);
+    return Handle(Geom_Curve)();
+  }
+
   TColgp_Array1OfPnt Poles(1,newNbPoles);
   TColStd_SequenceOfInteger PoleInd;
 
@@ -1087,6 +1094,7 @@ Handle(Geom_Curve) IGESToBRep_BasicCurve::TransferBSplineCurve
       anException.Print(std::cout);
 #endif
       (void)anException;
+      return Handle(Geom_Curve)();
     }
   }
   
