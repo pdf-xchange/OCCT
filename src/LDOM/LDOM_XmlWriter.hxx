@@ -59,7 +59,7 @@ private:
   Standard_Integer myIndent;
   Standard_Integer myCurIndent;
   char*            myABuffer;
-  Standard_Integer myABufferLen;
+  Standard_Size    myABufferLen;
 };
 
 #endif

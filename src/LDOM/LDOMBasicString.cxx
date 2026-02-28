@@ -50,7 +50,7 @@ LDOMBasicString::LDOMBasicString (const char                     * aValue,
     myVal.ptr = NULL;
   } else {
     myType = LDOM_AsciiDoc;
-    Standard_Integer aLen = (Standard_Integer) strlen (aValue) + 1;
+    Standard_Size aLen = strlen (aValue) + 1;
     myVal.ptr = aDoc -> Allocate (aLen);
     memcpy (myVal.ptr, aValue, aLen);
   }
@@ -62,7 +62,7 @@ LDOMBasicString::LDOMBasicString (const char                     * aValue,
 //=======================================================================
 
 LDOMBasicString::LDOMBasicString (const char                     * aValue,
-                                  const Standard_Integer         aLen,
+                                  const Standard_Size            aLen,
                                   const Handle(LDOM_MemManager)& aDoc)
 {
   if (aValue == NULL || aLen == 0) {

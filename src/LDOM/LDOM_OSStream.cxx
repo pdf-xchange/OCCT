@@ -17,6 +17,7 @@
 #include <NCollection_IncAllocator.hxx>
 #include <Standard_Assert.hxx>
 
+#include <algorithm>
 #include <string.h>
 
 //=======================================================================
@@ -24,7 +25,7 @@
 //purpose  : Constructor
 //=======================================================================
 LDOM_SBuffer::LDOM_StringElem::LDOM_StringElem
-  ( const int theLength, const Handle(NCollection_BaseAllocator)& theAlloc )
+  ( const Standard_Size theLength, const Handle(NCollection_BaseAllocator)& theAlloc )
 : buf (reinterpret_cast<char*>(theAlloc->Allocate (theLength))),
   len (0),
   next(0)
@@ -35,7 +36,7 @@ LDOM_SBuffer::LDOM_StringElem::LDOM_StringElem
 //function : LDOM_SBuffer()
 //purpose  : 
 //=======================================================================
-LDOM_SBuffer::LDOM_SBuffer (const Standard_Integer theMaxBuf)
+LDOM_SBuffer::LDOM_SBuffer (const Standard_Size theMaxBuf)
      : myMaxBuf (theMaxBuf), myLength(0),
        myAlloc (new NCollection_IncAllocator)
 {
@@ -73,7 +74,7 @@ Standard_CString LDOM_SBuffer::str () const
   char* aRetStr = new char [myLength + 1];
 
   LDOM_StringElem* aCurElem = myFirstString;
-  int aCurLen = 0;
+  Standard_Size aCurLen = 0;
   while (aCurElem)
   {
     strncpy(aRetStr + aCurLen, aCurElem->buf, aCurElem->len);
@@ -115,17 +116,14 @@ int LDOM_SBuffer::underflow()
 //=======================================================================
 std::streamsize LDOM_SBuffer::xsputn (const char* aStr, std::streamsize n)
 {
-  Standard_ASSERT_RAISE (n < IntegerLast(), "LDOM_SBuffer cannot work with strings greater than 2 Gb");
-
-  Standard_Integer aLen = static_cast<int>(n) + 1;
-  Standard_Integer freeLen = myMaxBuf - myCurString->len - 1;
-  if (freeLen >= n)
+  Standard_Size aLen = n + 1;
+  if (myMaxBuf >= (Standard_Size)n + myCurString->len + 1)
   {
     strncpy(myCurString->buf + myCurString->len, aStr, aLen);
   }
-  else if (freeLen <= 0)
+  else if (myMaxBuf <= myCurString->len + 1)
   {
-    LDOM_StringElem* aNextElem = new (myAlloc) LDOM_StringElem(Max(aLen, myMaxBuf), myAlloc);
+    LDOM_StringElem* aNextElem = new (myAlloc) LDOM_StringElem(std::max(aLen, myMaxBuf), myAlloc);
     myCurString->next = aNextElem;
     myCurString = aNextElem;
     strncpy(myCurString->buf + myCurString->len, aStr, aLen);
@@ -133,11 +131,12 @@ std::streamsize LDOM_SBuffer::xsputn (const char* aStr, std::streamsize n)
   else // 0 < freeLen < n
   {
     // copy string by parts
+    Standard_Size freeLen = myMaxBuf - myCurString->len - 1;
     strncpy(myCurString->buf + myCurString->len, aStr, freeLen);
     myCurString->len += freeLen;
     *(myCurString->buf + myCurString->len) = '\0';
     aLen -= freeLen;
-    LDOM_StringElem* aNextElem = new (myAlloc) LDOM_StringElem(Max(aLen, myMaxBuf), myAlloc);
+    LDOM_StringElem* aNextElem = new (myAlloc) LDOM_StringElem(std::max(aLen, myMaxBuf), myAlloc);
     myCurString->next = aNextElem;
     myCurString = aNextElem;
     strncpy(myCurString->buf + myCurString->len, aStr + freeLen, aLen);
@@ -145,7 +144,7 @@ std::streamsize LDOM_SBuffer::xsputn (const char* aStr, std::streamsize n)
   myCurString->len += aLen - 1;
   *(myCurString->buf + myCurString->len) = '\0';
 
-  myLength += static_cast<int>(n);
+  myLength += n;
   return n;
 }
 
@@ -156,7 +155,7 @@ std::streamsize LDOM_SBuffer::xsputn (const char* aStr, std::streamsize n)
 //function : LDOM_OSStream()
 //purpose  : Constructor
 //=======================================================================
-LDOM_OSStream::LDOM_OSStream (const Standard_Integer theMaxBuf)
+LDOM_OSStream::LDOM_OSStream (const Standard_Size theMaxBuf)
      : Standard_OStream (&myBuffer), myBuffer (theMaxBuf)
 {
   init(&myBuffer);

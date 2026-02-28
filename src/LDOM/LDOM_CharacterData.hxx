@@ -49,7 +49,7 @@ class LDOM_CharacterData : public LDOM_Node
   Standard_EXPORT void  setData         (const LDOMString& aValue);
   // Assign to data
 
-  Standard_EXPORT Standard_Integer
+  Standard_EXPORT intptr_t
                         getLength       () const;
   // Length of the string
 
@@ -60,7 +60,7 @@ class LDOM_CharacterData : public LDOM_Node
                                          const Handle(LDOM_MemManager)& aDoc);
  private:
   // ------------ PRIVATE FIELDS -----------
-  Standard_Integer      myLength;
+  mutable intptr_t myLength = -1;
 
 };
 

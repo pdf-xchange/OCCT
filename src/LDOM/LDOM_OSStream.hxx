@@ -34,12 +34,12 @@ class LDOM_SBuffer : public std::streambuf
   struct LDOM_StringElem
   {
     char*            buf;  //!< pointer on data string
-    int              len;  //!< quantity of really written data
+    Standard_Size    len;  //!< quantity of really written data
     LDOM_StringElem* next; //!< pointer on the next element of a sequence
 
     DEFINE_NCOLLECTION_ALLOC
 
-    LDOM_StringElem(const int, const Handle(NCollection_BaseAllocator)&);
+    LDOM_StringElem(const Standard_Size, const Handle(NCollection_BaseAllocator)&);
     ~LDOM_StringElem();
 
   private:
@@ -50,7 +50,7 @@ class LDOM_SBuffer : public std::streambuf
 public:
   //! Constructor. Sets a default value for the
   //!              length of each sequence element.
-  Standard_EXPORT LDOM_SBuffer (const Standard_Integer theMaxBuf);
+  Standard_EXPORT LDOM_SBuffer (const Standard_Size theMaxBuf);
 
   //! Concatenates strings of all sequence elements
   //! into one string. Space for output string is allocated
@@ -60,7 +60,7 @@ public:
   Standard_EXPORT Standard_CString str () const;
 
   //! Returns full length of data contained
-  Standard_Integer Length () const {return myLength;}
+  Standard_Size Length () const {return myLength;}
 
   //! Clears first element of sequence and removes all others
   Standard_EXPORT void Clear ();
@@ -80,8 +80,8 @@ public:
 
 private:
 
-  Standard_Integer      myMaxBuf; // default length of one element
-  Standard_Integer      myLength; // full length of contained data
+  Standard_Size    myMaxBuf;      // default length of one element
+  Standard_Size    myLength;      // full length of contained data
   LDOM_StringElem* myFirstString; // the head of the sequence
   LDOM_StringElem* myCurString;   // current element of the sequence
   Handle(NCollection_BaseAllocator) myAlloc; //allocator for chunks
@@ -98,13 +98,13 @@ class LDOM_OSStream : public Standard_OStream
 {
 public:
   //! Constructor
-  Standard_EXPORT LDOM_OSStream(const Standard_Integer theMaxBuf);
+  Standard_EXPORT LDOM_OSStream(const Standard_Size theMaxBuf);
 
   Standard_EXPORT virtual ~LDOM_OSStream();
 
   Standard_CString str () const {return myBuffer.str();}
 
-  Standard_Integer Length () const { return myBuffer.Length(); }
+  Standard_Size Length () const { return myBuffer.Length(); }
 
   void Clear () { myBuffer.Clear(); }
 

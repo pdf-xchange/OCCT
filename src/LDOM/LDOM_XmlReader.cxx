@@ -99,12 +99,12 @@ LDOM_XmlReader::RecordType LDOM_XmlReader::ReadRecord (Standard_IStream& theIStr
     //  Check if the current file buffer is exhausted
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //  There should always be some bytes available in the buffer for analysis
-    Standard_Integer aBytesRest = (Standard_Integer)(myEndPtr - myPtr);
+    Standard_Size aBytesRest = (myEndPtr - myPtr);
     if (aBytesRest < XML_MIN_BUFFER)
     {
       if (myEOF == Standard_True)
       {
-        if (aBytesRest <= 0)
+        if (aBytesRest == 0)
           break;                        // END of processing
       }
       else if (myTagPerStep && aHasRead)
@@ -296,7 +296,7 @@ LDOM_XmlReader::RecordType LDOM_XmlReader::ReadRecord (Standard_IStream& theIStr
             myPtr = aNameEnd;
             if (myPtr < myEndPtr) {
               myElement = & LDOM_BasicElement::Create (aStartData,
-                                                       (Standard_Integer)(myPtr - aStartData),
+                                                       (myPtr - aStartData),
                                                        myDocument);
               myLastChild = NULL;
               aState = STATE_ATTRIBUTE_NAME;
@@ -509,7 +509,7 @@ LDOM_XmlReader::RecordType LDOM_XmlReader::ReadRecord (Standard_IStream& theIStr
           aStartData = myPtr;
         else {
           if (theData.Length() == 0)
-            anAttrName = LDOMBasicString(myPtr, (Standard_Integer)(aNameEnd - myPtr), myDocument);
+            anAttrName = LDOMBasicString(myPtr, (aNameEnd - myPtr), myDocument);
           else {
             theData.rdbuf()->sputn(myPtr, aNameEnd - myPtr);
 attr_name:
@@ -578,7 +578,7 @@ attr_name:
             ePtr = strchr (aDataString, '\0');
           }
 
-          Standard_Integer aDataLen;
+          Standard_Size aDataLen = 0;
           aDataString = LDOM_CharReference::Decode (aDataString, aDataLen);
           if (IsDigit(aDataString[0])) {
             if (getInteger (anAttrValue, aDataString, ePtr))
@@ -678,7 +678,7 @@ static Standard_Boolean isName (const char  * aString,
 //function : CreateElement
 //purpose  : 
 //=======================================================================
-void LDOM_XmlReader::CreateElement( const char *theName, const Standard_Integer theLen )
+void LDOM_XmlReader::CreateElement( const char *theName, const Standard_Size theLen )
 {
   myElement = &LDOM_BasicElement::Create (theName, theLen, myDocument);
 }

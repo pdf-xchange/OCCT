@@ -34,29 +34,29 @@ class LDOM_MemManager : public Standard_Transient
  public:
   // ---------- PUBLIC METHODS ----------
 
-  Standard_EXPORT LDOM_MemManager       (const Standard_Integer aBlockSize);
+  Standard_EXPORT LDOM_MemManager       (const Standard_Size aBlockSize);
   // Constructor
 
   Standard_EXPORT ~LDOM_MemManager      ();
   // Destructor
 
-  Standard_EXPORT void * Allocate       (const Standard_Integer aSize);
+  Standard_EXPORT void * Allocate       (const Standard_Size aSize);
   // General Memory allocator
 
-  const char *           HashedAllocate (const char             * aString,
-                                         const Standard_Integer theLen,
-                                         Standard_Integer&      theHash);
+  const char *           HashedAllocate (const char*         aString,
+                                         const Standard_Size theLen,
+                                         Standard_Integer&   theHash);
   // Memory allocation with access via hash table. No new allocation
   // if already present 
 
-  void                   HashedAllocate (const char             * aString,
-                                         const Standard_Integer theLen,
-                                         LDOMBasicString&      theResult);
+  void                   HashedAllocate (const char*         aString,
+                                         const Standard_Size theLen,
+                                         LDOMBasicString&    theResult);
   // Memory allocation with access via hash table. No new allocation
   // if already present 
 
-  static Standard_Integer Hash          (const char             * theString,
-                                         const Standard_Integer theLen)
+  static Standard_Integer Hash          (const char*         theString,
+                                         const Standard_Size theLen)
                                 { return HashTable::Hash (theString, theLen); }
 
   static Standard_Boolean CompareStrings(const char             * theString,
@@ -79,13 +79,13 @@ class LDOM_MemManager : public Standard_Transient
   // ---- CLASS MemBlock ----
   class MemBlock {
     friend class LDOM_MemManager;
-    inline MemBlock         (const Standard_Integer aSize, MemBlock * aFirst);
-    inline void * Allocate  (const Standard_Integer aSize);
-    void * AllocateAndCheck (const Standard_Integer aSize, const MemBlock *&);
+    inline MemBlock         (const Standard_Size aSize, MemBlock * aFirst);
+    inline void * Allocate  (const Standard_Size aSize);
+    void * AllocateAndCheck (const Standard_Size aSize, const MemBlock *&);
     ~MemBlock               ();
     MemBlock * Next         ()           { return myNext; }
 
-    Standard_Integer    mySize;
+    Standard_Size       mySize;
     Standard_Integer    * myBlock;
     Standard_Integer    * myEndBlock;
     Standard_Integer    * myFreeSpace;
@@ -97,11 +97,11 @@ class LDOM_MemManager : public Standard_Transient
     friend class LDOM_MemManager;
     HashTable                   (/* const Standard_Integer theMask, */
                                  LDOM_MemManager&       theMemManager);
-    const char     * AddString  (const char             * theString,
-                                 const Standard_Integer theLen,
-                                 Standard_Integer&      theHashIndex);
-    static Standard_Integer Hash(const char             * theString,
-                                 const Standard_Integer theLen);
+    const char     * AddString  (const char*         theString,
+                                 const Standard_Size theLen,
+                                 Standard_Integer&   theHashIndex);
+    static Standard_Integer Hash(const char*         theString,
+                                 const Standard_Size theLen);
     struct TableItem {
       char             * str;
       struct TableItem * next;
@@ -122,7 +122,7 @@ class LDOM_MemManager : public Standard_Transient
   const LDOM_BasicElement * myRootElement;
   MemBlock              * myFirstBlock;
   MemBlock              * myFirstWithoutRoom;
-  Standard_Integer      myBlockSize;
+  Standard_Size         myBlockSize;
   HashTable             * myHashTable;
 
  public:

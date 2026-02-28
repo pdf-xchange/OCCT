@@ -24,14 +24,14 @@ IMPLEMENT_STANDARD_RTTIEXT(LDOM_MemManager,Standard_Transient)
 
 typedef unsigned char LDOM_HashValue;     // allocating HASH_MASK integer
 
-inline Standard_Integer convertBlockSize (const Standard_Integer aBlockSize)
+inline Standard_Size convertBlockSize (const Standard_Size aBlockSize)
 {
   return ((aBlockSize - 1) / sizeof(Standard_Integer)) + 1;
 }
 
-inline Standard_Boolean compareStrings (char * const           str,
-                                        const char *           theString,
-                                        const Standard_Integer theLength)
+inline Standard_Boolean compareStrings (char * const        str,
+                                        const char *        theString,
+                                        const Standard_Size theLength)
 {
 // ** This is a bit dangerous (can override the boundary of allocated memory)
 //  return (str[theLength] == '\0' &&
@@ -46,7 +46,7 @@ inline Standard_Boolean compareStrings (char * const           str,
 //purpose  : 
 //=======================================================================
 
-inline LDOM_MemManager::MemBlock::MemBlock (const Standard_Integer aSize,
+inline LDOM_MemManager::MemBlock::MemBlock (const Standard_Size aSize,
                                             LDOM_MemManager::MemBlock * aFirst)
      : mySize (aSize), myNext (aFirst)
 {
@@ -59,10 +59,10 @@ inline LDOM_MemManager::MemBlock::MemBlock (const Standard_Integer aSize,
 //purpose  : 
 //=======================================================================
 
-inline void * LDOM_MemManager::MemBlock::Allocate (const Standard_Integer aSize)
+inline void * LDOM_MemManager::MemBlock::Allocate (const Standard_Size aSize)
 {
   void * aResult = NULL;
-  if (aSize <= myEndBlock - myFreeSpace) {
+  if (aSize <= Standard_Size(myEndBlock - myFreeSpace)) {
     aResult = myFreeSpace;
     myFreeSpace += aSize;
   }
@@ -75,11 +75,11 @@ inline void * LDOM_MemManager::MemBlock::Allocate (const Standard_Integer aSize)
 //=======================================================================
 
 void * LDOM_MemManager::MemBlock::AllocateAndCheck
-                        (const Standard_Integer             aSize,
+                        (const Standard_Size                aSize,
                          const LDOM_MemManager::MemBlock *& aFirstWithoutRoom)
 {
   void * aResult = NULL;
-  Standard_Integer aRoom = (Standard_Integer)(myEndBlock - myFreeSpace);
+  Standard_Size aRoom = (myEndBlock - myFreeSpace);
   if (aSize <= aRoom) {
     aResult = myFreeSpace;
     myFreeSpace += aSize;
@@ -143,7 +143,7 @@ LDOM_MemManager::HashTable::HashTable (/* const Standard_Integer   aMask, */
 //=======================================================================
 
 Standard_Integer LDOM_MemManager::HashTable::Hash (const char * aString,
-                                                   const Standard_Integer aLen)
+                                                   const Standard_Size aLen)
 {
   static const unsigned int wCRC16a[16] =
   {
@@ -163,7 +163,7 @@ Standard_Integer LDOM_MemManager::HashTable::Hash (const char * aString,
 
   unsigned int aCRC = 0;
   const unsigned char * aPtr = (const unsigned char *) aString;
-  for (Standard_Integer i = aLen; i > 0; i--) {
+  for (Standard_Size i = aLen; i > 0; i--) {
     const unsigned int  bTmp = aCRC ^ (unsigned int) (* aPtr++);
     aCRC = ((aCRC >> 8) ^ wCRC16a[bTmp & 0x0F]) ^ wCRC16b[(bTmp >> 4) & 0x0F];
   }
@@ -176,9 +176,9 @@ Standard_Integer LDOM_MemManager::HashTable::Hash (const char * aString,
 //=======================================================================
 
 const char * LDOM_MemManager::HashTable::AddString
-                                          (const char             * theString,
-                                           const Standard_Integer theLen,
-                                           Standard_Integer&      theHashIndex)
+                                          (const char*         theString,
+                                           const Standard_Size theLen,
+                                           Standard_Integer&   theHashIndex)
 {
   const char * aResult = NULL;
   if (theString == NULL) return NULL;
@@ -227,7 +227,7 @@ const char * LDOM_MemManager::HashTable::AddString
 //purpose  : Constructor
 //=======================================================================
 
-LDOM_MemManager::LDOM_MemManager (const Standard_Integer aBlockSize)
+LDOM_MemManager::LDOM_MemManager (const Standard_Size aBlockSize)
      : myRootElement            (NULL),
        myFirstBlock             (NULL),
        myFirstWithoutRoom       (NULL),
@@ -242,7 +242,7 @@ LDOM_MemManager::LDOM_MemManager (const Standard_Integer aBlockSize)
 LDOM_MemManager::~LDOM_MemManager ()
 {
 #ifdef OCCT_DEBUG
-  Standard_Integer aSomme = 0, aCount = 0;
+  Standard_Size aSomme = 0, aCount = 0;
   MemBlock * aBlock = myFirstBlock;
 //FILE * out = fopen ("/tmp/dump","w");
   while (aBlock) {
@@ -251,7 +251,7 @@ LDOM_MemManager::~LDOM_MemManager ()
 //    for (const Standard_Integer * aPtr = aBlock -> myBlock;
 //         aPtr < aBlock -> myEndBlock; ) {
 //      const char * aStr = (const char *) aPtr;
-//      Standard_Integer aLen = strlen (aStr) + 1;
+//      Standard_Size aLen = strlen (aStr) + 1;
 //      if (aLen > 1) fprintf (out, "%s\n", aStr);
 //      aPtr += convertBlockSize (aLen);
 //    }
@@ -272,10 +272,10 @@ LDOM_MemManager::~LDOM_MemManager ()
 //purpose  : 
 //=======================================================================
 
-void * LDOM_MemManager::Allocate (const Standard_Integer theSize)
+void * LDOM_MemManager::Allocate (const Standard_Size theSize)
 {
-  void                  * aResult = NULL;
-  Standard_Integer      aSize = convertBlockSize (theSize);
+  void*         aResult = NULL;
+  Standard_Size aSize   = convertBlockSize (theSize);
 
   if (aSize >= myBlockSize) {
     myFirstBlock = new MemBlock (aSize, myFirstBlock);
@@ -311,9 +311,9 @@ void * LDOM_MemManager::Allocate (const Standard_Integer theSize)
 //           if already present
 //=======================================================================
 
-const char * LDOM_MemManager::HashedAllocate (const char           * theString,
-                                              const Standard_Integer theLen,
-                                              Standard_Integer&      theHash)
+const char * LDOM_MemManager::HashedAllocate (const char*         theString,
+                                              const Standard_Size theLen,
+                                              Standard_Integer&   theHash)
 {
   if (myHashTable == NULL) myHashTable = new HashTable (* this);
   return myHashTable -> AddString (theString, theLen, theHash);
@@ -325,9 +325,9 @@ const char * LDOM_MemManager::HashedAllocate (const char           * theString,
 //           if already present
 //=======================================================================
 
-void LDOM_MemManager::HashedAllocate         (const char             * aString,
-                                              const Standard_Integer theLen,
-                                              LDOMBasicString&       theResult)
+void LDOM_MemManager::HashedAllocate         (const char*         aString,
+                                              const Standard_Size theLen,
+                                              LDOMBasicString&    theResult)
 {
   theResult.myType = LDOMBasicString::LDOM_AsciiHashed;
   Standard_Integer aDummy;

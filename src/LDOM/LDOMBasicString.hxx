@@ -109,7 +109,7 @@ class LDOMBasicString
   //    Create LDOM_AsciiDoc
 
   Standard_EXPORT LDOMBasicString (const char             * aValue,
-                                   const Standard_Integer aLen,
+                                   const Standard_Size aLen,
                                    const Handle(LDOM_MemManager)&   aDoc);
   //    Create LDOM_AsciiDoc
 

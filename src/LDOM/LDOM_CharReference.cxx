@@ -47,27 +47,27 @@ struct entityRef
 //           Always returns the same string (shortened after replacements)
 //=======================================================================
 
-char * LDOM_CharReference::Decode (char * theSrc, Standard_Integer& theLen)
+char * LDOM_CharReference::Decode (char * theSrc, Standard_Size& theLen)
 {
 #define IS_EQUAL(_ptr,_string) (!memcmp(_ptr, _string, sizeof(_string)-1))
 
   char * aSrcPtr = theSrc, * aDstPtr = theSrc;
-  Standard_Integer anIncrCount = 0;
+  Standard_Size anIncrCount = 0;
   for(;;) {
     char * aPtr = strchr (aSrcPtr, '&');
     if (aPtr == NULL) {
       //        End of the loop
       aPtr = strchr (aSrcPtr, '\0');
       if (anIncrCount == 0)
-        theLen = (Standard_Integer)(aPtr - theSrc);
+        theLen = (aPtr - theSrc);
       else {
-        Standard_Integer aByteCount = (Standard_Integer)(aPtr - aSrcPtr);
+        Standard_Size aByteCount = (aPtr - aSrcPtr);
         memmove (aDstPtr, aSrcPtr, aByteCount + 1);
-        theLen = (Standard_Integer)(aDstPtr - theSrc) + aByteCount;
+        theLen = (aDstPtr - theSrc) + aByteCount;
       }
       break;
     }
-    Standard_Integer aByteCount = (Standard_Integer)(aPtr - aSrcPtr);
+    Standard_Size aByteCount = (aPtr - aSrcPtr);
     if (aByteCount > 0 && aDstPtr != aSrcPtr)
       memmove (aDstPtr, aSrcPtr, aByteCount);
     aSrcPtr = aPtr;
@@ -83,7 +83,7 @@ char * LDOM_CharReference::Decode (char * theSrc, Standard_Integer& theLen)
         //      Error reading an XML string
         return NULL;
       aDstPtr[-1] = (char) aChar;
-      anIncrCount += (Standard_Integer)(aNewPtr - aSrcPtr);
+      anIncrCount += (aNewPtr - aSrcPtr);
       aSrcPtr = &aNewPtr[1];
     }
     else if (IS_EQUAL(aSrcPtr+1, "amp;")) {
@@ -134,7 +134,7 @@ char * LDOM_CharReference::Decode (char * theSrc, Standard_Integer& theLen)
 //           the returned string (whatever the case)
 //=======================================================================
 
-char * LDOM_CharReference::Encode (const char* theSrc, Standard_Integer& theLen,
+char * LDOM_CharReference::Encode (const char* theSrc, Standard_Size& theLen,
                                    const Standard_Boolean isAttribute)
 {
   // Initialising the constants
@@ -149,7 +149,7 @@ char * LDOM_CharReference::Encode (const char* theSrc, Standard_Integer& theLen,
 
   const char * endSrc, * ptrSrc = theSrc;
   char       * aDest = (char *) theSrc;
-  Standard_Integer aCount = 0;
+  Standard_Size aCount = 0;
   //    Analyse if there is a non-standard character in the string
   for(;;) {
     const unsigned int iSrc = (unsigned int ) *(const unsigned char* )ptrSrc;
@@ -164,7 +164,7 @@ char * LDOM_CharReference::Encode (const char* theSrc, Standard_Integer& theLen,
   }
   //    If there are such, copy the string with replacements
   if (!aCount)
-    theLen = (Standard_Integer)(endSrc - theSrc);
+    theLen = (endSrc - theSrc);
   else {
     char * ptrDest = new char [(endSrc - theSrc) + aCount * 5 + 1];
     aDest = ptrDest;
@@ -184,7 +184,7 @@ char * LDOM_CharReference::Encode (const char* theSrc, Standard_Integer& theLen,
           ptrDest += entity_ref[aCode].length;
         }
     }
-    theLen = (Standard_Integer)(ptrDest - aDest);
+    theLen = (ptrDest - aDest);
     * ptrDest = '\0';
   }
   return aDest;

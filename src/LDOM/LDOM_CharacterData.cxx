@@ -23,7 +23,7 @@
 
 LDOM_CharacterData::LDOM_CharacterData (const LDOM_BasicText&          aText,
                                         const Handle(LDOM_MemManager)& aDoc)
-     : LDOM_Node (aText, aDoc), myLength (-1) {}
+     : LDOM_Node (aText, aDoc) {}
 
 //=======================================================================
 //function : operator =
@@ -67,9 +67,10 @@ void LDOM_CharacterData::setData (const LDOMString& theValue)
 //purpose  : query the data length
 //=======================================================================
 
-Standard_Integer LDOM_CharacterData::getLength () const
+intptr_t LDOM_CharacterData::getLength () const
 {
   if (myLength < 0)
-    (Standard_Integer&)myLength = (Standard_Integer)strlen (getNodeValue().GetString());
+    myLength = (intptr_t)strlen (getNodeValue().GetString());
+
   return myLength;
 }

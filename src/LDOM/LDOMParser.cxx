@@ -324,7 +324,7 @@ Standard_Boolean LDOMParser::ParseElement (Standard_IStream& theIStream, Standar
     case LDOM_XmlReader::XML_TEXT:
       aLocType = LDOM_Node::TEXT_NODE;
       {
-        Standard_Integer aTextLen;
+        Standard_Size aTextLen = 0;
         aTextStr = LDOM_CharReference::Decode ((char *)myCurrentData.str(), aTextLen);
         // try to convert to integer
         if (IsDigit(aTextStr[0])) {
@@ -338,7 +338,7 @@ Standard_Boolean LDOMParser::ParseElement (Standard_IStream& theIStream, Standar
     case LDOM_XmlReader::XML_COMMENT:
       aLocType = LDOM_Node::COMMENT_NODE;
       {
-        Standard_Integer aTextLen;
+        Standard_Size aTextLen = 0;
         aTextStr = LDOM_CharReference::Decode ((char *)myCurrentData.str(), aTextLen);
         aTextValue = LDOMBasicString (aTextStr, aTextLen, myDocument);
       }

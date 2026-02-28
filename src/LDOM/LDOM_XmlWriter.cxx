@@ -355,7 +355,7 @@ void LDOM_XmlWriter::Write (Standard_OStream& theOStream, const LDOMBasicString&
       const char* aStr = theString.GetString();
       if (aStr)
       {
-        Standard_Integer aLen;
+        Standard_Size aLen = 0;
         char* encStr = LDOM_CharReference::Encode (aStr, aLen, Standard_False);
         if (aLen > 0)
         {
@@ -403,7 +403,7 @@ void LDOM_XmlWriter::WriteAttribute (Standard_OStream& theOStream, const LDOM_No
   const char* aName = theAtt.getNodeName().GetString();
   const LDOMString aValueStr = theAtt.getNodeValue();
 
-  int aLength = 0;
+  Standard_Size aLength = 0;
 
   // Integer attribute value
   if (aValueStr.Type() == LDOMBasicString::LDOM_Integer)
@@ -411,7 +411,7 @@ void LDOM_XmlWriter::WriteAttribute (Standard_OStream& theOStream, const LDOM_No
     Standard_Integer anIntValue;
     aValueStr.GetInteger (anIntValue);
 
-    aLength = (Standard_Integer)(20 + strlen (aName));
+    aLength = strlen (aName) + 20;
     if (aLength > myABufferLen)
     {
       if (myABuffer != NULL)
@@ -423,7 +423,7 @@ void LDOM_XmlWriter::WriteAttribute (Standard_OStream& theOStream, const LDOM_No
       myABufferLen = aLength;
     }
     sprintf (myABuffer, "%c%s%c%c%d%c", chSpace, aName, chEqual, chDoubleQuote, anIntValue, chDoubleQuote);
-    aLength = (Standard_Integer)strlen (myABuffer);
+    aLength = strlen (myABuffer);
 
   
   }
@@ -434,12 +434,12 @@ void LDOM_XmlWriter::WriteAttribute (Standard_OStream& theOStream, const LDOM_No
     if (aValueStr.Type() == LDOMBasicString::LDOM_AsciiDocClear)
     {
       encStr  = (char *) aValue;
-      aLength = (Standard_Integer) (4 + strlen (aValue) + strlen (aName));
+      aLength = strlen (aValue) + strlen (aName) + 4;
     }
     else
     {
       encStr = LDOM_CharReference::Encode (aValue, aLength, Standard_True);
-      aLength += (Standard_Integer) (4 + strlen (aName));
+      aLength += strlen (aName) + 4;
     }
 
     if (aLength > myABufferLen)

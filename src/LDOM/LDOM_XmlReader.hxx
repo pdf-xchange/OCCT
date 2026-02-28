@@ -61,7 +61,7 @@ class LDOM_XmlReader
   LDOM_BasicElement& GetElement() const { return * myElement; }
   // get the last element retrieved from the stream
 
-  void CreateElement (const char *theName, const Standard_Integer theLen);
+  void CreateElement (const char *theName, const Standard_Size theLen);
 
   static Standard_Boolean getInteger (LDOMBasicString&       theValue,
                                       const char             * theStart,

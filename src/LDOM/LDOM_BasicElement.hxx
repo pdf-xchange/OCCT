@@ -42,7 +42,7 @@ class LDOM_BasicElement : public LDOM_BasicNode
   //    Empty constructor
 
   static LDOM_BasicElement& Create (const char                     * aName,
-                                    const Standard_Integer         aLength,
+                                    const Standard_Size            aLength,
                                     const Handle(LDOM_MemManager)& aDoc);
 
 //  Standard_EXPORT LDOM_BasicElement (const LDOM_BasicElement& theOther);

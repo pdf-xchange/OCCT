@@ -28,7 +28,7 @@
 
 LDOM_BasicElement& LDOM_BasicElement::Create
                                         (const char                     * aName,
-                                         const Standard_Integer         aLen,
+                                         const Standard_Size            aLen,
                                          const Handle(LDOM_MemManager)& aDoc)
 {
   if (aName == NULL) {
@@ -274,7 +274,7 @@ const LDOM_BasicNode * LDOM_BasicElement::RemoveAttribute
   //  Check attribute hash value against the current mask
   const char * const aNameStr = aName.GetString();
   const Standard_Integer aHash =
-    LDOM_MemManager::Hash (aNameStr, (Standard_Integer)strlen(aNameStr));
+    LDOM_MemManager::Hash (aNameStr, strlen(aNameStr));
   const unsigned int anAttrMaskValue = aHash & (8*sizeof(myAttributeMask) - 1);
   const unsigned long anAttributeMask = (1 << anAttrMaskValue);
 #ifdef OCCT_DEBUG_MASK
@@ -419,7 +419,7 @@ void LDOM_BasicElement::ReplaceElement
         const LDOM_BasicElement& aBNodeElem = *(const LDOM_BasicElement*)aBNode;
         const char * aTagString = aBNodeElem.GetTagName();
         LDOM_BasicElement& aNewBNodeElem =
-          LDOM_BasicElement::Create (aTagString, (Standard_Integer)strlen(aTagString), aDocument);
+          LDOM_BasicElement::Create (aTagString, strlen(aTagString), aDocument);
         aNewBNodeElem.ReplaceElement (aBNodeElem, aDocument); //reccur
         aNewBNode = &aNewBNodeElem;
         break;
