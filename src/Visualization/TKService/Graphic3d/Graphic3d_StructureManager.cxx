@@ -381,10 +381,12 @@ void Graphic3d_StructureManager::UnHighlight()
   }
 }
 
-//=================================================================================================
-
-void Graphic3d_StructureManager::SetTransform(const Handle(Graphic3d_Structure)& theStructure,
-                                              const Handle(TopLoc_Datum3D)&      theTrsf)
+// ========================================================================
+// function : SetTransform
+// purpose  :
+// ========================================================================
+void Graphic3d_StructureManager::SetTransform (const Handle(Graphic3d_Structure)& theStructure,
+                                               const Handle(Graphic3d_HGTrsf)& theTrsf)
 {
   for (Graphic3d_IndexedMapOfView::Iterator aViewIt(myDefinedViews); aViewIt.More(); aViewIt.Next())
   {

@@ -86,6 +86,7 @@ set(OCCT_Graphic3d_FILES
   Graphic3d_GroupDefinitionError.hxx
   Graphic3d_HatchStyle.hxx
   Graphic3d_HatchStyle.cxx
+  Graphic3d_HGTrsf.hxx
   Graphic3d_PresentationAttributes.hxx
   Graphic3d_PresentationAttributes.cxx
   Graphic3d_HorizontalTextAlignment.hxx

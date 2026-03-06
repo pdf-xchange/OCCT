@@ -19,12 +19,12 @@
 
 #include <Graphic3d_StructureManager.hxx>
 #include <Graphic3d_ZLayerId.hxx>
+#include <Graphic3d_HGTrsf.hxx>
 #include <PrsMgr_ListOfPresentations.hxx>
 
 class Graphic3d_Structure;
 typedef Graphic3d_Structure Prs3d_Presentation;
 
-class TopLoc_Datum3D;
 class Prs3d_Drawer;
 class PrsMgr_Presentation;
 class PrsMgr_PresentableObject;
@@ -145,12 +145,11 @@ public:
                                const Standard_Integer                  theOtherMode = 0);
 
   //! Sets the transformation theTransformation for the presentable object thePrsObject.
-  //! thePrsObject has the display mode theMode; this has the default value of 0, that is, the
-  //! wireframe display mode.
-  Standard_EXPORT void Transform(const Handle(PrsMgr_PresentableObject)& thePrsObject,
-                                 const Handle(TopLoc_Datum3D)&           theTransformation,
-                                 const Standard_Integer                  theMode = 0);
-
+  //! thePrsObject has the display mode theMode; this has the default value of 0, that is, the wireframe display mode.
+  Standard_EXPORT void Transform (const Handle(PrsMgr_PresentableObject)& thePrsObject,
+                                  const Handle(Graphic3d_HGTrsf)& theTransformation,
+                                  const Standard_Integer theMode = 0);
+  
   //! Returns the structure manager.
   const Handle(Graphic3d_StructureManager)& StructureManager() const { return myStructureManager; }
 

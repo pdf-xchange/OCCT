@@ -29,11 +29,13 @@
 
 IMPLEMENT_STANDARD_RTTIEXT(PrsMgr_PresentableObject, Standard_Transient)
 
-//=================================================================================================
-
-const gp_Trsf& PrsMgr_PresentableObject::getIdentityTrsf()
+//=======================================================================
+//function : getIdentityTrsf
+//purpose  :
+//=======================================================================
+const gp_GTrsf& PrsMgr_PresentableObject::getIdentityTrsf()
 {
-  static const gp_Trsf THE_IDENTITY_TRSF;
+  static const gp_GTrsf THE_IDENTITY_TRSF;
   return THE_IDENTITY_TRSF;
 }
 
@@ -73,7 +75,7 @@ PrsMgr_PresentableObject::~PrsMgr_PresentableObject()
 
   for (PrsMgr_ListOfPresentableObjectsIter anIter(myChildren); anIter.More(); anIter.Next())
   {
-    anIter.Value()->SetCombinedParentTransform(Handle(TopLoc_Datum3D)());
+    anIter.Value()->SetCombinedParentTransform (Handle(Graphic3d_HGTrsf)());
     anIter.Value()->myParent = NULL;
   }
 }
@@ -91,11 +93,13 @@ void PrsMgr_PresentableObject::Fill(const Handle(PrsMgr_PresentationManager)& th
   aStruct3d->SetTransformPersistence(TransformPersistence());
 }
 
-//=================================================================================================
-
-void PrsMgr_PresentableObject::computeHLR(const Handle(Graphic3d_Camera)&,
-                                          const Handle(TopLoc_Datum3D)&,
-                                          const Handle(Prs3d_Presentation)&)
+//=======================================================================
+//function : computeHLR
+//purpose  :
+//=======================================================================
+void PrsMgr_PresentableObject::computeHLR (const Handle(Graphic3d_Camera)& ,
+                                           const Handle(Graphic3d_HGTrsf)& ,
+                                           const Handle(Prs3d_Presentation)& )
 {
   throw Standard_NotImplemented("cannot compute under a specific projector");
 }
@@ -219,10 +223,11 @@ void PrsMgr_PresentableObject::SetTypeOfPresentation(const PrsMgr_TypeOfPresenta
   }
 }
 
-//=================================================================================================
-
-void PrsMgr_PresentableObject::setLocalTransformation(
-  const Handle(TopLoc_Datum3D)& theTransformation)
+//=======================================================================
+//function : setLocalTransformation
+//purpose  :
+//=======================================================================
+void PrsMgr_PresentableObject::setLocalTransformation (const Handle(Graphic3d_HGTrsf)& theTransformation)
 {
   myLocalTransformation = theTransformation;
   UpdateTransformation();
@@ -232,12 +237,14 @@ void PrsMgr_PresentableObject::setLocalTransformation(
 
 void PrsMgr_PresentableObject::ResetTransformation()
 {
-  setLocalTransformation(Handle(TopLoc_Datum3D)());
+  setLocalTransformation (Handle(Graphic3d_HGTrsf)());
 }
 
-//=================================================================================================
-
-void PrsMgr_PresentableObject::SetCombinedParentTransform(const Handle(TopLoc_Datum3D)& theTrsf)
+//=======================================================================
+//function : SetCombinedParentTransform
+//purpose  : 
+//=======================================================================
+void PrsMgr_PresentableObject::SetCombinedParentTransform (const Handle(Graphic3d_HGTrsf)& theTrsf)
 {
   myCombinedParentTransform = theTrsf;
   UpdateTransformation();
@@ -253,20 +260,20 @@ void PrsMgr_PresentableObject::UpdateTransformation()
   {
     if (!myLocalTransformation.IsNull() && myLocalTransformation->Form() != gp_Identity)
     {
-      const gp_Trsf aTrsf = myCombinedParentTransform->Trsf() * myLocalTransformation->Trsf();
-      myTransformation    = new TopLoc_Datum3D(aTrsf);
-      myInvTransformation = aTrsf.Inverted();
+      const gp_GTrsf aTrsf = *myCombinedParentTransform * *myLocalTransformation;
+      myTransformation     = new Graphic3d_HGTrsf (aTrsf);
+      myInvTransformation  = aTrsf.Inverted();
     }
     else
     {
       myTransformation    = myCombinedParentTransform;
-      myInvTransformation = myCombinedParentTransform->Trsf().Inverted();
+      myInvTransformation = myCombinedParentTransform->Inverted();
     }
   }
   else if (!myLocalTransformation.IsNull() && myLocalTransformation->Form() != gp_Identity)
   {
     myTransformation    = myLocalTransformation;
-    myInvTransformation = myLocalTransformation->Trsf().Inverted();
+    myInvTransformation = myLocalTransformation->Inverted();
   }
 
   for (PrsMgr_Presentations::Iterator aPrsIter(myPresentations); aPrsIter.More(); aPrsIter.Next())
@@ -326,7 +333,7 @@ void PrsMgr_PresentableObject::AddChild(const Handle(PrsMgr_PresentableObject)& 
 void PrsMgr_PresentableObject::AddChildWithCurrentTransformation(
   const Handle(PrsMgr_PresentableObject)& theObject)
 {
-  gp_Trsf aTrsf = Transformation().Inverted() * theObject->Transformation();
+  gp_GTrsf aTrsf = Transformation().Inverted() * theObject->Transformation();
   theObject->SetLocalTransformation(aTrsf);
   AddChild(theObject);
 }
@@ -341,8 +348,8 @@ void PrsMgr_PresentableObject::RemoveChild(const Handle(PrsMgr_PresentableObject
     if (anIter.Value() == theObject)
     {
       theObject->myParent = NULL;
-      theObject->SetCombinedParentTransform(Handle(TopLoc_Datum3D)());
-      myChildren.Remove(anIter);
+      theObject->SetCombinedParentTransform (Handle(Graphic3d_HGTrsf)());
+      myChildren.Remove (anIter);
       break;
     }
   }
@@ -353,7 +360,7 @@ void PrsMgr_PresentableObject::RemoveChild(const Handle(PrsMgr_PresentableObject
 void PrsMgr_PresentableObject::RemoveChildWithRestoreTransformation(
   const Handle(PrsMgr_PresentableObject)& theObject)
 {
-  gp_Trsf aTrsf = theObject->Transformation();
+  gp_GTrsf aTrsf = theObject->Transformation();
   RemoveChild(theObject);
   theObject->SetLocalTransformation(aTrsf);
 }

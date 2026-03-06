@@ -14,7 +14,6 @@
 
 #include <PrsMgr_PresentationManager.hxx>
 
-#include <TopLoc_Datum3D.hxx>
 #include <Prs3d_PresentationShadow.hxx>
 #include <PrsMgr_PresentableObject.hxx>
 #include <PrsMgr_Presentation.hxx>
@@ -570,11 +569,13 @@ void PrsMgr_PresentationManager::Connect(const Handle(PrsMgr_PresentableObject)&
   aPrs->Connect(aPrsOther.get(), Graphic3d_TOC_DESCENDANT);
 }
 
-//=================================================================================================
-
-void PrsMgr_PresentationManager::Transform(const Handle(PrsMgr_PresentableObject)& thePrsObj,
-                                           const Handle(TopLoc_Datum3D)& theTransformation,
-                                           const Standard_Integer        theMode)
+// =======================================================================
+// function : Transform
+// purpose  :
+// =======================================================================
+void PrsMgr_PresentationManager::Transform (const Handle(PrsMgr_PresentableObject)& thePrsObj,
+                                            const Handle(Graphic3d_HGTrsf)& theTransformation,
+                                            const Standard_Integer theMode)
 {
   Presentation(thePrsObj, theMode)->SetTransformation(theTransformation);
 }
@@ -628,14 +629,12 @@ void PrsMgr_PresentationManager::Color(const Handle(PrsMgr_PresentableObject)& t
 
 namespace
 {
-//! Internal function that scans thePrsList for shadow presentations
-//! and applies transformation theTrsf to them in case if parent ID
-//! of shadow presentation is equal to theRefId
-static void updatePrsTransformation(const PrsMgr_ListOfPresentations& thePrsList,
-                                    const Standard_Integer            theRefId,
-                                    const Handle(TopLoc_Datum3D)&     theTrsf)
-{
-  for (PrsMgr_ListOfPresentations::Iterator anIter(thePrsList); anIter.More(); anIter.Next())
+  //! Internal function that scans thePrsList for shadow presentations
+  //! and applies transformation theTrsf to them in case if parent ID
+  //! of shadow presentation is equal to theRefId
+  static void updatePrsTransformation (const PrsMgr_ListOfPresentations& thePrsList,
+                                       const Standard_Integer theRefId,
+                                       const Handle(Graphic3d_HGTrsf)& theTrsf)
   {
     const Handle(Prs3d_Presentation)& aPrs = anIter.Value();
     if (aPrs.IsNull())
@@ -668,7 +667,7 @@ void PrsMgr_PresentationManager::UpdateHighlightTrsf(
     return;
   }
 
-  Handle(TopLoc_Datum3D) aTrsf     = theObj->LocalTransformationGeom();
+  Handle(Graphic3d_HGTrsf) aTrsf = theObj->LocalTransformationGeom();
   const Standard_Integer aParentId = aPrs->CStructure()->Identification();
   updatePrsTransformation(myImmediateList, aParentId, aTrsf);
 

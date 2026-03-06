@@ -135,15 +135,18 @@ public:
   }
 
   //! Returns transformation of selectable.
-  virtual TopLoc_Location Location() const
+  virtual Handle(Graphic3d_HGTrsf) Location() const
   {
     return mySelectable != NULL && mySelectable->HasTransformation()
-             ? TopLoc_Location(mySelectable->Transformation())
-             : TopLoc_Location();
+         ? mySelectable->TransformationGeom()
+         : Handle(Graphic3d_HGTrsf)();
   }
 
   //! Change owner location (callback for handling change of location of selectable object).
-  virtual void SetLocation(const TopLoc_Location& theLocation) { (void)theLocation; }
+  virtual void SetLocation (const Handle(Graphic3d_HGTrsf)& theLocation)
+  {
+    (void )theLocation;
+  }
 
   //! @return Standard_True if the owner is selected.
   Standard_Boolean IsSelected() const { return myIsSelected; }

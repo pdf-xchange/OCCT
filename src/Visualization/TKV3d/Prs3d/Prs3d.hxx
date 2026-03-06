@@ -116,9 +116,10 @@ public:
   //! @param[out] theSegments  sequence of line segments to fill
   //! @param[in] thePolyTri    triangulation to process
   //! @param[in] theLocation   transformation to apply
-  Standard_EXPORT static void AddFreeEdges(TColgp_SequenceOfPnt&             theSegments,
-                                           const Handle(Poly_Triangulation)& thePolyTri,
-                                           const gp_Trsf&                    theLocation);
+  Standard_EXPORT static void AddFreeEdges (TColgp_SequenceOfPnt& theSegments,
+                                            const Handle(Poly_Triangulation)& thePolyTri,
+                                            const gp_GTrsf& theLocation);
+
 };
 
 #endif // _Prs3d_HeaderFile

@@ -829,10 +829,10 @@ protected: //! @name methods related to ray-tracing
                                         const Handle(OpenGl_Context)& theGlContext);
 
   //! Adds OpenGL groups to ray-traced scene geometry.
-  Standard_Boolean addRaytraceGroups(const OpenGl_Structure*        theStructure,
-                                     const OpenGl_RaytraceMaterial& theStructMat,
-                                     const Handle(TopLoc_Datum3D)&  theTrsf,
-                                     const Handle(OpenGl_Context)&  theGlContext);
+  Standard_Boolean addRaytraceGroups (const OpenGl_Structure*        theStructure,
+                                      const OpenGl_RaytraceMaterial& theStructMat,
+                                      const Handle(Graphic3d_HGTrsf)& theTrsf,
+                                      const Handle(OpenGl_Context)&  theGlContext);
 
   //! Creates ray-tracing material properties.
   OpenGl_RaytraceMaterial convertMaterial(const OpenGl_Aspects*         theAspect,

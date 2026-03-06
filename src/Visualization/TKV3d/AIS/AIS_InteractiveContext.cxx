@@ -1038,9 +1038,42 @@ void AIS_InteractiveContext::SetLocation(const Handle(AIS_InteractiveObject)& th
   }
 }
 
-//=================================================================================================
 
-void AIS_InteractiveContext::ResetLocation(const Handle(AIS_InteractiveObject)& theIObj)
+//=======================================================================
+//function : SetLocalTransformation
+//purpose  :
+//=======================================================================
+void AIS_InteractiveContext::SetLocalTransformation(const Handle(AIS_InteractiveObject)& theIObj,
+                                                    const Handle(Graphic3d_HGTrsf)&      theLoc)
+{
+  if (theIObj.IsNull() ||
+      (!theIObj->HasTransformation() && (theLoc.IsNull() || theLoc->Form() == gp_Identity)))
+    return;
+
+  // reset the previous location to properly clean everything...
+  if (theIObj->HasTransformation())
+    theIObj->ResetTransformation();
+
+  theIObj->SetLocalTransformation(theLoc);
+
+  mgrSelector->Update(theIObj, Standard_False);
+
+  // if the object or its part is highlighted dynamically, it is necessary to apply location transformation
+  // to its highlight structure immediately
+  if (!myLastPicked.IsNull() && myLastPicked->IsSameSelectable(theIObj))
+  {
+    const Standard_Integer aHiMod = theIObj->HasHilightMode() ? theIObj->HilightMode() : 0;
+    myLastPicked->UpdateHighlightTrsf(myMainVwr,
+                                      myMainPM,
+                                      aHiMod);
+  }
+}
+
+//=======================================================================
+//function : ResetLocation
+//purpose  :
+//=======================================================================
+void AIS_InteractiveContext::ResetLocation (const Handle(AIS_InteractiveObject)& theIObj)
 {
   if (theIObj.IsNull())
   {
@@ -1063,7 +1096,7 @@ Standard_Boolean AIS_InteractiveContext::HasLocation(
 
 TopLoc_Location AIS_InteractiveContext::Location(const Handle(AIS_InteractiveObject)& theIObj) const
 {
-  return theIObj->Transformation();
+  return theIObj->Transformation().Trsf(); // will throw exception for non-uniform scale in gp_GTrsf
 }
 
 //=================================================================================================
@@ -3397,7 +3430,11 @@ TopoDS_Shape AIS_InteractiveContext::SelectedShape() const
     return TopoDS_Shape();
   }
 
-  return anOwner->Shape().Located(anOwner->Location() * anOwner->Shape().Location());
+  if (!anOwner->HasLocation())
+    return anOwner->Shape();
+
+  Handle(Graphic3d_HGTrsf) aLoc = anOwner->Location();
+  return anOwner->Shape().Located (aLoc->Trsf() * anOwner->Shape().Location());
 }
 
 //=================================================================================================

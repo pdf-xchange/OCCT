@@ -31,12 +31,13 @@ AIS_MultipleConnectedInteractive::AIS_MultipleConnectedInteractive()
   myHasOwnPresentations = Standard_False;
 }
 
-//=================================================================================================
-
-Handle(AIS_InteractiveObject) AIS_MultipleConnectedInteractive::connect(
-  const Handle(AIS_InteractiveObject)&   theAnotherObj,
-  const Handle(TopLoc_Datum3D)&          theTrsf,
-  const Handle(Graphic3d_TransformPers)& theTrsfPers)
+//=======================================================================
+//function : connect
+//purpose  :
+//=======================================================================
+Handle(AIS_InteractiveObject) AIS_MultipleConnectedInteractive::connect (const Handle(AIS_InteractiveObject)& theAnotherObj,
+                                                                         const Handle(Graphic3d_HGTrsf)& theTrsf,
+                                                                         const Handle(Graphic3d_TransformPers)& theTrsfPers)
 {
   if (myAssemblyOwner.IsNull())
     myAssemblyOwner = new SelectMgr_EntityOwner(this);

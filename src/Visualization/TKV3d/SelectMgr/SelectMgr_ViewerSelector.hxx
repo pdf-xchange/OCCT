@@ -307,10 +307,10 @@ public:
 
   Standard_EXPORT void ClearSensitive(const Handle(V3d_View)& theView);
 
-  Standard_EXPORT void DisplaySensitive(const Handle(SelectMgr_Selection)& theSel,
-                                        const gp_Trsf&                     theTrsf,
-                                        const Handle(V3d_View)&            theView,
-                                        const Standard_Boolean theToClearOthers = Standard_True);
+  Standard_EXPORT void DisplaySensitive (const Handle(SelectMgr_Selection)& theSel,
+                                         const gp_GTrsf& theTrsf,
+                                         const Handle(V3d_View)& theView,
+                                         const Standard_Boolean theToClearOthers = Standard_True);
 
   //! Dumps the content of me into the stream
   Standard_EXPORT void DumpJson(Standard_OStream& theOStream, Standard_Integer theDepth = -1) const;

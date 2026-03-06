@@ -42,10 +42,12 @@ AIS_ConnectedInteractive::AIS_ConnectedInteractive(
   //
 }
 
-//=================================================================================================
-
-void AIS_ConnectedInteractive::connect(const Handle(AIS_InteractiveObject)& theAnotherObj,
-                                       const Handle(TopLoc_Datum3D)&        theLocation)
+//=======================================================================
+//function : connect
+//purpose  :
+//=======================================================================
+void AIS_ConnectedInteractive::connect (const Handle(AIS_InteractiveObject)& theAnotherObj,
+                                        const Handle(Graphic3d_HGTrsf)& theLocation)
 {
   if (myReference == theAnotherObj)
   {
@@ -125,11 +127,13 @@ void AIS_ConnectedInteractive::Compute(const Handle(PrsMgr_PresentationManager)&
   }
 }
 
-//=================================================================================================
-
-void AIS_ConnectedInteractive::computeHLR(const Handle(Graphic3d_Camera)&   theProjector,
-                                          const Handle(TopLoc_Datum3D)&     theTransformation,
-                                          const Handle(Prs3d_Presentation)& thePresentation)
+//=======================================================================
+//function : computeHLR
+//purpose  :
+//=======================================================================
+void AIS_ConnectedInteractive::computeHLR (const Handle(Graphic3d_Camera)& theProjector,
+                                           const Handle(Graphic3d_HGTrsf)& theTransformation,
+                                           const Handle(Prs3d_Presentation)& thePresentation)
 {
   const bool hasTrsf = !theTransformation.IsNull() && theTransformation->Form() != gp_Identity;
   updateShape(!hasTrsf);
@@ -139,6 +143,9 @@ void AIS_ConnectedInteractive::computeHLR(const Handle(Graphic3d_Camera)&   theP
   }
   if (hasTrsf)
   {
+    if (theTransformation->Form() == gp_Other)
+      throw Standard_NotImplemented("AIS_ConnectedInteractive::computeHLR() - unsupported gp_Other transformation");
+
     const TopLoc_Location& aLocation = myShape.Location();
     TopoDS_Shape aShape = myShape.Located(TopLoc_Location(theTransformation->Trsf()) * aLocation);
     AIS_Shape::computeHlrPresentation(theProjector, thePresentation, aShape, myDrawer);
@@ -171,7 +178,7 @@ void AIS_ConnectedInteractive::updateShape(const Standard_Boolean isWithLocation
   }
   else
   {
-    myShape = aShape.Moved(TopLoc_Location(Transformation()));
+    myShape = aShape.Moved (TopLoc_Location (Transformation().Trsf()));
   }
 }
 
@@ -196,11 +203,10 @@ void AIS_ConnectedInteractive::ComputeSelection(const Handle(SelectMgr_Selection
     myReference->RecomputePrimitives(theMode);
   }
 
-  const Handle(SelectMgr_Selection)& TheRefSel = myReference->Selection(theMode);
-  Handle(SelectMgr_EntityOwner)      anOwner   = new SelectMgr_EntityOwner(this);
+  const Handle(SelectMgr_Selection)& TheRefSel = myReference->Selection (theMode);
+  Handle(SelectMgr_EntityOwner) anOwner = new SelectMgr_EntityOwner (this);
 
-  TopLoc_Location aLocation(Transformation());
-  anOwner->SetLocation(aLocation);
+  anOwner->SetLocation (TransformationGeom());
 
   if (TheRefSel->IsEmpty())
   {
@@ -275,7 +281,7 @@ void AIS_ConnectedInteractive::computeSubShapeSelection(
                               this,
                               aSEList.First()->OwnerId()->Priority(),
                               Standard_True);
-    anOwner->SetLocation(Transformation());
+    anOwner->SetLocation (TransformationGeom());
     for (SensitiveList::Iterator aListIt(aSEList); aListIt.More(); aListIt.Next())
     {
       if (Handle(Select3D_SensitiveEntity) aNewSE = aListIt.Value()->GetConnected())

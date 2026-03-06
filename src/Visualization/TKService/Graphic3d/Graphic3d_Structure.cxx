@@ -575,18 +575,21 @@ void Graphic3d_Structure::DisconnectAll(const Graphic3d_TypeOfConnection theType
   }
 }
 
-//=================================================================================================
-
-void Graphic3d_Structure::SetTransformation(const Handle(TopLoc_Datum3D)& theTrsf)
+//=============================================================================
+//function : SetTransform
+//purpose  :
+//=============================================================================
+void Graphic3d_Structure::SetTransformation (const Handle(Graphic3d_HGTrsf)& theTrsf)
 {
   if (IsDeleted())
     return;
 
   const Standard_Boolean wasTransformed = IsTransformed();
 
-  if (!theTrsf.IsNull() && theTrsf->Trsf().Form() == gp_Identity)
+  if (!theTrsf.IsNull()
+    && theTrsf->Form() == gp_Identity)
   {
-    myCStructure->SetTransformation(Handle(TopLoc_Datum3D)());
+    myCStructure->SetTransformation (Handle(Graphic3d_HGTrsf)());
   }
   else
   {
@@ -762,13 +765,9 @@ void Graphic3d_Structure::addTransformed(Graphic3d_BndBox3d&    theBox,
   {
     if (!myCStructure->Transformation().IsNull())
     {
-      TransformBoundaries(myCStructure->Transformation()->Trsf(),
-                          aBox.CornerMin().x(),
-                          aBox.CornerMin().y(),
-                          aBox.CornerMin().z(),
-                          aBox.CornerMax().x(),
-                          aBox.CornerMax().y(),
-                          aBox.CornerMax().z());
+      Graphic3d_Mat4d aMat4;
+      myCStructure->Transformation()->GetMat4 (aMat4);
+      aBox.Transform (aMat4);
     }
 
     // if box is still valid after transformation

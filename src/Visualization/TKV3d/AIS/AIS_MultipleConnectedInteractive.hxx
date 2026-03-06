@@ -37,9 +37,9 @@ public:
   //! reference. Locates instance in theLocation and applies specified transformation persistence
   //! mode.
   //! @return created instance object (AIS_ConnectedInteractive or AIS_MultipleConnectedInteractive)
-  Handle(AIS_InteractiveObject) Connect(const Handle(AIS_InteractiveObject)&   theAnotherObj,
-                                        const Handle(TopLoc_Datum3D)&          theLocation,
-                                        const Handle(Graphic3d_TransformPers)& theTrsfPers)
+  Handle(AIS_InteractiveObject) Connect (const Handle(AIS_InteractiveObject)& theAnotherObj,
+                                         const Handle(Graphic3d_HGTrsf)& theLocation,
+                                         const Handle(Graphic3d_TransformPers)& theTrsfPers)
   {
     return connect(theAnotherObj, theLocation, theTrsfPers);
   }
@@ -99,9 +99,7 @@ public: // short aliases to Connect() method
   Handle(AIS_InteractiveObject) Connect(const Handle(AIS_InteractiveObject)& theAnotherObj,
                                         const gp_Trsf&                       theLocation)
   {
-    return connect(theAnotherObj,
-                   new TopLoc_Datum3D(theLocation),
-                   theAnotherObj->TransformPersistence());
+    return connect (theAnotherObj, new Graphic3d_HGTrsf (theLocation), theAnotherObj->TransformPersistence());
   }
 
   //! Establishes the connection between the Connected Interactive Object, theInteractive, and its
@@ -112,7 +110,7 @@ public: // short aliases to Connect() method
                                         const gp_Trsf&                         theLocation,
                                         const Handle(Graphic3d_TransformPers)& theTrsfPers)
   {
-    return connect(theAnotherObj, new TopLoc_Datum3D(theLocation), theTrsfPers);
+    return connect (theAnotherObj, new Graphic3d_HGTrsf (theLocation), theTrsfPers);
   }
 
 protected:
@@ -130,10 +128,9 @@ protected:
   //! reference. Locates instance in theLocation and applies specified transformation persistence
   //! mode.
   //! @return created instance object (AIS_ConnectedInteractive or AIS_MultipleConnectedInteractive)
-  Standard_EXPORT virtual Handle(AIS_InteractiveObject) connect(
-    const Handle(AIS_InteractiveObject)&   theInteractive,
-    const Handle(TopLoc_Datum3D)&          theLocation,
-    const Handle(Graphic3d_TransformPers)& theTrsfPers);
+  Standard_EXPORT virtual Handle(AIS_InteractiveObject) connect (const Handle(AIS_InteractiveObject)& theInteractive,
+                                                                 const Handle(Graphic3d_HGTrsf)& theLocation,
+                                                                 const Handle(Graphic3d_TransformPers)& theTrsfPers);
 
 private:
   //! Computes the selection for whole subtree in scene hierarchy.

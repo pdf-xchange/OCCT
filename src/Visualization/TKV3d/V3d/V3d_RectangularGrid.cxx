@@ -186,7 +186,7 @@ void V3d_RectangularGrid::UpdateDisplay()
                      1.0,
                      0.0);
     aTrsf.Multiply(aTrsf2);
-    myStructure->SetTransformation(new TopLoc_Datum3D(aTrsf));
+    myStructure->SetTransformation(new Graphic3d_HGTrsf(aTrsf));
 
     myCurAngle = RotationAngle();
     myCurXo = XOrigin(), myCurYo = YOrigin();

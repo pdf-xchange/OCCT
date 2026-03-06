@@ -497,23 +497,21 @@ Handle(AIS_InteractiveObject) AIS_Manipulator::Object() const
   return Object(1);
 }
 
-//=================================================================================================
-
-Standard_Boolean AIS_Manipulator::ObjectTransformation(const Standard_Integer  theMaxX,
-                                                       const Standard_Integer  theMaxY,
-                                                       const Handle(V3d_View)& theView,
-                                                       gp_Trsf&                theTrsf)
+//=======================================================================
+//function : ObjectTransformation
+//purpose  :
+//=======================================================================
+Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer theMaxX, const Standard_Integer theMaxY,
+                                                        const Handle(V3d_View)& theView, gp_GTrsf& theTrsf)
 {
   // Initialize start reference data
   if (!myHasStartedTransformation)
   {
     myStartTrsfs.Clear();
     Handle(AIS_ManipulatorObjectSequence) anObjects = Objects();
-    for (AIS_ManipulatorObjectSequence::Iterator anObjIter(*anObjects); anObjIter.More();
-         anObjIter.Next())
-    {
-      myStartTrsfs.Append(anObjIter.Value()->LocalTransformation());
-    }
+    for (AIS_ManipulatorObjectSequence::Iterator anObjIter (*anObjects); anObjIter.More(); anObjIter.Next())
+      myStartTrsfs.Append (anObjIter.Value()->LocalTransformationGeom());
+
     myStartPosition = myPosition;
   }
 
@@ -558,8 +556,8 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation(const Standard_Integer  t
       gp_Trsf aNewTrsf;
       if (myCurrentMode == AIS_MM_Translation)
       {
-        aNewTrsf.SetTranslation(gp_Vec(myStartPick, aNewPosition));
-        theTrsf *= aNewTrsf;
+        aNewTrsf.SetTranslation (gp_Vec(myStartPick, aNewPosition));
+        theTrsf *= gp_GTrsf(aNewTrsf);
       }
       else if (myCurrentMode == AIS_MM_Scaling)
       {
@@ -654,8 +652,8 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation(const Standard_Integer  t
       }
 
       gp_Trsf aNewTrsf;
-      aNewTrsf.SetRotation(aCurrAxis, anAngle);
-      theTrsf *= aNewTrsf;
+      aNewTrsf.SetRotation (aCurrAxis, anAngle);
+      theTrsf *= gp_GTrsf(aNewTrsf);
       myPrevState = anAngle;
       return Standard_True;
     }
@@ -686,7 +684,7 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation(const Standard_Integer  t
 
       gp_Trsf aNewTrsf;
       aNewTrsf.SetTranslation(gp_Vec(myStartPick, aNewPosition));
-      theTrsf *= aNewTrsf;
+      theTrsf *= gp_GTrsf(aNewTrsf);
       return Standard_True;
     }
     case AIS_MM_None: {
@@ -722,9 +720,17 @@ Standard_Boolean AIS_Manipulator::ProcessDragging(const Handle(AIS_InteractiveCo
       Transform(theDragTo.x(), theDragTo.y(), theView);
       return Standard_True;
     }
-    case AIS_DragAction_Abort: {
-      StopTransform(false);
-      return Standard_True;
+    case AIS_DragAction_Stop:
+    {
+      Handle(AIS_ManipulatorObjectSequence) anObjects = Objects();
+      if (!myHasStartedTransformation || anObjects.IsNull())
+        break;
+
+      // update selection manager for moved objects
+      for (const Handle(AIS_InteractiveObject)& anObjIter : *anObjects)
+        anObjIter->InteractiveContext()->SetLocalTransformation (anObjIter, anObjIter->LocalTransformationGeom());
+
+      break;
     }
     case AIS_DragAction_Stop: {
       StopTransform(true);
@@ -755,8 +761,8 @@ void AIS_Manipulator::StartTransform(const Standard_Integer  theX,
     return;
   }
 
-  gp_Trsf aTrsf;
-  ObjectTransformation(theX, theY, theView, aTrsf);
+  gp_GTrsf aTrsf;
+  ObjectTransformation (theX, theY, theView, aTrsf);
 }
 
 //=================================================================================================
@@ -774,208 +780,20 @@ void AIS_Manipulator::StopTransform(const Standard_Boolean theToApply)
     return;
   }
 
-  Handle(AIS_ManipulatorObjectSequence)   anObjects = Objects();
-  AIS_ManipulatorObjectSequence::Iterator anObjIter(*anObjects);
-  NCollection_Sequence<gp_Trsf>::Iterator aTrsfIter(myStartTrsfs);
+  Handle(AIS_ManipulatorObjectSequence) anObjects = Objects();
+  AIS_ManipulatorObjectSequence::Iterator anObjIter (*anObjects);
+  NCollection_Sequence<Handle(Graphic3d_HGTrsf)>::Iterator aTrsfIter (myStartTrsfs);
   for (; anObjIter.More(); anObjIter.Next(), aTrsfIter.Next())
-  {
-    anObjIter.ChangeValue()->SetLocalTransformation(aTrsfIter.Value());
-  }
-  SetPosition(myStartPosition);
+    anObjIter.Value()->InteractiveContext()->SetLocalTransformation(anObjIter.Value(), aTrsfIter.Value());
+
+  SetPosition (myStartPosition);
 }
 
-//=================================================================================================
-
-void AIS_Manipulator::RecomputeTransformation(const Handle(Graphic3d_Camera)& theCamera)
-{
-  if (mySkinMode == ManipulatorSkin_Shaded)
-  {
-    return;
-  }
-
-  Standard_Boolean isRecomputedTranslation = Standard_False;
-  Standard_Boolean isRecomputedRotation    = Standard_False;
-  Standard_Boolean isRecomputedDragging    = Standard_False;
-  Standard_Boolean isRecomputedScaling     = Standard_False;
-
-  // Remove transformation from dragger group
-  for (Standard_Integer anIt = 0; anIt < 3; ++anIt)
-  {
-    if (myAxes[anIt].HasDragging())
-    {
-      myAxes[anIt].DraggerGroup()->SetTransformation(gp_Trsf());
-      isRecomputedDragging = Standard_True;
-    }
-  }
-
-  const gp_Dir& aCameraDir = theCamera->Direction();
-  for (Standard_Integer anIt = 0; anIt < 3; ++anIt)
-  {
-    Axis&         anAxis   = myAxes[anIt];
-    const gp_Ax1& aRefAxis = anAxis.ReferenceAxis();
-    gp_Dir        anAxisDir, aNormal;
-
-    if (aRefAxis.Direction().X() > 0)
-    {
-      aNormal   = myPosition.YDirection().Reversed();
-      anAxisDir = myPosition.XDirection();
-    }
-    else if (aRefAxis.Direction().Y() > 0)
-    {
-      aNormal   = myPosition.XDirection().Crossed(myPosition.YDirection()).Reversed();
-      anAxisDir = myPosition.YDirection();
-    }
-    else
-    {
-      aNormal   = myPosition.XDirection().Reversed();
-      anAxisDir = myPosition.XDirection().Crossed(myPosition.YDirection());
-    }
-
-    const gp_Dir aCameraProj = Abs(Abs(anAxisDir.Dot(aCameraDir)) - 1.0) <= gp::Resolution()
-                                 ? aCameraDir
-                                 : anAxisDir.Crossed(aCameraDir).Crossed(anAxisDir);
-    const Standard_Boolean isReversed = anAxisDir.Dot(aCameraDir) > 0;
-    Standard_Real          anAngle    = aNormal.AngleWithRef(aCameraProj, anAxisDir);
-    if (aRefAxis.Direction().X() > 0)
-      anAngle -= M_PI_2;
-
-    if (anAxis.HasTranslation())
-    {
-      Handle(Prs3d_ShadingAspect) anAspect = new Prs3d_ShadingAspect();
-      anAspect->Aspect()->SetShadingModel(Graphic3d_TypeOfShadingModel_Unlit);
-
-      Quantity_Color aColor =
-        isReversed ? Quantity_Color(anAxis.Color().Rgb() * 0.1f) : anAxis.Color();
-      anAspect->Aspect()->SetInteriorColor(aColor);
-
-      gp_Trsf aTranslatorTrsf;
-      aTranslatorTrsf.SetRotation(aRefAxis, anAngle);
-      if (isReversed)
-      {
-        const Standard_Real aLength = anAxis.AxisLength() + anAxis.Indent() * 4.0f;
-        aTranslatorTrsf.SetTranslationPart(aRefAxis.Direction().XYZ().Reversed() * aLength);
-      }
-
-      anAxis.TranslatorGroup()->SetGroupPrimitivesAspect(anAspect->Aspect());
-      anAxis.TranslatorGroup()->SetTransformation(aTranslatorTrsf);
-      anAxis.TranslatorHighlightPrs()->CurrentGroup()->SetTransformation(aTranslatorTrsf);
-      isRecomputedTranslation = Standard_True;
-    }
-
-    if (anAxis.HasRotation())
-    {
-      gp_Trsf aRotatorTrsf;
-      aRotatorTrsf.SetRotation(aRefAxis, anAngle - M_PI_2);
-      anAxis.RotatorGroup()->SetTransformation(aRotatorTrsf);
-      anAxis.RotatorHighlightPrs()->CurrentGroup()->SetTransformation(aRotatorTrsf);
-      isRecomputedRotation = Standard_True;
-    }
-
-    if (anAxis.HasDragging() && isReversed)
-    {
-      for (Standard_Integer anIndexIter = 0; anIndexIter < 3; ++anIndexIter)
-      {
-        gp_Vec aTranslation =
-          (anIndexIter == anIt)
-            ? aRefAxis.Direction().XYZ() * myAxes[anIndexIter].AxisRadius() * 2.0f
-            : aRefAxis.Direction().XYZ().Reversed() * myAxes[anIndexIter].AxisLength();
-        gp_Trsf aDraggerTrsf;
-        aDraggerTrsf.SetTranslation(aTranslation);
-
-        const Handle(Graphic3d_Group)& aDraggerGroup = myAxes[anIndexIter].DraggerGroup();
-        aDraggerTrsf *= aDraggerGroup->Transformation();
-        aDraggerGroup->SetTransformation(aDraggerTrsf);
-      }
-    }
-
-    if (anAxis.HasScaling())
-    {
-      gp_Trsf aScalerTrsf;
-      if (aRefAxis.Direction().X() > 0)
-      {
-        anAngle += M_PI_2;
-      }
-      aScalerTrsf.SetRotation(aRefAxis, anAngle);
-      if (isReversed)
-      {
-        Standard_ShortReal aLength =
-          anAxis.AxisLength() * 2.0f + anAxis.BoxSize() + anAxis.Indent() * 4.0f;
-        aScalerTrsf.SetTranslationPart(gp_Vec(aRefAxis.Direction().XYZ().Reversed() * aLength));
-      }
-      anAxis.ScalerGroup()->SetTransformation(aScalerTrsf);
-      anAxis.ScalerHighlightPrs()->CurrentGroup()->SetTransformation(aScalerTrsf);
-      isRecomputedScaling = Standard_True;
-    }
-  }
-
-  if (isRecomputedRotation)
-  {
-    const gp_Dir aXDir  = gp::DX();
-    const gp_Dir anYDir = gp::DY();
-    const gp_Dir aZDir  = gp::DZ();
-
-    const gp_Dir aCameraProjection =
-      Abs(aXDir.Dot(aCameraDir)) <= gp::Resolution()
-          || Abs(anYDir.Dot(aCameraDir)) <= gp::Resolution()
-        ? aCameraDir
-        : aXDir.XYZ() * (aXDir.Dot(aCameraDir)) + anYDir.XYZ() * (anYDir.Dot(aCameraDir));
-    const Standard_Boolean isReversed = aZDir.Dot(aCameraDir) > 0;
-
-    const Standard_Real anAngle  = M_PI_2 - aCameraDir.Angle(aCameraProjection);
-    gp_Dir              aRotAxis = Abs(Abs(aCameraProjection.Dot(aZDir)) - 1.0) <= gp::Resolution()
-                                     ? aZDir
-                                     : aCameraProjection.Crossed(aZDir);
-    if (isReversed)
-    {
-      aRotAxis.Reverse();
-    }
-
-    gp_Trsf aRotationTrsf;
-    aRotationTrsf.SetRotation(gp_Ax1(gp::Origin(), aRotAxis), anAngle);
-
-    gp_Ax3 aToSystem(gp::Origin(),
-                     myPosition.XDirection().Crossed(myPosition.YDirection()),
-                     myPosition.XDirection());
-    gp_Ax3 aFromSystem(gp::XOY());
-    aFromSystem.Transform(aRotationTrsf);
-
-    gp_Trsf aTrsf;
-    aTrsf.SetTransformation(aFromSystem, aToSystem);
-    myCircleGroup->SetTransformation(aTrsf);
-  }
-
-  if (isRecomputedDragging)
-  {
-    for (Standard_Integer anIt = 0; anIt < 3; ++anIt)
-    {
-      myAxes[anIt].DraggerHighlightPrs()->CurrentGroup()->SetTransformation(
-        myAxes[anIt].DraggerGroup()->Transformation());
-    }
-  }
-
-  if (isRecomputedTranslation)
-  {
-    RecomputeSelection(AIS_MM_Translation);
-  };
-  if (isRecomputedRotation)
-  {
-    RecomputeSelection(AIS_MM_Rotation);
-  };
-  if (isRecomputedDragging)
-  {
-    RecomputeSelection(AIS_MM_TranslationPlane);
-  };
-  if (isRecomputedScaling)
-  {
-    RecomputeSelection(AIS_MM_Scaling);
-  };
-
-  Object()->GetContext()->RecomputeSelectionOnly(this);
-}
-
-//=================================================================================================
-
-void AIS_Manipulator::Transform(const gp_Trsf& theTrsf)
+//=======================================================================
+//function : Transform
+//purpose  : 
+//=======================================================================
+void AIS_Manipulator::Transform (const gp_GTrsf& theTrsf)
 {
   if (!IsAttached() || !myHasStartedTransformation)
   {
@@ -998,14 +816,15 @@ void AIS_Manipulator::Transform(const gp_Trsf& theTrsf)
         continue;
       }
 
-      const gp_Trsf&                anOldTrsf   = aTrsfIter.Value();
-      const Handle(TopLoc_Datum3D)& aParentTrsf = anObj->CombinedParentTransformation();
+      const gp_GTrsf anOldTrsf = !aTrsfIter.Value().IsNull() ? *aTrsfIter.Value() : gp_GTrsf();
+      const Handle(Graphic3d_HGTrsf)& aParentTrsf = anObj->CombinedParentTransformation();
+      // intentionally avoid calling AIS_InteractiveConext::SetLocation()
+      // to postpone invalidation of selection manager
       if (!aParentTrsf.IsNull() && aParentTrsf->Form() != gp_Identity)
       {
         // recompute local transformation relative to parent transformation
-        const gp_Trsf aNewLocalTrsf =
-          aParentTrsf->Trsf().Inverted() * theTrsf * aParentTrsf->Trsf() * anOldTrsf;
-        anObj->SetLocalTransformation(aNewLocalTrsf);
+        const gp_GTrsf aNewLocalTrsf = aParentTrsf->Inverted() * theTrsf * (*aParentTrsf) * anOldTrsf;
+        anObj->SetLocalTransformation (aNewLocalTrsf);
       }
       else
       {
@@ -1025,17 +844,16 @@ void AIS_Manipulator::Transform(const gp_Trsf& theTrsf)
   }
 }
 
-//=================================================================================================
-
-gp_Trsf AIS_Manipulator::Transform(const Standard_Integer  thePX,
-                                   const Standard_Integer  thePY,
-                                   const Handle(V3d_View)& theView)
+//=======================================================================
+//function : Transform
+//purpose  :
+//=======================================================================
+gp_GTrsf AIS_Manipulator::Transform (const Standard_Integer thePX, const Standard_Integer thePY,
+                                     const Handle(V3d_View)& theView)
 {
-  gp_Trsf aTrsf;
-  if (ObjectTransformation(thePX, thePY, theView, aTrsf))
-  {
-    Transform(aTrsf);
-  }
+  gp_GTrsf aTrsf;
+  if (ObjectTransformation (thePX, thePY, theView, aTrsf))
+    Transform (aTrsf);
 
   return aTrsf;
 }
@@ -1075,7 +893,7 @@ void AIS_Manipulator::updateTransformation()
     aTrsf.SetTransformation(gp_Ax2(gp::Origin(), aVDir, aXDir), gp::XOY());
   }
 
-  Handle(TopLoc_Datum3D) aGeomTrsf = new TopLoc_Datum3D(aTrsf);
+  Handle(Graphic3d_HGTrsf) aGeomTrsf = new Graphic3d_HGTrsf (aTrsf);
   // we explicitly call here setLocalTransformation() of the base class
   // since AIS_Manipulator::setLocalTransformation() implementation throws exception
   // as protection from external calls
@@ -1222,9 +1040,11 @@ void AIS_Manipulator::setTransformPersistence(const Handle(Graphic3d_TransformPe
   }
 }
 
-//=================================================================================================
-
-void AIS_Manipulator::setLocalTransformation(const Handle(TopLoc_Datum3D)& /*theTrsf*/)
+//=======================================================================
+//function : setLocalTransformation
+//purpose  :
+//=======================================================================
+void AIS_Manipulator::setLocalTransformation (const Handle(Graphic3d_HGTrsf)& /*theTrsf*/)
 {
   Standard_ASSERT_INVOKE("AIS_Manipulator::setLocalTransformation: "
                          "Custom transformation is not supported by this class");
@@ -2011,4 +1831,66 @@ void AIS_Manipulator::Axis::Compute(const Handle(PrsMgr_PresentationManager)& th
       aGroup->AddPrimitiveArray(mySector.Array());
     }
   }
+}
+
+//=======================================================================
+//class    : Axis
+//function : SetTransformPersistence
+//=======================================================================
+void AIS_Manipulator::Axis::SetTransformPersistence(const Handle(Graphic3d_TransformPers)& theTrsfPers)
+{
+  if (!myHighlightTranslator.IsNull())
+    myHighlightTranslator->SetTransformPersistence(theTrsfPers);
+
+  if (!myHighlightScaler.IsNull())
+    myHighlightScaler->SetTransformPersistence(theTrsfPers);
+
+  if (!myHighlightRotator.IsNull())
+    myHighlightRotator->SetTransformPersistence(theTrsfPers);
+
+  if (!myHighlightDragger.IsNull())
+    myHighlightDragger->SetTransformPersistence(theTrsfPers);
+}
+
+//=======================================================================
+//class    : Axis
+//function : Transform
+//=======================================================================
+void AIS_Manipulator::Axis::Transform(const Handle(Graphic3d_HGTrsf)& theTransformation)
+{
+  if (!myHighlightTranslator.IsNull())
+    myHighlightTranslator->SetTransformation(theTransformation);
+
+  if (!myHighlightScaler.IsNull())
+    myHighlightScaler->SetTransformation(theTransformation);
+
+  if (!myHighlightRotator.IsNull())
+    myHighlightRotator->SetTransformation(theTransformation);
+
+  if (!myHighlightDragger.IsNull())
+    myHighlightDragger->SetTransformation(theTransformation);
+}
+
+//=======================================================================
+//class    : Axis
+//function : SetSize
+//=======================================================================
+void AIS_Manipulator::Axis::SetSize(const Standard_ShortReal theValue)
+{
+  if (myIndent > theValue * 0.1f)
+  {
+    myLength = theValue * 0.7f;
+    myBoxSize = theValue * 0.15f;
+    myDiskThickness = theValue * 0.05f;
+    myIndent = theValue * 0.05f;
+  }
+  else // use pre-set value of predent
+  {
+    Standard_ShortReal aLength = theValue - 2 * myIndent;
+    myLength = aLength * 0.8f;
+    myBoxSize = aLength * 0.15f;
+    myDiskThickness = aLength * 0.05f;
+  }
+  myInnerRadius = myIndent * 2 + myBoxSize + myLength;
+  myAxisRadius = myBoxSize / 4.0f;
 }

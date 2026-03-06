@@ -212,10 +212,10 @@ public:
   //! @remark The transformation is set using SetLocalTransformation for owning objects.
   //! The location of the manipulator is stored also in Local Transformation,
   //! so that there's no need to redisplay objects.
-  //! @warning It is used in chain with StartTransform-Transform(gp_Trsf)-StopTransform
+  //! @warning It is used in chain with StartTransform-Transform(gp_GTrsf)-StopTransform
   //! and is used only for custom transform set.
   //! @warning It will does nothing if transformation is not initiated (with StartTransform() call).
-  Standard_EXPORT void Transform(const gp_Trsf& aTrsf);
+  Standard_EXPORT void Transform(const gp_GTrsf& aTrsf);
 
   //! Apply camera transformation to flat skin manipulator
   Standard_EXPORT void RecomputeTransformation(const Handle(Graphic3d_Camera)& theCamera)
@@ -227,14 +227,14 @@ public:
 
   //! Reset start (reference) transformation.
   //! @param[in] theToApply  option to apply or to cancel the started transformation.
-  //! @warning It is used in chain with StartTransform-Transform(gp_Trsf)-StopTransform
+  //! @warning It is used in chain with StartTransform-Transform(gp_GTrsf)-StopTransform
   //! and is used only for custom transform set.
   Standard_EXPORT void StopTransform(const Standard_Boolean theToApply = Standard_True);
 
   //! Apply transformation made from mouse moving from start position
   //! (save on the first Transform() call and reset on DeactivateCurrentMode() call.)
   //! to the in/out mouse position (theX, theY)
-  Standard_EXPORT gp_Trsf Transform(const Standard_Integer  theX,
+  Standard_EXPORT gp_GTrsf Transform(const Standard_Integer  theX,
                                     const Standard_Integer  theY,
                                     const Handle(V3d_View)& theView);
 
@@ -245,7 +245,7 @@ public:
   Standard_EXPORT Standard_Boolean ObjectTransformation(const Standard_Integer  theX,
                                                         const Standard_Integer  theY,
                                                         const Handle(V3d_View)& theView,
-                                                        gp_Trsf&                theTrsf);
+                                                        gp_GTrsf&                theTrsf);
 
   //! Make inactive the current selected manipulator part and reset current axis index and current
   //! mode. After its call HasActiveMode() returns false.
@@ -274,7 +274,9 @@ public:
 
   Standard_Boolean HasActiveTransformation() { return myHasStartedTransformation; }
 
-  gp_Trsf StartTransformation() const
+  Handle(Graphic3d_HGTrsf) StartTransformation() const { return !myStartTrsfs.IsEmpty() ? myStartTrsfs.First() : Handle(Graphic3d_HGTrsf)(); }
+
+  Handle(Graphic3d_HGTrsf) StartTransformation (Standard_Integer theIndex) const
   {
     return !myStartTrsfs.IsEmpty() ? myStartTrsfs.First() : gp_Trsf();
   }
@@ -284,7 +286,7 @@ public:
     Standard_ProgramError_Raise_if(
       theIndex < 1 || theIndex > Objects()->Upper(),
       "AIS_Manipulator::StartTransformation(): theIndex is out of bounds");
-    return !myStartTrsfs.IsEmpty() ? myStartTrsfs(theIndex) : gp_Trsf();
+    return !myStartTrsfs.IsEmpty() ? myStartTrsfs (theIndex) : Handle(Graphic3d_HGTrsf)();
   }
 
 public: //! @name Configuration of graphical transformations
@@ -450,8 +452,7 @@ protected:
   //! without need for recomputing presentation.
   //! @warning Invokes debug assertion in debug to catch incompatible usage of the
   //! method, silently does nothing in release mode.
-  Standard_EXPORT virtual void setLocalTransformation(const Handle(TopLoc_Datum3D)& theTrsf)
-    Standard_OVERRIDE;
+  Standard_EXPORT virtual void setLocalTransformation (const Handle(Graphic3d_HGTrsf)& theTrsf) Standard_OVERRIDE;
   using AIS_InteractiveObject::SetLocalTransformation; // hide visibility
 
 protected: //! @name Auxiliary classes to fill presentation with proper primitives
@@ -614,28 +615,7 @@ protected: //! @name Auxiliary classes to fill presentation with proper primitiv
       }
     }
 
-    void Transform(const Handle(TopLoc_Datum3D)& theTransformation)
-    {
-      if (!myHighlightTranslator.IsNull())
-      {
-        myHighlightTranslator->SetTransformation(theTransformation);
-      }
-
-      if (!myHighlightScaler.IsNull())
-      {
-        myHighlightScaler->SetTransformation(theTransformation);
-      }
-
-      if (!myHighlightRotator.IsNull())
-      {
-        myHighlightRotator->SetTransformation(theTransformation);
-      }
-
-      if (!myHighlightDragger.IsNull())
-      {
-        myHighlightDragger->SetTransformation(theTransformation);
-      }
-    }
+    Standard_EXPORT void Transform (const Handle(Graphic3d_HGTrsf)& theTransformation);
 
     Standard_Boolean HasTranslation() const { return myHasTranslation; }
 
@@ -797,7 +777,7 @@ protected:
 
 protected: //! @name Fields for interactive transformation. Fields only for internal needs. They do not have public interface.
 
-  NCollection_Sequence<gp_Trsf> myStartTrsfs; //!< Owning object transformation for start. It is used internally.
+  NCollection_Sequence<Handle(Graphic3d_HGTrsf)> myStartTrsfs; //!< Owning object transformation for start. It is used internally.
   Standard_Boolean myHasStartedTransformation; //!< Shows if transformation is processed (sequential calls of Transform()).
                                               // clang-format on
   gp_Ax2        myStartPosition; //! Start position of manipulator.

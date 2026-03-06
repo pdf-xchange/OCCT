@@ -112,8 +112,9 @@ public:
 
   //! Clears the presentation manager object aPM of all
   //! shapes with the selection mode aMode.
-  Standard_EXPORT virtual void Clear(const Handle(PrsMgr_PresentationManager)& aPM,
-                                     const Standard_Integer aMode = 0) Standard_OVERRIDE;
+  Standard_EXPORT virtual void Clear (const Handle(PrsMgr_PresentationManager)& aPM, const Standard_Integer aMode = 0) Standard_OVERRIDE;
+  
+  Standard_EXPORT virtual void SetLocation (const Handle(Graphic3d_HGTrsf)& aLoc) Standard_OVERRIDE;
 
   Standard_EXPORT virtual void SetLocation(const TopLoc_Location& aLoc) Standard_OVERRIDE;
 

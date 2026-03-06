@@ -530,10 +530,10 @@ Standard_Boolean OpenGl_View::addRaytraceStructure(const OpenGl_Structure*      
 // function : addRaytraceGroups
 // purpose  : Adds OpenGL groups to ray-traced scene geometry
 // =======================================================================
-Standard_Boolean OpenGl_View::addRaytraceGroups(const OpenGl_Structure*        theStructure,
-                                                const OpenGl_RaytraceMaterial& theStructMat,
-                                                const Handle(TopLoc_Datum3D)&  theTrsf,
-                                                const Handle(OpenGl_Context)&  theGlContext)
+Standard_Boolean OpenGl_View::addRaytraceGroups (const OpenGl_Structure*        theStructure,
+                                                 const OpenGl_RaytraceMaterial& theStructMat,
+                                                 const Handle(Graphic3d_HGTrsf)& theTrsf,
+                                                 const Handle(OpenGl_Context)&  theGlContext)
 {
   OpenGl_Mat4 aMat4;
   for (OpenGl_Structure::GroupIterator aGroupIter(theStructure->Groups()); aGroupIter.More();
@@ -582,8 +582,8 @@ Standard_Boolean OpenGl_View::addRaytraceGroups(const OpenGl_Structure*        t
               new BVH_Transform<Standard_ShortReal, 4>();
             if (!theTrsf.IsNull())
             {
-              theTrsf->Trsf().GetMat4(aMat4);
-              aTransform->SetTransform(aMat4);
+              theTrsf->GetMat4 (aMat4);
+              aTransform->SetTransform (aMat4);
             }
 
             aSet->SetProperties(aTransform);
@@ -601,8 +601,8 @@ Standard_Boolean OpenGl_View::addRaytraceGroups(const OpenGl_Structure*        t
                 new BVH_Transform<Standard_ShortReal, 4>();
               if (!theTrsf.IsNull())
               {
-                theTrsf->Trsf().GetMat4(aMat4);
-                aTransform->SetTransform(aMat4);
+                theTrsf->GetMat4 (aMat4);
+                aTransform->SetTransform (aMat4);
               }
 
               aSet->SetProperties(aTransform);

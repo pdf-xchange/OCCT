@@ -384,10 +384,10 @@ public:
   }
 
   //! Return local transformation.
-  const Handle(TopLoc_Datum3D)& Transformation() const { return myCStructure->Transformation(); }
+  const Handle(Graphic3d_HGTrsf)& Transformation() const { return myCStructure->Transformation(); }
 
   //! Modifies the current local transformation
-  Standard_EXPORT void SetTransformation(const Handle(TopLoc_Datum3D)& theTrsf);
+  Standard_EXPORT void SetTransformation (const Handle(Graphic3d_HGTrsf)& theTrsf);
 
   //! Modifies the current transform persistence (pan, zoom or rotate)
   Standard_EXPORT void SetTransformPersistence(const Handle(Graphic3d_TransformPers)& theTrsfPers);
@@ -434,7 +434,7 @@ public:
   }
 
   //! Internal method which sets new transformation without calling graphic manager callbacks.
-  void GraphicTransform(const Handle(TopLoc_Datum3D)& theTrsf)
+  void GraphicTransform (const Handle(Graphic3d_HGTrsf)& theTrsf)
   {
     if (!myCStructure.IsNull())
     {

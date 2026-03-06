@@ -19,18 +19,18 @@
 class Graphic3d_Structure;
 class Graphic3d_TransformPers;
 class SelectMgr_Selection;
-class gp_Trsf;
+class gp_GTrsf;
 
 //! Auxiliary tools for SelectMgr package.
 class SelectMgr
 {
 public:
   //! Compute debug presentation for sensitive objects.
-  Standard_EXPORT static void ComputeSensitivePrs(
-    const Handle(Graphic3d_Structure)&     theStructure,
-    const Handle(SelectMgr_Selection)&     theSel,
-    const gp_Trsf&                         theLoc,
-    const Handle(Graphic3d_TransformPers)& theTrsfPers);
+  Standard_EXPORT static void ComputeSensitivePrs (const Handle(Graphic3d_Structure)& theStructure,
+                                                   const Handle(SelectMgr_Selection)& theSel,
+                                                   const gp_GTrsf& theLoc,
+                                                   const Handle(Graphic3d_TransformPers)& theTrsfPers);
+
 };
 
 #endif
