@@ -111,7 +111,7 @@ public:
 
   //! Transforms the structure.
   Standard_EXPORT virtual void SetTransform(const occ::handle<Graphic3d_Structure>& theStructure,
-                                            const occ::handle<TopLoc_Datum3D>&      theTrsf);
+                                            const occ::handle<Graphic3d_HGTrsf>&      theTrsf);
 
   //! Changes the display priority of the structure <AStructure>.
   Standard_EXPORT virtual void ChangeDisplayPriority(

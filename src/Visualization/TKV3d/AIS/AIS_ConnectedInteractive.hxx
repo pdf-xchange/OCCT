@@ -54,7 +54,7 @@ public:
   //! Interactive Object, anotherIobj, and its reference.
   void Connect(const occ::handle<AIS_InteractiveObject>& theAnotherObj)
   {
-    connect(theAnotherObj, occ::handle<TopLoc_Datum3D>());
+    connect(theAnotherObj, occ::handle<Graphic3d_HGTrsf>());
   }
 
   //! Establishes the connection between the Connected
@@ -62,14 +62,14 @@ public:
   //! Locates instance in aLocation.
   void Connect(const occ::handle<AIS_InteractiveObject>& theAnotherObj, const gp_Trsf& theLocation)
   {
-    connect(theAnotherObj, new TopLoc_Datum3D(theLocation));
+    connect(theAnotherObj, new Graphic3d_HGTrsf(theLocation));
   }
 
   //! Establishes the connection between the Connected
   //! Interactive Object, anotherIobj, and its reference.
   //! Locates instance in aLocation.
   void Connect(const occ::handle<AIS_InteractiveObject>& theAnotherObj,
-               const occ::handle<TopLoc_Datum3D>&        theLocation)
+               const occ::handle<Graphic3d_HGTrsf>&        theLocation)
   {
     connect(theAnotherObj, theLocation);
   }
@@ -115,7 +115,7 @@ protected:
 
   //! Computes the presentation according to a point of view.
   Standard_EXPORT void computeHLR(const occ::handle<Graphic3d_Camera>&   theProjector,
-                                  const occ::handle<TopLoc_Datum3D>&     theTrsf,
+                                  const occ::handle<Graphic3d_HGTrsf>&   theTrsf,
                                   const occ::handle<Prs3d_Presentation>& thePrs) override;
 
   //! Generates sensitive entities by copying
@@ -134,7 +134,7 @@ protected:
   Standard_EXPORT void updateShape(const bool WithLocation = true);
 
   Standard_EXPORT void connect(const occ::handle<AIS_InteractiveObject>& theAnotherObj,
-                               const occ::handle<TopLoc_Datum3D>&        theLocation);
+                               const occ::handle<Graphic3d_HGTrsf>&      theLocation);
 
 protected:
   occ::handle<AIS_InteractiveObject> myReference;

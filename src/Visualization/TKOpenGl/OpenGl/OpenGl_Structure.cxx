@@ -129,23 +129,21 @@ void OpenGl_Structure::SetZLayer(const Graphic3d_ZLayerId theLayerIndex)
   updateLayerTransformation();
 }
 
-//=================================================================================================
-
-void OpenGl_Structure::SetTransformation(const occ::handle<TopLoc_Datum3D>& theTrsf)
+// =======================================================================
+// function : SetTransformation
+// purpose  :
+// =======================================================================
+void OpenGl_Structure::SetTransformation (const Handle(Graphic3d_HGTrsf)& theTrsf)
 {
   myTrsf       = theTrsf;
   myIsMirrored = false;
   if (!myTrsf.IsNull())
   {
-    // Determinant of transform matrix less then 0 means that mirror transform applied.
-    const gp_Trsf& aTrsf = myTrsf->Transformation();
-    const double   aDet =
-      aTrsf.Value(1, 1)
-        * (aTrsf.Value(2, 2) * aTrsf.Value(3, 3) - aTrsf.Value(3, 2) * aTrsf.Value(2, 3))
-      - aTrsf.Value(1, 2)
-          * (aTrsf.Value(2, 1) * aTrsf.Value(3, 3) - aTrsf.Value(3, 1) * aTrsf.Value(2, 3))
-      + aTrsf.Value(1, 3)
-          * (aTrsf.Value(2, 1) * aTrsf.Value(3, 2) - aTrsf.Value(3, 1) * aTrsf.Value(2, 2));
+    // Determinant of transform matrix less than 0 means that mirror transform applied.
+    const gp_GTrsf& aTrsf = *myTrsf;
+    const double aDet = aTrsf.Value(1, 1) * (aTrsf.Value (2, 2) * aTrsf.Value (3, 3) - aTrsf.Value (3, 2) * aTrsf.Value (2, 3))
+                             - aTrsf.Value(1, 2) * (aTrsf.Value (2, 1) * aTrsf.Value (3, 3) - aTrsf.Value (3, 1) * aTrsf.Value (2, 3))
+                             + aTrsf.Value(1, 3) * (aTrsf.Value (2, 1) * aTrsf.Value (3, 2) - aTrsf.Value (3, 1) * aTrsf.Value (2, 2));
     myIsMirrored = aDet < 0.0;
   }
 
@@ -173,10 +171,10 @@ void OpenGl_Structure::SetTransformPersistence(
 
 void OpenGl_Structure::updateLayerTransformation()
 {
-  gp_Trsf aRenderTrsf;
+  gp_GTrsf aRenderTrsf;
   if (!myTrsf.IsNull())
   {
-    aRenderTrsf = myTrsf->Trsf();
+    aRenderTrsf = *myTrsf;
   }
 
   const Graphic3d_ZLayerSettings& aLayer = myGraphicDriver->ZLayerSettings(myZLayer);
@@ -451,8 +449,9 @@ void OpenGl_Structure::Render(const occ::handle<OpenGl_Workspace>& theWorkspace)
   // detect scale transform
   if (aCtx->core11ffp != nullptr && !myTrsf.IsNull())
   {
-    const double aScale = myTrsf->Trsf().ScaleFactor();
-    if (std::abs(aScale - 1.0) > Precision::Confusion())
+    const double aScale = myTrsf->ScaleFactor();
+    if (myTrsf->Form() == gp_Other
+     || std::abs(aScale - 1.0) > Precision::Confusion())
     {
       aCtx->SetGlNormalizeEnabled(true);
     }

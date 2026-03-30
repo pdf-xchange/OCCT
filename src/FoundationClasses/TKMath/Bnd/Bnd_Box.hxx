@@ -29,6 +29,7 @@
 
 class gp_Pnt;
 class gp_Dir;
+class gp_GTrsf;
 class gp_Trsf;
 class gp_Lin;
 class gp_Pln;
@@ -293,7 +294,15 @@ public:
   //! Applying a geometric transformation (for example, a
   //! rotation) to a bounding box generally increases its
   //! dimensions. This is not optimal for algorithms which use it.
-  [[nodiscard]] Standard_EXPORT Bnd_Box Transformed(const gp_Trsf& T) const;
+  Standard_NODISCARD Standard_EXPORT Bnd_Box Transformed (const gp_Trsf& T) const;
+
+  //! Returns a bounding box which is the result of applying the
+  //! transformation @p T to this bounding box.
+  //! Warning
+  //! Applying a geometric transformation (for example, a rotation)
+  //! to a bounding box generally increases its dimensions.
+  //! This is suboptimal for algorithms which use it.
+  Standard_NODISCARD Standard_EXPORT Bnd_Box Transformed(const gp_GTrsf& T) const;
 
   //! Adds the box <Other> to <me>.
   Standard_EXPORT void Add(const Bnd_Box& Other);
@@ -404,14 +413,18 @@ protected:
   };
 
 private:
-  double Xmin;
-  double Xmax;
-  double Ymin;
-  double Ymax;
-  double Zmin;
-  double Zmax;
-  double Gap;
-  int    Flags;
+  //! Returns transformed bounding box.
+  template<class Trsf_t> Bnd_Box transformed(const Trsf_t& theTrsf) const;
+
+private:
+  double    Xmin;
+  double    Xmax;
+  double    Ymin;
+  double    Ymax;
+  double    Zmin;
+  double    Zmax;
+  double    Gap;
+  int       Flags;
 };
 
 #endif // _Bnd_Box_HeaderFile

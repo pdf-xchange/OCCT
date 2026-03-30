@@ -829,7 +829,7 @@ private:
     occ::handle<XCAFPrs_AISObject> aPrs = new XCAFPrs_AISObject(theLabel);
     if (!theLoc.IsIdentity())
     {
-      aPrs->SetLocalTransformation(theLoc);
+      aPrs->SetLocalTransformation(theLoc.Transformation());
     }
     if (myDispMode != -2)
     {

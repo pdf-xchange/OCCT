@@ -122,7 +122,7 @@ public:
   //! @param[in] theLocation   transformation to apply
   Standard_EXPORT static void AddFreeEdges(NCollection_Sequence<gp_Pnt>&          theSegments,
                                            const occ::handle<Poly_Triangulation>& thePolyTri,
-                                           const gp_Trsf&                         theLocation);
+                                           const gp_GTrsf&                        theLocation);
 };
 
 #endif // _Prs3d_HeaderFile

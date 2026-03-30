@@ -21,11 +21,11 @@
 #include <Graphic3d_ZLayerId.hxx>
 #include <NCollection_List.hxx>
 #include <Prs3d_Presentation.hxx>
+#include <Graphic3d_HGTrsf.hxx>
 
 class Graphic3d_Structure;
 typedef Graphic3d_Structure Prs3d_Presentation;
 
-class TopLoc_Datum3D;
 class Prs3d_Drawer;
 class PrsMgr_Presentation;
 class PrsMgr_PresentableObject;
@@ -146,7 +146,7 @@ public:
   //! thePrsObject has the display mode theMode; this has the default value of 0, that is, the
   //! wireframe display mode.
   Standard_EXPORT void Transform(const occ::handle<PrsMgr_PresentableObject>& thePrsObject,
-                                 const occ::handle<TopLoc_Datum3D>&           theTransformation,
+                                 const occ::handle<Graphic3d_HGTrsf>&         theTransformation,
                                  const int                                    theMode = 0);
 
   //! Returns the structure manager.

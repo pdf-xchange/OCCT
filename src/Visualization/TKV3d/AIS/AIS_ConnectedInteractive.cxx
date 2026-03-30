@@ -44,7 +44,7 @@ AIS_ConnectedInteractive::AIS_ConnectedInteractive(
 //=================================================================================================
 
 void AIS_ConnectedInteractive::connect(const occ::handle<AIS_InteractiveObject>& theAnotherObj,
-                                       const occ::handle<TopLoc_Datum3D>&        theLocation)
+                                       const occ::handle<Graphic3d_HGTrsf>&      theLocation)
 {
   if (myReference == theAnotherObj)
   {
@@ -129,7 +129,7 @@ void AIS_ConnectedInteractive::Compute(const occ::handle<PrsMgr_PresentationMana
 //=================================================================================================
 
 void AIS_ConnectedInteractive::computeHLR(const occ::handle<Graphic3d_Camera>&   theProjector,
-                                          const occ::handle<TopLoc_Datum3D>&     theTransformation,
+                                          const occ::handle<Graphic3d_HGTrsf>&   theTransformation,
                                           const occ::handle<Prs3d_Presentation>& thePresentation)
 {
   const bool hasTrsf = !theTransformation.IsNull() && theTransformation->Form() != gp_Identity;
@@ -140,6 +140,9 @@ void AIS_ConnectedInteractive::computeHLR(const occ::handle<Graphic3d_Camera>&  
   }
   if (hasTrsf)
   {
+    if (theTransformation->Form() == gp_Other)
+      throw Standard_NotImplemented("AIS_ConnectedInteractive::computeHLR() - unsupported gp_Other transformation");
+
     const TopLoc_Location& aLocation = myShape.Location();
     TopoDS_Shape aShape = myShape.Located(TopLoc_Location(theTransformation->Trsf()) * aLocation);
     AIS_Shape::computeHlrPresentation(theProjector, thePresentation, aShape, myDrawer);
@@ -172,7 +175,7 @@ void AIS_ConnectedInteractive::updateShape(const bool isWithLocation)
   }
   else
   {
-    myShape = aShape.Moved(TopLoc_Location(Transformation()));
+    myShape = aShape.Moved (TopLoc_Location (Transformation().Trsf()));
   }
 }
 
@@ -201,8 +204,7 @@ void AIS_ConnectedInteractive::ComputeSelection(
   const occ::handle<SelectMgr_Selection>& TheRefSel = myReference->Selection(theMode);
   occ::handle<SelectMgr_EntityOwner>      anOwner   = new SelectMgr_EntityOwner(this);
 
-  TopLoc_Location aLocation(Transformation());
-  anOwner->SetLocation(aLocation);
+  anOwner->SetLocation (TransformationGeom());
 
   if (TheRefSel->IsEmpty())
   {
@@ -275,7 +277,7 @@ void AIS_ConnectedInteractive::computeSubShapeSelection(
     const SensitiveList&             aSEList = aMapIt.Value();
     occ::handle<StdSelect_BRepOwner> anOwner =
       new StdSelect_BRepOwner(aMapIt.Key(), this, aSEList.First()->OwnerId()->Priority(), true);
-    anOwner->SetLocation(Transformation());
+    anOwner->SetLocation(TransformationGeom());
     for (SensitiveList::Iterator aListIt(aSEList); aListIt.More(); aListIt.Next())
     {
       if (occ::handle<Select3D_SensitiveEntity> aNewSE = aListIt.Value()->GetConnected())

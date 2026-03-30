@@ -260,7 +260,7 @@ void SelectMgr_SelectableObject::UpdateTransformation()
 void SelectMgr_SelectableObject::UpdateTransformations(
   const occ::handle<SelectMgr_Selection>& theSel)
 {
-  const TopLoc_Location aSelfLocation(Transformation());
+  const Handle(Graphic3d_HGTrsf) aSelfLocation (TransformationGeom());
   for (NCollection_Vector<occ::handle<SelectMgr_SensitiveEntity>>::Iterator aSelEntIter(
          theSel->Entities());
        aSelEntIter.More();

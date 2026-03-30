@@ -24,6 +24,7 @@
 
 class gp_Ax1;
 class gp_Ax2;
+class gp_GTrsf;
 class gp_Trsf;
 class gp_Vec;
 
@@ -179,6 +180,16 @@ public:
   Standard_EXPORT void Transform(const gp_Trsf& theT);
 
   [[nodiscard]] gp_Pnt Transformed(const gp_Trsf& theT) const
+  {
+    gp_Pnt aP = *this;
+    aP.Transform(theT);
+    return aP;
+  }
+
+  //! Transforms a point with the transformation @p T.
+  Standard_EXPORT void Transform(const gp_GTrsf& theT);
+
+  [[nodiscard]] gp_Pnt Transformed(const gp_GTrsf& theT) const
   {
     gp_Pnt aP = *this;
     aP.Transform(theT);

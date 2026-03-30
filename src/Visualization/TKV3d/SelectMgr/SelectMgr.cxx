@@ -59,12 +59,12 @@ static void addTriangulation(
   NCollection_List<occ::handle<NCollection_HSequence<gp_Pnt>>>& theSeqLines,
   NCollection_List<occ::handle<NCollection_HSequence<gp_Pnt>>>& theSeqFree,
   const occ::handle<Select3D_SensitiveTriangulation>&           theTri,
-  const gp_Trsf&                                                theLoc)
+  const gp_GTrsf&                                                theLoc)
 {
-  gp_Trsf aTrsf = theLoc;
+  gp_GTrsf aTrsf = theLoc;
   if (theTri->HasInitLocation())
   {
-    aTrsf = theLoc * theTri->GetInitLocation();
+    aTrsf = theLoc * gp_GTrsf(theTri->GetInitLocation());
   }
   const occ::handle<Poly_Triangulation>& aPolyTri = theTri->Triangulation();
   for (int aTriIter = 1; aTriIter <= aPolyTri->NbTriangles(); ++aTriIter)
@@ -81,7 +81,7 @@ static void addTriangulation(
   Prs3d::AddFreeEdges(*aPoints, aPolyTri, aTrsf);
   if (!aPoints->IsEmpty())
   {
-    theSeqFree.Append(aPoints);
+    theSeqFree.Append (aPoints);
   }
 }
 
@@ -89,7 +89,7 @@ static void addTriangulation(
 static void addBoundingBox(
   NCollection_List<occ::handle<NCollection_HSequence<gp_Pnt>>>& theSeqLines,
   const occ::handle<Select3D_SensitiveBox>&                     theSensBox,
-  const gp_Trsf&                                                theLoc)
+  const gp_GTrsf&                                               theLoc)
 {
   NCollection_Vec3<double> aMin, aMax;
   theSensBox->Box().Get(aMin.x(), aMin.y(), aMin.z(), aMax.x(), aMax.y(), aMax.z());
@@ -136,7 +136,7 @@ static void addBoundingBox(
 //! Fill in circle polylines.
 static void addCircle(NCollection_List<occ::handle<NCollection_HSequence<gp_Pnt>>>& theSeqLines,
                       const double                                                  theRadius,
-                      const gp_Trsf&                                                theTrsf,
+                      const gp_GTrsf&                                               theTrsf,
                       const double                                                  theHeight = 0)
 {
   const double anUStep = 0.1;
@@ -156,12 +156,12 @@ static void addCircle(NCollection_List<occ::handle<NCollection_HSequence<gp_Pnt>
 //! Fill in cylinder polylines.
 static void addCylinder(NCollection_List<occ::handle<NCollection_HSequence<gp_Pnt>>>& theSeqLines,
                         const occ::handle<Select3D_SensitiveCylinder>&                theSensCyl,
-                        const gp_Trsf&                                                theLoc)
+                        const gp_GTrsf&                                               theLoc)
 {
   occ::handle<NCollection_HSequence<gp_Pnt>> aVertLine1 = new NCollection_HSequence<gp_Pnt>();
   occ::handle<NCollection_HSequence<gp_Pnt>> aVertLine2 = new NCollection_HSequence<gp_Pnt>();
 
-  const gp_Trsf& aTrsf   = theLoc.Multiplied(theSensCyl->Transformation());
+  const gp_GTrsf aTrsf   = theLoc.Multiplied (gp_GTrsf(theSensCyl->Transformation()));
   const double   aHeight = theSensCyl->Height();
 
   for (int aCircNum = 0; aCircNum < 3; aCircNum++)
@@ -190,7 +190,7 @@ static void addCylinder(NCollection_List<occ::handle<NCollection_HSequence<gp_Pn
 
 void SelectMgr::ComputeSensitivePrs(const occ::handle<Graphic3d_Structure>&     thePrs,
                                     const occ::handle<SelectMgr_Selection>&     theSel,
-                                    const gp_Trsf&                              theLoc,
+                                    const gp_GTrsf&                             theLoc,
                                     const occ::handle<Graphic3d_TransformPers>& theTrsfPers)
 {
   thePrs->SetTransformPersistence(theTrsfPers);
@@ -215,7 +215,7 @@ void SelectMgr::ComputeSensitivePrs(const occ::handle<Graphic3d_Structure>&     
     else if (occ::handle<Select3D_SensitiveCircle> aSensCircle =
                occ::down_cast<Select3D_SensitiveCircle>(anEnt))
     {
-      addCircle(aSeqLines, aSensCircle->Radius(), theLoc.Multiplied(aSensCircle->Transformation()));
+      addCircle(aSeqLines, aSensCircle->Radius(), theLoc.Multiplied(gp_GTrsf(aSensCircle->Transformation())));
     }
     else if (occ::handle<Select3D_SensitiveFace> aFace =
                occ::down_cast<Select3D_SensitiveFace>(anEnt))

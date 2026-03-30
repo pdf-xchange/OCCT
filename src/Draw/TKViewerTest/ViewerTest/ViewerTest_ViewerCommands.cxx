@@ -7473,7 +7473,7 @@ static int VAnimation(Draw_Interpretor& theDI, int theArgNb, const char** theArg
         return 1;
       }
 
-      gp_Trsf       aTrsfs[2] = {anObject->LocalTransformation(), anObject->LocalTransformation()};
+      gp_Trsf       aTrsfs[2] = {anObject->LocalTransformation().Trsf(), anObject->LocalTransformation().Trsf()};
       gp_Quaternion aRotQuats[2] = {aTrsfs[0].GetRotation(), aTrsfs[1].GetRotation()};
       gp_XYZ        aLocPnts[2]  = {aTrsfs[0].TranslationPart(), aTrsfs[1].TranslationPart()};
       double        aScales[2]   = {aTrsfs[0].ScaleFactor(), aTrsfs[1].ScaleFactor()};
@@ -12471,21 +12471,27 @@ static int VManipulator(Draw_Interpretor& theDi, int theArgsNb, const char** the
   if (anAttachPos != ManipAjustPosition_Off && aManipulator->IsAttached()
       && (anAttachObject.IsNull() || anAttachPos != ManipAjustPosition_Center))
   {
-    gp_Ax2        aPosition = gp::XOY();
-    const gp_Trsf aBaseTrsf = aManipulator->Object()->LocalTransformation();
+    gp_Ax2 aPosition = gp::XOY();
+    const gp_GTrsf aBaseTrsf = aManipulator->Object()->LocalTransformation();
     switch (anAttachPos)
     {
       case ManipAjustPosition_Off: {
         break;
       }
-      case ManipAjustPosition_Location: {
-        aPosition = gp::XOY().Transformed(aBaseTrsf);
+      case ManipAjustPosition_Location:
+      {
+        gp_Dir aDirN = aPosition.Direction().Transformed(aBaseTrsf);
+        gp_Dir aDirX = aPosition.XDirection().Transformed(aBaseTrsf);
+        aPosition = gp_Ax2(aBaseTrsf.TranslationPart(), aDirN, aDirX);
         break;
       }
       case ManipAjustPosition_ShapeLocation: {
         if (occ::handle<AIS_Shape> aShapePrs = occ::down_cast<AIS_Shape>(aManipulator->Object()))
         {
-          aPosition = gp::XOY().Transformed(aBaseTrsf * aShapePrs->Shape().Location());
+          gp_GTrsf aTrsfComb = aBaseTrsf * aShapePrs->Shape().Location().Transformation();
+          gp_Dir aDirN = aPosition.Direction().Transformed(aTrsfComb);
+          gp_Dir aDirX = aPosition.XDirection().Transformed(aTrsfComb);
+          aPosition = gp_Ax2(aTrsfComb.TranslationPart(), aDirN, aDirX);
         }
         else
         {

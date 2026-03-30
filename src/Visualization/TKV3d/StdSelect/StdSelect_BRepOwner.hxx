@@ -111,7 +111,7 @@ public:
   Standard_EXPORT void Clear(const occ::handle<PrsMgr_PresentationManager>& aPM,
                              const int                                      aMode = 0) override;
 
-  Standard_EXPORT void SetLocation(const TopLoc_Location& aLoc) override;
+  Standard_EXPORT void SetLocation(const Handle(Graphic3d_HGTrsf)& aLoc) override;
 
   //! Implements immediate application of location transformation of parent object to dynamic
   //! highlight structure

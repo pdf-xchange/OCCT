@@ -502,10 +502,10 @@ bool OpenGl_View::addRaytraceStructure(const OpenGl_Structure*            theStr
 // function : addRaytraceGroups
 // purpose  : Adds OpenGL groups to ray-traced scene geometry
 // =======================================================================
-bool OpenGl_View::addRaytraceGroups(const OpenGl_Structure*            theStructure,
-                                    const OpenGl_RaytraceMaterial&     theStructMat,
-                                    const occ::handle<TopLoc_Datum3D>& theTrsf,
-                                    const occ::handle<OpenGl_Context>& theGlContext)
+bool OpenGl_View::addRaytraceGroups (const OpenGl_Structure*        theStructure,
+                                     const OpenGl_RaytraceMaterial& theStructMat,
+                                     const occ::handle<Graphic3d_HGTrsf>& theTrsf,
+                                     const occ::handle<OpenGl_Context>&  theGlContext)
 {
   NCollection_Mat4<float> aMat4;
   const bool              hasTrsf = !theTrsf.IsNull();
@@ -557,7 +557,8 @@ bool OpenGl_View::addRaytraceGroups(const OpenGl_Structure*            theStruct
             opencascade::handle<BVH_Transform<float, 4>> aTransform = new BVH_Transform<float, 4>();
             if (hasTrsf)
             {
-              aTransform->SetTransform(aMat4);
+              theTrsf->GetMat4 (aMat4);
+              aTransform->SetTransform (aMat4);
             }
 
             aSet->SetProperties(aTransform);
@@ -576,7 +577,8 @@ bool OpenGl_View::addRaytraceGroups(const OpenGl_Structure*            theStruct
                 new BVH_Transform<float, 4>();
               if (hasTrsf)
               {
-                aTransform->SetTransform(aMat4);
+                theTrsf->GetMat4 (aMat4);
+                aTransform->SetTransform (aMat4);
               }
 
               aSet->SetProperties(aTransform);

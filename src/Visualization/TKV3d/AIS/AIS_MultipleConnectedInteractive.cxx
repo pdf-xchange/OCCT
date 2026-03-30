@@ -35,7 +35,7 @@ AIS_MultipleConnectedInteractive::AIS_MultipleConnectedInteractive()
 
 occ::handle<AIS_InteractiveObject> AIS_MultipleConnectedInteractive::connect(
   const occ::handle<AIS_InteractiveObject>&   theAnotherObj,
-  const occ::handle<TopLoc_Datum3D>&          theTrsf,
+  const occ::handle<Graphic3d_HGTrsf>&        theTrsf,
   const occ::handle<Graphic3d_TransformPers>& theTrsfPers)
 {
   if (myAssemblyOwner.IsNull())

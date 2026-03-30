@@ -263,7 +263,7 @@ bool BRepTools_GTrsfModification::NewTriangulation(
   for (int anInd = 1; anInd <= theTriangulation->NbNodes(); ++anInd)
   {
     gp_Pnt aP = theTriangulation->Node(anInd);
-    aGTrsf.Transforms(aP.ChangeCoord());
+    aP.Transform(aGTrsf);
     theTriangulation->SetNode(anInd, aP);
   }
   // modify triangles orientation in case of mirror transformation
@@ -284,12 +284,7 @@ bool BRepTools_GTrsfModification::NewTriangulation(
     for (int anInd = 1; anInd <= theTriangulation->NbNodes(); ++anInd)
     {
       gp_Dir aNormal = theTriangulation->Normal(anInd);
-      gp_Mat aMat    = aGTrsf.VectorialPart();
-      aMat.SetDiagonal(1., 1., 1.);
-      gp_Trsf aTrsf;
-      aTrsf.SetForm(gp_Rotation);
-      (gp_Mat&)aTrsf.HVectorialPart() = aMat;
-      aNormal.Transform(aTrsf);
+      aNormal.Transform(aGTrsf);
       theTriangulation->SetNormal(anInd, aNormal);
     }
   }
@@ -321,7 +316,7 @@ bool BRepTools_GTrsfModification::NewPolygon(const TopoDS_Edge&           theEdg
   for (int anId = aNodesArray.Lower(); anId <= aNodesArray.Upper(); ++anId)
   {
     gp_Pnt& aP = aNodesArray.ChangeValue(anId);
-    aGTrsf.Transforms(aP.ChangeCoord());
+    aP.Transform(aGTrsf);
   }
   return true;
 }

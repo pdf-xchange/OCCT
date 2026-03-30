@@ -23,7 +23,7 @@
 #include <Graphic3d_ViewAffinity.hxx>
 #include <Graphic3d_TransformPers.hxx>
 #include <Graphic3d_ZLayerId.hxx>
-#include <TopLoc_Datum3D.hxx>
+#include <Graphic3d_HGTrsf.hxx>
 #include <NCollection_IndexedMap.hxx>
 
 class Graphic3d_GraphicDriver;
@@ -86,10 +86,10 @@ public:
   const NCollection_Sequence<occ::handle<Graphic3d_Group>>& Groups() const { return myGroups; }
 
   //! Return transformation.
-  const occ::handle<TopLoc_Datum3D>& Transformation() const { return myTrsf; }
+  const Handle(Graphic3d_HGTrsf)& Transformation() const { return myTrsf; }
 
   //! Assign transformation.
-  virtual void SetTransformation(const occ::handle<TopLoc_Datum3D>& theTrsf) { myTrsf = theTrsf; }
+  virtual void SetTransformation (const Handle(Graphic3d_HGTrsf)& theTrsf) { myTrsf = theTrsf; }
 
   //! Return transformation persistence.
   const occ::handle<Graphic3d_TransformPers>& TransformPersistence() const { return myTrsfPers; }
@@ -235,7 +235,7 @@ protected:
   occ::handle<Graphic3d_GraphicDriver>               myGraphicDriver;
   NCollection_Sequence<occ::handle<Graphic3d_Group>> myGroups;
   Graphic3d_BndBox3d                                 myBndBox;
-  occ::handle<TopLoc_Datum3D>                        myTrsf;
+  occ::handle<Graphic3d_HGTrsf>                      myTrsf;
   occ::handle<Graphic3d_TransformPers>               myTrsfPers;
   occ::handle<Graphic3d_SequenceOfHClipPlane>        myClipPlanes;
   // clang-format off

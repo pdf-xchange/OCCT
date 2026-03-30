@@ -17,6 +17,7 @@
 #define OpenGl_View_HeaderFile
 
 #include <Graphic3d_CullingTool.hxx>
+#include <Graphic3d_HGTrsf.hxx>
 #include <Graphic3d_WorldViewProjState.hxx>
 #include <math_BullardGenerator.hxx>
 
@@ -803,10 +804,10 @@ protected: //! @name methods related to ray-tracing
                             const occ::handle<OpenGl_Context>& theGlContext);
 
   //! Adds OpenGL groups to ray-traced scene geometry.
-  bool addRaytraceGroups(const OpenGl_Structure*            theStructure,
-                         const OpenGl_RaytraceMaterial&     theStructMat,
-                         const occ::handle<TopLoc_Datum3D>& theTrsf,
-                         const occ::handle<OpenGl_Context>& theGlContext);
+  bool addRaytraceGroups (const OpenGl_Structure*        theStructure,
+                          const OpenGl_RaytraceMaterial& theStructMat,
+                          const occ::handle<Graphic3d_HGTrsf>& theTrsf,
+                          const occ::handle<OpenGl_Context>&  theGlContext);
 
   //! Creates ray-tracing material properties.
   OpenGl_RaytraceMaterial convertMaterial(const OpenGl_Aspects*              theAspect,

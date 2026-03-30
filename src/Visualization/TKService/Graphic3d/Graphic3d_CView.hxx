@@ -213,7 +213,7 @@ private:
 
   //! Transforms the structure in the view.
   Standard_EXPORT void SetTransform(const occ::handle<Graphic3d_Structure>& theStructure,
-                                    const occ::handle<TopLoc_Datum3D>&      theTrsf);
+                                    const occ::handle<Graphic3d_HGTrsf>&    theTrsf);
 
   //! Suppress the highlighting on the structure <AStructure>
   //! in the view <me>.

@@ -248,8 +248,9 @@ bool AIS_LightSource::ProcessDragging(const occ::handle<AIS_InteractiveContext>&
 
   switch (theAction)
   {
-    case AIS_DragAction_Start: {
-      myLocTrsfStart = LocalTransformation();
+    case AIS_DragAction_Start:
+    {
+      myLocTrsfStart = LocalTransformation().Trsf();
       return true;
     }
     case AIS_DragAction_Confirmed: {
@@ -422,36 +423,36 @@ void AIS_LightSource::updateLightLocalTransformation()
       if (myIsZoomable)
       {
         gp_Trsf aTrsf;
-        aTrsf.SetTranslation(gp::Origin(), myLightSource->Position());
-        myLocalTransformation = new TopLoc_Datum3D(aTrsf);
+        aTrsf.SetTranslation (gp::Origin(), myLightSource->Position());
+        myLocalTransformation = new Graphic3d_HGTrsf (aTrsf);
       }
       break;
     }
     case Graphic3d_TypeOfLightSource_Directional: {
       const gp_Pnt aLightPos = (myIsZoomable && !myLightSource->IsHeadlight())
-                                 ? myLightSource->DisplayPosition()
-                                 : gp::Origin();
-      gp_Trsf      aTrsf;
-      const gp_Ax2 anAx2(aLightPos, -myLightSource->Direction());
-      aTrsf.SetTransformation(anAx2, gp_Ax3());
-      myLocalTransformation = new TopLoc_Datum3D(aTrsf);
+                             ? myLightSource->DisplayPosition()
+                             : gp::Origin();
+      gp_Trsf aTrsf;
+      const gp_Ax2 anAx2 (aLightPos, -myLightSource->Direction());
+      aTrsf.SetTransformation (anAx2, gp_Ax3());
+      myLocalTransformation = new Graphic3d_HGTrsf (aTrsf);
       break;
     }
     case Graphic3d_TypeOfLightSource_Positional: {
       if (myIsZoomable)
       {
         gp_Trsf aTrsf;
-        aTrsf.SetTranslation(gp::Origin(), myLightSource->Position());
-        myLocalTransformation = new TopLoc_Datum3D(aTrsf);
+        aTrsf.SetTranslation (gp::Origin(), myLightSource->Position());
+        myLocalTransformation = new Graphic3d_HGTrsf (aTrsf);
       }
       break;
     }
-    case Graphic3d_TypeOfLightSource_Spot: {
-      gp_Trsf      aTrsf;
-      const gp_Ax2 anAx2(myIsZoomable ? myLightSource->Position() : gp::Origin(),
-                         -myLightSource->Direction());
-      aTrsf.SetTransformation(anAx2, gp_Ax3());
-      myLocalTransformation = new TopLoc_Datum3D(aTrsf);
+    case Graphic3d_TypeOfLightSource_Spot:
+    {
+      gp_Trsf aTrsf;
+      const gp_Ax2 anAx2 (myIsZoomable ? myLightSource->Position() : gp::Origin(), -myLightSource->Direction());
+      aTrsf.SetTransformation (anAx2, gp_Ax3());
+      myLocalTransformation = new Graphic3d_HGTrsf (aTrsf);
       break;
     }
   }
@@ -460,9 +461,9 @@ void AIS_LightSource::updateLightLocalTransformation()
 
 //=================================================================================================
 
-void AIS_LightSource::setLocalTransformation(const occ::handle<TopLoc_Datum3D>& theTrsf)
+void AIS_LightSource::setLocalTransformation(const occ::handle<Graphic3d_HGTrsf>& theTrsf)
 {
-  const gp_Trsf aTrsf = !theTrsf.IsNull() ? theTrsf->Transformation() : gp_Trsf();
+  const gp_GTrsf aTrsf = !theTrsf.IsNull() ? *theTrsf : gp_GTrsf();
   switch (myLightSource->Type())
   {
     case Graphic3d_TypeOfLightSource_Ambient: {
@@ -493,7 +494,7 @@ void AIS_LightSource::setLocalTransformation(const occ::handle<TopLoc_Datum3D>& 
     }
   }
 
-  base_type::setLocalTransformation(new TopLoc_Datum3D(aTrsf));
+  base_type::setLocalTransformation (new Graphic3d_HGTrsf (aTrsf));
 
   updateLightAspects();
   updateLightTransformPersistence();

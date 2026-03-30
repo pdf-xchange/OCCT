@@ -304,7 +304,7 @@ public:
   Standard_EXPORT void ClearSensitive(const occ::handle<V3d_View>& theView);
 
   Standard_EXPORT void DisplaySensitive(const occ::handle<SelectMgr_Selection>& theSel,
-                                        const gp_Trsf&                          theTrsf,
+                                        const gp_GTrsf&                         theTrsf,
                                         const occ::handle<V3d_View>&            theView,
                                         const bool theToClearOthers = true);
 

@@ -156,6 +156,9 @@ public:
   //! some other type of transformation.
   constexpr gp_TrsfForm Form() const noexcept { return shape; }
 
+  //! Returns the scale factor or 0.0 for gp_Other transformation.
+  double ScaleFactor() const { return scale; }
+
   //! verify and set the shape of the GTrsf Other or CompoundTrsf
   //! Ex :
   //! @code

@@ -183,12 +183,9 @@ public:
                         Aspect_VKeyFlags             theModifiers,
                         bool                         theIsDoubleClick) override;
 
-  void SetLocation(const TopLoc_Location& theLocation) override
+  void SetLocation (const Handle(Graphic3d_HGTrsf)& theLocation) override
   {
-    if (!myPrs.IsNull())
-    {
-      myPrs->SetTransformation(new TopLoc_Datum3D(theLocation.Transformation()));
-    }
+    if (!myPrs.IsNull()) { myPrs->SetTransformation (theLocation); }
   }
 
 protected:
@@ -288,11 +285,10 @@ bool MyAisOwner::HandleMouseClick(const NCollection_Vec2<int>& thePoint,
     MyAisObject* anObj  = dynamic_cast<MyAisObject*>(mySelectable);
 
     gp_Trsf aTrsfTo;
-    aTrsfTo.SetRotation(gp_Ax1(gp::Origin(), gp::DX()), isFirst ? M_PI * 0.5 : -M_PI * 0.5);
-    gp_Trsf                          aTrsfFrom = anObj->LocalTransformation();
-    occ::handle<AIS_AnimationObject> anAnim =
-      new AIS_AnimationObject("MyAnim", anObj->InteractiveContext(), anObj, aTrsfFrom, aTrsfTo);
-    anAnim->SetOwnDuration(2.0);
+    aTrsfTo.SetRotation (gp_Ax1 (gp::Origin(), gp::DX()), isFirst ? M_PI * 0.5 : -M_PI * 0.5);
+    gp_Trsf aTrsfFrom = anObj->LocalTransformation().Trsf();
+    Handle(AIS_AnimationObject) anAnim = new AIS_AnimationObject ("MyAnim", anObj->InteractiveContext(), anObj, aTrsfFrom, aTrsfTo);
+    anAnim->SetOwnDuration (2.0);
 
     myAnim->Clear();
     myAnim->Add(anAnim);

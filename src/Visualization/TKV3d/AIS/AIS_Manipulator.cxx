@@ -494,19 +494,16 @@ occ::handle<AIS_InteractiveObject> AIS_Manipulator::Object() const
 bool AIS_Manipulator::ObjectTransformation(const int                    theMaxX,
                                            const int                    theMaxY,
                                            const occ::handle<V3d_View>& theView,
-                                           gp_Trsf&                     theTrsf)
+                                           gp_GTrsf&                    theTrsf)
 {
   // Initialize start reference data
   if (!myHasStartedTransformation)
   {
     myStartTrsfs.Clear();
     occ::handle<NCollection_HSequence<occ::handle<AIS_InteractiveObject>>> anObjects = Objects();
-    for (NCollection_HSequence<occ::handle<AIS_InteractiveObject>>::Iterator anObjIter(*anObjects);
-         anObjIter.More();
-         anObjIter.Next())
-    {
-      myStartTrsfs.Append(anObjIter.Value()->LocalTransformation());
-    }
+    for (NCollection_HSequence<occ::handle<AIS_InteractiveObject>>::Iterator anObjIter (*anObjects); anObjIter.More(); anObjIter.Next())
+      myStartTrsfs.Append (anObjIter.Value()->LocalTransformationGeom());
+
     myStartPosition = myPosition;
   }
 
@@ -551,8 +548,8 @@ bool AIS_Manipulator::ObjectTransformation(const int                    theMaxX,
       gp_Trsf aNewTrsf;
       if (myCurrentMode == AIS_MM_Translation)
       {
-        aNewTrsf.SetTranslation(gp_Vec(myStartPick, aNewPosition));
-        theTrsf *= aNewTrsf;
+        aNewTrsf.SetTranslation (gp_Vec(myStartPick, aNewPosition));
+        theTrsf *= gp_GTrsf(aNewTrsf);
       }
       else if (myCurrentMode == AIS_MM_Scaling)
       {
@@ -646,8 +643,8 @@ bool AIS_Manipulator::ObjectTransformation(const int                    theMaxX,
       }
 
       gp_Trsf aNewTrsf;
-      aNewTrsf.SetRotation(aCurrAxis, anAngle);
-      theTrsf *= aNewTrsf;
+      aNewTrsf.SetRotation (aCurrAxis, anAngle);
+      theTrsf *= gp_GTrsf(aNewTrsf);
       myPrevState = anAngle;
       return true;
     }
@@ -678,7 +675,7 @@ bool AIS_Manipulator::ObjectTransformation(const int                    theMaxX,
 
       gp_Trsf aNewTrsf;
       aNewTrsf.SetTranslation(gp_Vec(myStartPick, aNewPosition));
-      theTrsf *= aNewTrsf;
+      theTrsf *= gp_GTrsf(aNewTrsf);
       return true;
     }
     case AIS_MM_None: {
@@ -747,8 +744,8 @@ void AIS_Manipulator::StartTransform(const int                    theX,
     return;
   }
 
-  gp_Trsf aTrsf;
-  ObjectTransformation(theX, theY, theView, aTrsf);
+  gp_GTrsf aTrsf;
+  ObjectTransformation (theX, theY, theView, aTrsf);
 }
 
 //=================================================================================================
@@ -768,12 +765,12 @@ void AIS_Manipulator::StopTransform(const bool theToApply)
 
   occ::handle<NCollection_HSequence<occ::handle<AIS_InteractiveObject>>> anObjects = Objects();
   NCollection_HSequence<occ::handle<AIS_InteractiveObject>>::Iterator    anObjIter(*anObjects);
-  NCollection_Sequence<gp_Trsf>::Iterator                                aTrsfIter(myStartTrsfs);
+  NCollection_Sequence<Handle(Graphic3d_HGTrsf)>::Iterator               aTrsfIter(myStartTrsfs);
   for (; anObjIter.More(); anObjIter.Next(), aTrsfIter.Next())
   {
     anObjIter.ChangeValue()->SetLocalTransformation(aTrsfIter.Value());
   }
-  SetPosition(myStartPosition);
+  SetPosition (myStartPosition);
 }
 
 //=================================================================================================
@@ -966,8 +963,7 @@ void AIS_Manipulator::RecomputeTransformation(const occ::handle<Graphic3d_Camera
 }
 
 //=================================================================================================
-
-void AIS_Manipulator::Transform(const gp_Trsf& theTrsf)
+void AIS_Manipulator::Transform (const gp_GTrsf& theTrsf)
 {
   if (!IsAttached() || !myHasStartedTransformation)
   {
@@ -977,7 +973,7 @@ void AIS_Manipulator::Transform(const gp_Trsf& theTrsf)
   {
     occ::handle<NCollection_HSequence<occ::handle<AIS_InteractiveObject>>> anObjects = Objects();
     NCollection_HSequence<occ::handle<AIS_InteractiveObject>>::Iterator    anObjIter(*anObjects);
-    NCollection_Sequence<gp_Trsf>::Iterator                                aTrsfIter(myStartTrsfs);
+    NCollection_Sequence<Handle(Graphic3d_HGTrsf)>::Iterator               aTrsfIter(myStartTrsfs);
     for (; anObjIter.More(); anObjIter.Next(), aTrsfIter.Next())
     {
       const occ::handle<AIS_InteractiveObject>&   anObj      = anObjIter.ChangeValue();
@@ -990,14 +986,15 @@ void AIS_Manipulator::Transform(const gp_Trsf& theTrsf)
         continue;
       }
 
-      const gp_Trsf&                     anOldTrsf   = aTrsfIter.Value();
-      const occ::handle<TopLoc_Datum3D>& aParentTrsf = anObj->CombinedParentTransformation();
+      const gp_GTrsf anOldTrsf = !aTrsfIter.Value().IsNull() ? *aTrsfIter.Value() : gp_GTrsf();
+      const Handle(Graphic3d_HGTrsf)& aParentTrsf = anObj->CombinedParentTransformation();
+      // intentionally avoid calling AIS_InteractiveConext::SetLocation()
+      // to postpone invalidation of selection manager
       if (!aParentTrsf.IsNull() && aParentTrsf->Form() != gp_Identity)
       {
         // recompute local transformation relative to parent transformation
-        const gp_Trsf aNewLocalTrsf =
-          aParentTrsf->Trsf().Inverted() * theTrsf * aParentTrsf->Trsf() * anOldTrsf;
-        anObj->SetLocalTransformation(aNewLocalTrsf);
+        const gp_GTrsf aNewLocalTrsf = aParentTrsf->Inverted() * theTrsf * (*aParentTrsf) * anOldTrsf;
+        anObj->SetLocalTransformation (aNewLocalTrsf);
       }
       else
       {
@@ -1019,15 +1016,13 @@ void AIS_Manipulator::Transform(const gp_Trsf& theTrsf)
 
 //=================================================================================================
 
-gp_Trsf AIS_Manipulator::Transform(const int                    thePX,
-                                   const int                    thePY,
-                                   const occ::handle<V3d_View>& theView)
+gp_GTrsf AIS_Manipulator::Transform(const int                    thePX,
+                                    const int                    thePY,
+                                    const occ::handle<V3d_View>& theView)
 {
-  gp_Trsf aTrsf;
-  if (ObjectTransformation(thePX, thePY, theView, aTrsf))
-  {
-    Transform(aTrsf);
-  }
+  gp_GTrsf aTrsf;
+  if (ObjectTransformation (thePX, thePY, theView, aTrsf))
+    Transform (aTrsf);
 
   return aTrsf;
 }
@@ -1067,7 +1062,7 @@ void AIS_Manipulator::updateTransformation()
     aTrsf.SetTransformation(gp_Ax2(gp::Origin(), aVDir, aXDir), gp::XOY());
   }
 
-  occ::handle<TopLoc_Datum3D> aGeomTrsf = new TopLoc_Datum3D(aTrsf);
+  Handle(Graphic3d_HGTrsf) aGeomTrsf = new Graphic3d_HGTrsf (aTrsf);
   // we explicitly call here setLocalTransformation() of the base class
   // since AIS_Manipulator::setLocalTransformation() implementation throws exception
   // as protection from external calls
@@ -1219,7 +1214,7 @@ void AIS_Manipulator::setTransformPersistence(
 
 //=================================================================================================
 
-void AIS_Manipulator::setLocalTransformation(const occ::handle<TopLoc_Datum3D>& /*theTrsf*/)
+void AIS_Manipulator::setLocalTransformation(const occ::handle<Graphic3d_HGTrsf>& /*theTrsf*/)
 {
   Standard_ASSERT_INVOKE("AIS_Manipulator::setLocalTransformation: "
                          "Custom transformation is not supported by this class");
@@ -1991,4 +1986,23 @@ void AIS_Manipulator::Axis::Compute(const occ::handle<PrsMgr_PresentationManager
       aGroup->AddPrimitiveArray(mySector.Array());
     }
   }
+}
+
+//=======================================================================
+//class    : Axis
+//function : Transform
+//=======================================================================
+void AIS_Manipulator::Axis::Transform(const Handle(Graphic3d_HGTrsf)& theTransformation)
+{
+  if (!myHighlightTranslator.IsNull())
+    myHighlightTranslator->SetTransformation(theTransformation);
+
+  if (!myHighlightScaler.IsNull())
+    myHighlightScaler->SetTransformation(theTransformation);
+
+  if (!myHighlightRotator.IsNull())
+    myHighlightRotator->SetTransformation(theTransformation);
+
+  if (!myHighlightDragger.IsNull())
+    myHighlightDragger->SetTransformation(theTransformation);
 }

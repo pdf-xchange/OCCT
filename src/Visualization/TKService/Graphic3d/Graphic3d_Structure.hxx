@@ -370,13 +370,10 @@ public:
   bool HLRValidation() const { return myOwner != nullptr && myCStructure->HLRValidation != 0; }
 
   //! Return local transformation.
-  const occ::handle<TopLoc_Datum3D>& Transformation() const
-  {
-    return myCStructure->Transformation();
-  }
+  const Handle(Graphic3d_HGTrsf)& Transformation() const { return myCStructure->Transformation(); }
 
   //! Modifies the current local transformation
-  Standard_EXPORT void SetTransformation(const occ::handle<TopLoc_Datum3D>& theTrsf);
+  Standard_EXPORT void SetTransformation (const Handle(Graphic3d_HGTrsf)& theTrsf);
 
   //! Modifies the current transform persistence (pan, zoom or rotate)
   Standard_EXPORT void SetTransformPersistence(
@@ -424,7 +421,7 @@ public:
   }
 
   //! Internal method which sets new transformation without calling graphic manager callbacks.
-  void GraphicTransform(const occ::handle<TopLoc_Datum3D>& theTrsf)
+  void GraphicTransform(const occ::handle<Graphic3d_HGTrsf>& theTrsf)
   {
     if (!myCStructure.IsNull())
     {

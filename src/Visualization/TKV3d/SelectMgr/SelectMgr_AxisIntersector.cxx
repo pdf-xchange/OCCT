@@ -61,11 +61,9 @@ occ::handle<SelectMgr_BaseIntersector> SelectMgr_AxisIntersector::ScaleAndTransf
   }
 
   gp_Pnt aTransformedLoc = myAxis.Location();
-  theTrsf.Transforms(aTransformedLoc.ChangeCoord());
-  gp_XYZ   aTransformedDir = myAxis.Direction().XYZ();
-  gp_GTrsf aTrsf           = theTrsf;
-  aTrsf.SetTranslationPart(gp_XYZ(0., 0., 0.));
-  aTrsf.Transforms(aTransformedDir);
+  aTransformedLoc.Transform(theTrsf);
+  gp_Dir aTransformedDir = myAxis.Direction();
+  aTransformedDir.Transform(theTrsf);
 
   occ::handle<SelectMgr_AxisIntersector> aRes = new SelectMgr_AxisIntersector();
   aRes->myAxis                                = gp_Ax1(aTransformedLoc, gp_Dir(aTransformedDir));

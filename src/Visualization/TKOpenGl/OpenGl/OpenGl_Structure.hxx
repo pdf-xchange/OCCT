@@ -53,7 +53,7 @@ public:
   Standard_EXPORT void Disconnect(Graphic3d_CStructure& theStructure) override;
 
   //! Synchronize structure transformation
-  Standard_EXPORT void SetTransformation(const occ::handle<TopLoc_Datum3D>& theTrsf) override;
+  Standard_EXPORT void SetTransformation (const Handle(Graphic3d_HGTrsf)& theTrsf) override;
 
   //! Set transformation persistence.
   Standard_EXPORT void SetTransformPersistence(

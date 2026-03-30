@@ -404,7 +404,7 @@ void Graphic3d_StructureManager::UnHighlight()
 //=================================================================================================
 
 void Graphic3d_StructureManager::SetTransform(const occ::handle<Graphic3d_Structure>& theStructure,
-                                              const occ::handle<TopLoc_Datum3D>&      theTrsf)
+                                              const occ::handle<Graphic3d_HGTrsf>&    theTrsf)
 {
   for (NCollection_IndexedMap<Graphic3d_CView*>::Iterator aViewIt(myDefinedViews); aViewIt.More();
        aViewIt.Next())

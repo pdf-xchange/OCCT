@@ -39,7 +39,7 @@ public:
   //! @return created instance object (AIS_ConnectedInteractive or AIS_MultipleConnectedInteractive)
   occ::handle<AIS_InteractiveObject> Connect(
     const occ::handle<AIS_InteractiveObject>&   theAnotherObj,
-    const occ::handle<TopLoc_Datum3D>&          theLocation,
+    const occ::handle<Graphic3d_HGTrsf>&        theLocation,
     const occ::handle<Graphic3d_TransformPers>& theTrsfPers)
   {
     return connect(theAnotherObj, theLocation, theTrsfPers);
@@ -95,9 +95,7 @@ public: // short aliases to Connect() method
     const occ::handle<AIS_InteractiveObject>& theAnotherObj,
     const gp_Trsf&                            theLocation)
   {
-    return connect(theAnotherObj,
-                   new TopLoc_Datum3D(theLocation),
-                   theAnotherObj->TransformPersistence());
+    return connect (theAnotherObj, new Graphic3d_HGTrsf (theLocation), theAnotherObj->TransformPersistence());
   }
 
   //! Establishes the connection between the Connected Interactive Object, theInteractive, and its
@@ -109,7 +107,7 @@ public: // short aliases to Connect() method
     const gp_Trsf&                              theLocation,
     const occ::handle<Graphic3d_TransformPers>& theTrsfPers)
   {
-    return connect(theAnotherObj, new TopLoc_Datum3D(theLocation), theTrsfPers);
+    return connect (theAnotherObj, new Graphic3d_HGTrsf (theLocation), theTrsfPers);
   }
 
 protected:
@@ -129,7 +127,7 @@ protected:
   //! @return created instance object (AIS_ConnectedInteractive or AIS_MultipleConnectedInteractive)
   Standard_EXPORT virtual occ::handle<AIS_InteractiveObject> connect(
     const occ::handle<AIS_InteractiveObject>&   theInteractive,
-    const occ::handle<TopLoc_Datum3D>&          theLocation,
+    const occ::handle<Graphic3d_HGTrsf>&        theLocation,
     const occ::handle<Graphic3d_TransformPers>& theTrsfPers);
 
 private:

@@ -582,16 +582,17 @@ void Graphic3d_Structure::DisconnectAll(const Graphic3d_TypeOfConnection theType
 
 //=================================================================================================
 
-void Graphic3d_Structure::SetTransformation(const occ::handle<TopLoc_Datum3D>& theTrsf)
+void Graphic3d_Structure::SetTransformation(const occ::handle<Graphic3d_HGTrsf>& theTrsf)
 {
   if (IsDeleted())
     return;
 
   const bool wasTransformed = IsTransformed();
 
-  if (!theTrsf.IsNull() && theTrsf->Trsf().Form() == gp_Identity)
+  if (!theTrsf.IsNull()
+    && theTrsf->Form() == gp_Identity)
   {
-    myCStructure->SetTransformation(occ::handle<TopLoc_Datum3D>());
+    myCStructure->SetTransformation(occ::handle<Graphic3d_HGTrsf>());
   }
   else
   {
@@ -770,7 +771,7 @@ void Graphic3d_Structure::addTransformed(Graphic3d_BndBox3d& theBox,
     if (!myCStructure->Transformation().IsNull())
     {
       NCollection_Mat4<double> aMat4;
-      myCStructure->Transformation()->Trsf().GetMat4(aMat4);
+      myCStructure->Transformation()->GetMat4(aMat4);
       aBox.Transform(aMat4);
     }
 
