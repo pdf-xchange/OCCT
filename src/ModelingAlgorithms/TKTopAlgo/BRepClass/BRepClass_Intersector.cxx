@@ -23,11 +23,11 @@
 #include <BRepClass_Intersector.hxx>
 #include <ElCLib.hxx>
 #include <Extrema_ExtPC2d.hxx>
-#include <GCE2d_MakeSegment.hxx>
+#include <GC_MakeSegment2d.hxx>
 #include <Geom2d_Curve.hxx>
 #include <Geom2d_Line.hxx>
 #include <Geom2dInt_GInter.hxx>
-#include <Geom2dLProp_CLProps2d.hxx>
+#include <GeomLProp_CLProps.hxx>
 #include <gp_Dir2d.hxx>
 #include <gp_Lin2d.hxx>
 #include <IntRes2d_Domain.hxx>
@@ -282,7 +282,7 @@ void CheckSkip(Geom2dInt_GInter&                theInter,
   else
   {
     anIsLSkip = true;
-    GCE2d_MakeSegment aMkSeg(aP1, aP2);
+    GC_MakeSegment2d aMkSeg(aP1, aP2);
     if (!aMkSeg.IsDone())
     {
       return;
@@ -450,7 +450,7 @@ void BRepClass_Intersector::LocalGeometry(const BRepClass_Edge& E,
 {
   double                    fpar, lpar;
   occ::handle<Geom2d_Curve> aPCurve = BRep_Tool::CurveOnSurface(E.Edge(), E.Face(), fpar, lpar);
-  Geom2dLProp_CLProps2d     Prop(aPCurve, U, 2, Precision::PConfusion());
+  GeomLProp_CLProps2d       Prop(aPCurve, U, 2, Precision::PConfusion());
 
   C = 0.;
   if (Prop.IsTangentDefined())

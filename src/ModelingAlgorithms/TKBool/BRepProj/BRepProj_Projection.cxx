@@ -132,8 +132,8 @@ void BRepProj_Projection::BuildSection(const TopoDS_Shape& theShape, const TopoD
     return;
 
   // connect edges to wires using ShapeAnalysis functionality
-  ShapeAnalysis_FreeBounds::ConnectEdgesToWires(anEdges, Precision::Confusion(), true, mySection);
-  myIsDone = (!mySection.IsNull() && mySection->Length() > 0);
+  mySection = ShapeAnalysis_FreeBounds::ConnectEdgesToWires(anEdges, Precision::Confusion(), true);
+  myIsDone  = (!mySection.IsNull() && mySection->Length() > 0);
 
   // collect all resulting wires to compound
   if (myIsDone)
@@ -148,10 +148,7 @@ void BRepProj_Projection::BuildSection(const TopoDS_Shape& theShape, const TopoD
   }
 }
 
-//=======================================================================
-// function : BRepProj_Projection
-// purpose  : Cylindrical Projection
-//=======================================================================
+//=================================================================================================
 
 BRepProj_Projection::BRepProj_Projection(const TopoDS_Shape& Wire,
                                          const TopoDS_Shape& Shape,

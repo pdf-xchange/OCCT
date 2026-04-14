@@ -1690,11 +1690,8 @@ void AIS_Manipulator::Cube::Init(const gp_Ax1&         thePosition,
   }
 }
 
-//=======================================================================
-// class    : Cube
-// function : addTriangle
-// purpose  :
-//=======================================================================
+//=================================================================================================
+
 void AIS_Manipulator::Cube::addTriangle(const int     theIndex,
                                         const gp_Pnt& theP1,
                                         const gp_Pnt& theP2,
@@ -1759,11 +1756,8 @@ void AIS_Manipulator::Sector::Init(const float           theRadius,
   }
 }
 
-//=======================================================================
-// class    : Axis
-// function : Constructor
-// purpose  :
-//=======================================================================
+//=================================================================================================
+
 AIS_Manipulator::Axis::Axis(const gp_Ax1&         theAxis,
                             const Quantity_Color& theColor,
                             const float           theLength)

@@ -203,6 +203,12 @@ public:
     theV2 = LastVParameter();
   }
 
+  //! Returns tolerance in U direction.
+  double ToleranceU() const { return myTolU; }
+
+  //! Returns tolerance in V direction.
+  double ToleranceV() const { return myTolV; }
+
   Standard_EXPORT GeomAbs_Shape UContinuity() const override;
 
   Standard_EXPORT GeomAbs_Shape VContinuity() const override;
@@ -254,85 +260,26 @@ public:
 
   Standard_EXPORT double VPeriod() const override;
 
-  //! Computes the point of parameters U,V on the surface.
-  Standard_EXPORT gp_Pnt Value(const double U, const double V) const final;
-
-  //! Computes the point of parameters U,V on the surface.
-  Standard_EXPORT void D0(const double U, const double V, gp_Pnt& P) const final;
-
-  //! Computes the point and the first derivatives on
-  //! the surface.
-  //!
-  //! Warning : On the specific case of BSplineSurface:
-  //! if the surface is cut in interval of continuity at least C1,
-  //! the derivatives are computed on the current interval.
-  //! else the derivatives are computed on the basis surface.
-  Standard_EXPORT void D1(const double U,
-                          const double V,
-                          gp_Pnt&      P,
-                          gp_Vec&      D1U,
-                          gp_Vec&      D1V) const final;
-
-  //! Computes the point, the first and second derivatives
-  //! on the surface.
-  //!
-  //! Warning : On the specific case of BSplineSurface:
-  //! if the surface is cut in interval of continuity at least C2,
-  //! the derivatives are computed on the current interval.
-  //! else the derivatives are computed on the basis surface.
-  Standard_EXPORT void D2(const double U,
-                          const double V,
-                          gp_Pnt&      P,
-                          gp_Vec&      D1U,
-                          gp_Vec&      D1V,
-                          gp_Vec&      D2U,
-                          gp_Vec&      D2V,
-                          gp_Vec&      D2UV) const final;
-
-  //! Computes the point, the first, second and third
-  //! derivatives on the surface.
-  //!
-  //! Warning : On the specific case of BSplineSurface:
-  //! if the surface is cut in interval of continuity at least C3,
-  //! the derivatives are computed on the current interval.
-  //! else the derivatives are computed on the basis surface.
-  Standard_EXPORT void D3(const double U,
-                          const double V,
-                          gp_Pnt&      P,
-                          gp_Vec&      D1U,
-                          gp_Vec&      D1V,
-                          gp_Vec&      D2U,
-                          gp_Vec&      D2V,
-                          gp_Vec&      D2UV,
-                          gp_Vec&      D3U,
-                          gp_Vec&      D3V,
-                          gp_Vec&      D3UUV,
-                          gp_Vec&      D3UVV) const final;
-
-  //! Computes the derivative of order Nu in the
-  //! direction U and Nv in the direction V at the point P(U, V).
-  //!
-  //! Warning : On the specific case of BSplineSurface:
-  //! if the surface is cut in interval of continuity CN,
-  //! the derivatives are computed on the current interval.
-  //! else the derivatives are computed on the basis surface.
-  //! Raised if Nu + Nv < 1 or Nu < 0 or Nv < 0.
-  Standard_EXPORT gp_Vec DN(const double U, const double V, const int Nu, const int Nv) const final;
-
   //! Point evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT gp_Pnt EvalD0(double U, double V) const final;
+  [[nodiscard]] Standard_EXPORT gp_Pnt EvalD0(const double theU, const double theV) const final;
 
   //! D1 evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT Geom_Surface::ResD1 EvalD1(double U, double V) const final;
+  [[nodiscard]] Standard_EXPORT Geom_Surface::ResD1 EvalD1(const double theU,
+                                                           const double theV) const final;
 
   //! D2 evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT Geom_Surface::ResD2 EvalD2(double U, double V) const final;
+  [[nodiscard]] Standard_EXPORT Geom_Surface::ResD2 EvalD2(const double theU,
+                                                           const double theV) const final;
 
   //! D3 evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT Geom_Surface::ResD3 EvalD3(double U, double V) const final;
+  [[nodiscard]] Standard_EXPORT Geom_Surface::ResD3 EvalD3(const double theU,
+                                                           const double theV) const final;
 
   //! DN evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT gp_Vec EvalDN(double U, double V, int Nu, int Nv) const final;
+  [[nodiscard]] Standard_EXPORT gp_Vec EvalDN(const double theU,
+                                              const double theV,
+                                              const int    theNu,
+                                              const int    theNv) const final;
 
   //! Returns the parametric U resolution corresponding
   //! to the real space resolution <R3d>.

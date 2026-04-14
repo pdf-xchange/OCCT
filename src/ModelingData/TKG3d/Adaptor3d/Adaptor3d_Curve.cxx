@@ -107,55 +107,6 @@ double Adaptor3d_Curve::Period() const
 
 //=================================================================================================
 
-// gp_Pnt Adaptor3d_Curve::Value(const double U) const
-gp_Pnt Adaptor3d_Curve::Value(const double) const
-{
-  throw Standard_NotImplemented("Adaptor3d_Curve::Value");
-}
-
-//=================================================================================================
-
-// void Adaptor3d_Curve::D0(const double U, gp_Pnt& P) const
-void Adaptor3d_Curve::D0(const double, gp_Pnt&) const
-{
-  throw Standard_NotImplemented("Adaptor3d_Curve::D0");
-}
-
-//=================================================================================================
-
-// void Adaptor3d_Curve::D1(const double U, gp_Pnt& P, gp_Vec& V) const
-void Adaptor3d_Curve::D1(const double, gp_Pnt&, gp_Vec&) const
-{
-  throw Standard_NotImplemented("Adaptor3d_Curve::D1");
-}
-
-//=================================================================================================
-
-// void Adaptor3d_Curve::D2(const double U, gp_Pnt& P, gp_Vec& V1, gp_Vec& V2) const
-void Adaptor3d_Curve::D2(const double, gp_Pnt&, gp_Vec&, gp_Vec&) const
-{
-  throw Standard_NotImplemented("Adaptor3d_Curve::D2");
-}
-
-//=================================================================================================
-
-// void Adaptor3d_Curve::D3(const double U, gp_Pnt& P, gp_Vec& V1, gp_Vec& V2, gp_Vec& V3)
-// const
-void Adaptor3d_Curve::D3(const double, gp_Pnt&, gp_Vec&, gp_Vec&, gp_Vec&) const
-{
-  throw Standard_NotImplemented("Adaptor3d_Curve::D3");
-}
-
-//=================================================================================================
-
-// gp_Vec Adaptor3d_Curve::DN(const double U, const int N) const
-gp_Vec Adaptor3d_Curve::DN(const double, const int) const
-{
-  throw Standard_NotImplemented("Adaptor3d_Curve::DN");
-}
-
-//=================================================================================================
-
 // double Adaptor3d_Curve::Resolution(const double R3d) const
 double Adaptor3d_Curve::Resolution(const double) const
 {
@@ -255,43 +206,41 @@ occ::handle<Geom_OffsetCurve> Adaptor3d_Curve::OffsetCurve() const
 
 //=================================================================================================
 
-gp_Pnt Adaptor3d_Curve::EvalD0(double theU) const
+gp_Pnt Adaptor3d_Curve::EvalD0(const double theU) const
 {
-  gp_Pnt aP;
-  D0(theU, aP);
-  return aP;
+  (void)theU;
+  throw Standard_NotImplemented("Adaptor3d_Curve::EvalD0");
 }
 
 //=================================================================================================
 
-Geom_Curve::ResD1 Adaptor3d_Curve::EvalD1(double theU) const
+Geom_Curve::ResD1 Adaptor3d_Curve::EvalD1(const double theU) const
 {
-  Geom_Curve::ResD1 aResult;
-  D1(theU, aResult.Point, aResult.D1);
-  return aResult;
+  (void)theU;
+  throw Standard_NotImplemented("Adaptor3d_Curve::EvalD1");
 }
 
 //=================================================================================================
 
-Geom_Curve::ResD2 Adaptor3d_Curve::EvalD2(double theU) const
+Geom_Curve::ResD2 Adaptor3d_Curve::EvalD2(const double theU) const
 {
-  Geom_Curve::ResD2 aResult;
-  D2(theU, aResult.Point, aResult.D1, aResult.D2);
-  return aResult;
+  (void)theU;
+  throw Standard_NotImplemented("Adaptor3d_Curve::EvalD2");
 }
 
 //=================================================================================================
 
-Geom_Curve::ResD3 Adaptor3d_Curve::EvalD3(double theU) const
+Geom_Curve::ResD3 Adaptor3d_Curve::EvalD3(const double theU) const
 {
-  Geom_Curve::ResD3 aResult;
-  D3(theU, aResult.Point, aResult.D1, aResult.D2, aResult.D3);
-  return aResult;
+  (void)theU;
+  throw Standard_NotImplemented("Adaptor3d_Curve::EvalD3");
 }
 
 //=================================================================================================
 
-gp_Vec Adaptor3d_Curve::EvalDN(double theU, int theN) const
+gp_Vec Adaptor3d_Curve::EvalDN(const double theU, const int theN) const
 {
-  return DN(theU, theN);
+  (void)theU;
+  (void)theN;
+  throw Standard_NotImplemented("Adaptor3d_Curve::EvalDN");
 }
