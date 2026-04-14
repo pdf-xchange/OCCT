@@ -284,7 +284,7 @@ public:
   //! Applying a geometric transformation (for example, a
   //! rotation) to a bounding box generally increases its
   //! dimensions. This is not optimal for algorithms which use it.
-  Standard_NODISCARD Standard_EXPORT Bnd_Box Transformed (const gp_Trsf& T) const;
+  [[nodiscard]] Standard_EXPORT Bnd_Box Transformed (const gp_Trsf& T) const;
 
   //! Returns a bounding box which is the result of applying the
   //! transformation @p T to this bounding box.
@@ -292,7 +292,7 @@ public:
   //! Applying a geometric transformation (for example, a rotation)
   //! to a bounding box generally increases its dimensions.
   //! This is suboptimal for algorithms which use it.
-  Standard_NODISCARD Standard_EXPORT Bnd_Box Transformed(const gp_GTrsf& T) const;
+  [[nodiscard]] Standard_EXPORT Bnd_Box Transformed(const gp_GTrsf& T) const;
 
   //! Adds the box <Other> to <me>.
   Standard_EXPORT void Add(const Bnd_Box& Other);
