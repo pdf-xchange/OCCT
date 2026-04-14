@@ -126,10 +126,10 @@ static void GetGoodShape(TopoDS_Shape& theShape)
       }
       else
       {
-        anExp.Init(theShape, TopAbs_VERTEX);
-        if (anExp.More())
+        TopExp_Explorer anExpV(theShape, TopAbs_VERTEX);
+        if (anExpV.More())
         {
-          theShape = anExp.Current();
+          theShape = anExpV.Current();
         }
       }
     }
@@ -227,12 +227,28 @@ void TPrsStd_ConstraintTools::UpdateOnlyValue(const occ::handle<TDataXtd_Constra
     rel->SetText(txt);
 }
 
-//=======================================================================
-// function : ComputeDistance
-// purpose  : Build an PrsDim_LengthDimension.
-//=======================================================================
+//=================================================================================================
+
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeDistance(
+  const occ::handle<TDataXtd_Constraint>& theConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeDistanceImpl(theConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeDistance(const occ::handle<TDataXtd_Constraint>& theConst,
                                               occ::handle<AIS_InteractiveObject>&     theAIS)
+{
+  computeDistanceImpl(theConst, theAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeDistanceImpl(const occ::handle<TDataXtd_Constraint>& theConst,
+                                                  occ::handle<AIS_InteractiveObject>&     theAIS)
 {
   int aGeomNum = theConst->NbGeometries();
 
@@ -460,8 +476,27 @@ void TPrsStd_ConstraintTools::ComputeDistance(const occ::handle<TDataXtd_Constra
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputePerpendicular(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computePerpendicularImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputePerpendicular(const occ::handle<TDataXtd_Constraint>& aConst,
                                                    occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computePerpendicularImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computePerpendicularImpl(
+  const occ::handle<TDataXtd_Constraint>& aConst,
+  occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 2)
@@ -529,8 +564,26 @@ void TPrsStd_ConstraintTools::ComputePerpendicular(const occ::handle<TDataXtd_Co
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeParallel(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeParallelImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeParallel(const occ::handle<TDataXtd_Constraint>& aConst,
                                               occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeParallelImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeParallelImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                  occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 2)
@@ -599,8 +652,26 @@ void TPrsStd_ConstraintTools::ComputeParallel(const occ::handle<TDataXtd_Constra
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeSymmetry(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeSymmetryImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeSymmetry(const occ::handle<TDataXtd_Constraint>& aConst,
                                               occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeSymmetryImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeSymmetryImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                  occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 3)
@@ -672,8 +743,26 @@ void TPrsStd_ConstraintTools::ComputeSymmetry(const occ::handle<TDataXtd_Constra
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeMidPoint(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeMidPointImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeMidPoint(const occ::handle<TDataXtd_Constraint>& aConst,
                                               occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeMidPointImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeMidPointImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                  occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 3)
@@ -747,8 +836,26 @@ void TPrsStd_ConstraintTools::ComputeMidPoint(const occ::handle<TDataXtd_Constra
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeTangent(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeTangentImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeTangent(const occ::handle<TDataXtd_Constraint>& aConst,
                                              occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeTangentImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeTangentImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                 occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 2)
@@ -818,12 +925,29 @@ void TPrsStd_ConstraintTools::ComputeTangent(const occ::handle<TDataXtd_Constrai
   anAIS = ais;
 }
 
-//=======================================================================
-// function : ComputeAngleForOneFace
-// purpose  : computes AngleDimension for one-conical-face case
-//=======================================================================
+//=================================================================================================
+
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeAngleForOneFace(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeAngleForOneFaceImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeAngleForOneFace(const occ::handle<TDataXtd_Constraint>& aConst,
                                                      occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeAngleForOneFaceImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeAngleForOneFaceImpl(
+  const occ::handle<TDataXtd_Constraint>& aConst,
+  occ::handle<AIS_InteractiveObject>&     anAIS)
 {
 
   TopoDS_Shape               shape;
@@ -893,15 +1017,33 @@ static bool CheckIsShapeCompound(TopoDS_Shape& shape, TopoDS_Face& aFace)
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeAngle(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeAngleImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeAngle(const occ::handle<TDataXtd_Constraint>& aConst,
                                            occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeAngleImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeAngleImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                               occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 2)
   {
     if (nbgeom == 1)
     {
-      ComputeAngleForOneFace(aConst, anAIS);
+      computeAngleForOneFaceImpl(aConst, anAIS);
       return;
     }
 #ifdef OCCT_DEBUG
@@ -1161,8 +1303,26 @@ void TPrsStd_ConstraintTools::ComputeAngle(const occ::handle<TDataXtd_Constraint
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeConcentric(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeConcentricImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeConcentric(const occ::handle<TDataXtd_Constraint>& aConst,
                                                 occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeConcentricImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeConcentricImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                    occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 2)
@@ -1242,8 +1402,26 @@ void TPrsStd_ConstraintTools::ComputeConcentric(const occ::handle<TDataXtd_Const
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeRadius(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeRadiusImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeRadius(const occ::handle<TDataXtd_Constraint>& aConst,
                                             occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeRadiusImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeRadiusImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 1)
@@ -1327,8 +1505,26 @@ void TPrsStd_ConstraintTools::ComputeRadius(const occ::handle<TDataXtd_Constrain
 // ota -- begin --
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeMinRadius(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeMinRadiusImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeMinRadius(const occ::handle<TDataXtd_Constraint>& aConst,
                                                occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeMinRadiusImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeMinRadiusImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                   occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 1)
@@ -1413,8 +1609,26 @@ void TPrsStd_ConstraintTools::ComputeMinRadius(const occ::handle<TDataXtd_Constr
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeMaxRadius(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeMaxRadiusImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeMaxRadius(const occ::handle<TDataXtd_Constraint>& aConst,
                                                occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeMaxRadiusImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeMaxRadiusImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                   occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 1)
@@ -1499,8 +1713,27 @@ void TPrsStd_ConstraintTools::ComputeMaxRadius(const occ::handle<TDataXtd_Constr
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeEqualDistance(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeEqualDistanceImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeEqualDistance(const occ::handle<TDataXtd_Constraint>& aConst,
                                                    occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeEqualDistanceImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeEqualDistanceImpl(
+  const occ::handle<TDataXtd_Constraint>& aConst,
+  occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 4)
@@ -1584,16 +1817,8 @@ void TPrsStd_ConstraintTools::ComputeEqualDistance(const occ::handle<TDataXtd_Co
   return;
 }
 
-//======================================================================
-// function : CheckShapesPair
-// purpose  : checks the types of two shapes.
-//            If the types aShape1 and aShape2 are EDGE - EDGE,
-//                                              or EDGE - VERTEX,
-//                                              or VERTEX - VERTEX,
-//                                              or CIRCLE - CIRCLE,
-//                                              or CIRCLE - VERTEX,
-//            then function returns TRUE, otherwise FALSE.
-//======================================================================
+//=================================================================================================
+
 static bool CheckShapesPair(const TopoDS_Shape& aShape1, const TopoDS_Shape& aShape2)
 {
   // Check whether the shapes form a correct pair.
@@ -1664,8 +1889,26 @@ static bool CheckShapesPair(const TopoDS_Shape& aShape1, const TopoDS_Shape& aSh
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeEqualRadius(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeEqualRadiusImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeEqualRadius(const occ::handle<TDataXtd_Constraint>& aConst,
                                                  occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeEqualRadiusImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeEqualRadiusImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                     occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 2)
@@ -1765,8 +2008,26 @@ void TPrsStd_ConstraintTools::ComputeEqualRadius(const occ::handle<TDataXtd_Cons
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeDiameter(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeDiameterImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeDiameter(const occ::handle<TDataXtd_Constraint>& aConst,
                                               occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeDiameterImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeDiameterImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                  occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 1)
@@ -1833,8 +2094,26 @@ void TPrsStd_ConstraintTools::ComputeDiameter(const occ::handle<TDataXtd_Constra
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeFix(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeFixImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeFix(const occ::handle<TDataXtd_Constraint>& aConst,
                                          occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeFixImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeFixImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                             occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 1)
@@ -1901,8 +2180,26 @@ void TPrsStd_ConstraintTools::ComputeFix(const occ::handle<TDataXtd_Constraint>&
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeOffset(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeOffsetImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeOffset(const occ::handle<TDataXtd_Constraint>& aConst,
                                             occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeOffsetImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeOffsetImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   // Get plane for planar constraint
   bool                    is_planar(aConst->IsPlanar());
@@ -2092,8 +2389,26 @@ void TPrsStd_ConstraintTools::ComputeOffset(const occ::handle<TDataXtd_Constrain
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputePlacement(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computePlacementImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputePlacement(const occ::handle<TDataXtd_Constraint>& aConst,
                                                occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computePlacementImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computePlacementImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                   occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 2)
@@ -2148,8 +2463,26 @@ void TPrsStd_ConstraintTools::ComputePlacement(const occ::handle<TDataXtd_Constr
 
 //=================================================================================================
 
-void TPrsStd_ConstraintTools::ComputeOthers(const occ::handle<TDataXtd_Constraint>& /*aConst*/,
-                                            occ::handle<AIS_InteractiveObject>& /*anAIS*/)
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeOthers(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeOthersImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::ComputeOthers(const occ::handle<TDataXtd_Constraint>& aConst,
+                                            occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeOthersImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeOthersImpl(const occ::handle<TDataXtd_Constraint>& /*aConst*/,
+                                                occ::handle<AIS_InteractiveObject>& /*anAIS*/)
 {
 }
 
@@ -2224,8 +2557,26 @@ void TPrsStd_ConstraintTools::GetShapesAndGeom(const occ::handle<TDataXtd_Constr
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeCoincident(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeCoincidentImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeCoincident(const occ::handle<TDataXtd_Constraint>& aConst,
                                                 occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeCoincidentImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeCoincidentImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                                    occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 2)
@@ -2295,8 +2646,26 @@ void TPrsStd_ConstraintTools::ComputeCoincident(const occ::handle<TDataXtd_Const
 
 //=================================================================================================
 
+occ::handle<AIS_InteractiveObject> TPrsStd_ConstraintTools::ComputeRound(
+  const occ::handle<TDataXtd_Constraint>& aConst)
+{
+  occ::handle<AIS_InteractiveObject> aResult;
+  computeRoundImpl(aConst, aResult);
+  return aResult;
+}
+
+//=================================================================================================
+
 void TPrsStd_ConstraintTools::ComputeRound(const occ::handle<TDataXtd_Constraint>& aConst,
                                            occ::handle<AIS_InteractiveObject>&     anAIS)
+{
+  computeRoundImpl(aConst, anAIS);
+}
+
+//=================================================================================================
+
+void TPrsStd_ConstraintTools::computeRoundImpl(const occ::handle<TDataXtd_Constraint>& aConst,
+                                               occ::handle<AIS_InteractiveObject>&     anAIS)
 {
   int nbgeom = aConst->NbGeometries();
   if (nbgeom < 1)

@@ -15,6 +15,7 @@
 #include <IntCurveSurface_TheHCurveTool.hxx>
 
 #include <Adaptor3d_Curve.hxx>
+#include <Precision.hxx>
 #include <GeomAbs_CurveType.hxx>
 #include <GeomAbs_Shape.hxx>
 #include <Geom_BSplineCurve.hxx>
@@ -47,7 +48,9 @@ int IntCurveSurface_TheHCurveTool::NbSamples(const occ::handle<Adaptor3d_Curve>&
     nbs = C->NbKnots();
     nbs *= C->Degree();
     nbs *= C->LastParameter() - C->FirstParameter();
-    nbs /= U1 - U0;
+    double aRange = U1 - U0;
+    if (std::abs(aRange) > Precision::PConfusion())
+      nbs /= aRange;
     if (nbs < 2.0)
       nbs = 2;
   }
@@ -56,16 +59,17 @@ int IntCurveSurface_TheHCurveTool::NbSamples(const occ::handle<Adaptor3d_Curve>&
   return ((int)nbs);
 }
 
-void IntCurveSurface_TheHCurveTool::SamplePars(const occ::handle<Adaptor3d_Curve>&       C,
-                                               const double                              U0,
-                                               const double                              U1,
-                                               const double                              Defl,
-                                               const int                                 NbMin,
-                                               occ::handle<NCollection_HArray1<double>>& Pars)
+occ::handle<NCollection_HArray1<double>> IntCurveSurface_TheHCurveTool::SamplePars(
+  const occ::handle<Adaptor3d_Curve>& C,
+  const double                        U0,
+  const double                        U1,
+  const double                        Defl,
+  const int                           NbMin)
 {
-  GeomAbs_CurveType typC     = C->GetType();
-  const double      nbsOther = 10.0;
-  double            nbs      = nbsOther;
+  occ::handle<NCollection_HArray1<double>> Pars;
+  GeomAbs_CurveType                        typC     = C->GetType();
+  const double                             nbsOther = 10.0;
+  double                                   nbs      = nbsOther;
 
   if (typC == GeomAbs_Line)
     nbs = 2;
@@ -91,7 +95,7 @@ void IntCurveSurface_TheHCurveTool::SamplePars(const occ::handle<Adaptor3d_Curve
     {
       Pars->SetValue(i, u);
     }
-    return;
+    return Pars;
   }
 
   const occ::handle<Geom_BSplineCurve>& aBC = C->BSpline();
@@ -254,7 +258,7 @@ void IntCurveSurface_TheHCurveTool::SamplePars(const occ::handle<Adaptor3d_Curve
     {
       Pars->SetValue(i, t1);
     }
-    return;
+    return Pars;
   }
 
   Pars = new NCollection_HArray1<double>(1, NbSamples);
@@ -267,4 +271,17 @@ void IntCurveSurface_TheHCurveTool::SamplePars(const occ::handle<Adaptor3d_Curve
       Pars->SetValue(j, aPars(i));
     }
   }
+  return Pars;
+}
+
+//=================================================================================================
+
+void IntCurveSurface_TheHCurveTool::SamplePars(const occ::handle<Adaptor3d_Curve>&       C,
+                                               const double                              U0,
+                                               const double                              U1,
+                                               const double                              Defl,
+                                               const int                                 NbMin,
+                                               occ::handle<NCollection_HArray1<double>>& Pars)
+{
+  Pars = SamplePars(C, U0, U1, Defl, NbMin);
 }

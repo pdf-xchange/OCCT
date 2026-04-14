@@ -48,15 +48,17 @@ int BRepGProp_Face::UIntegrationOrder() const
       break;
 
     case GeomAbs_BezierSurface: {
-      Nu = (*((occ::handle<Geom_BezierSurface>*)&((mySurface.Surface()).Surface())))->UDegree() + 1;
+      Nu =
+        (*((occ::handle<Geom_BezierSurface>*)&((mySurface.GeomSurfaceOriginal()))))->UDegree() + 1;
       Nu = std::max(4, Nu);
     }
     break;
     case GeomAbs_BSplineSurface: {
       int a =
-        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->UDegree() + 1;
+        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.GeomSurfaceOriginal()))))->UDegree() + 1;
       int b =
-        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->NbUKnots() - 1;
+        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.GeomSurfaceOriginal()))))->NbUKnots()
+        - 1;
       Nu = std::max(4, a * b);
     }
     break;
@@ -81,16 +83,18 @@ int BRepGProp_Face::VIntegrationOrder() const
       break;
 
     case GeomAbs_BezierSurface: {
-      Nv = (*((occ::handle<Geom_BezierSurface>*)&((mySurface.Surface()).Surface())))->VDegree() + 1;
+      Nv =
+        (*((occ::handle<Geom_BezierSurface>*)&((mySurface.GeomSurfaceOriginal()))))->VDegree() + 1;
       Nv = std::max(4, Nv);
     }
     break;
 
     case GeomAbs_BSplineSurface: {
       int a =
-        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->VDegree() + 1;
+        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.GeomSurfaceOriginal()))))->VDegree() + 1;
       int b =
-        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->NbVKnots() - 1;
+        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.GeomSurfaceOriginal()))))->NbVKnots()
+        - 1;
       Nv = std::max(4, a * b);
     }
     break;
@@ -246,12 +250,12 @@ int BRepGProp_Face::SIntOrder(const double Eps) const
       Nv = 2;
       break;
     case GeomAbs_BezierSurface:
-      Nv = (*((occ::handle<Geom_BezierSurface>*)&((mySurface.Surface()).Surface())))->VDegree();
-      Nu = (*((occ::handle<Geom_BezierSurface>*)&((mySurface.Surface()).Surface())))->UDegree();
+      Nv = (*(occ::handle<Geom_BezierSurface>*)&mySurface.GeomSurfaceOriginal())->VDegree();
+      Nu = (*(occ::handle<Geom_BezierSurface>*)&mySurface.GeomSurfaceOriginal())->UDegree();
       break;
     case GeomAbs_BSplineSurface:
-      Nv = (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->VDegree();
-      Nu = (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->UDegree();
+      Nv = (*(occ::handle<Geom_BSplineSurface>*)&mySurface.GeomSurfaceOriginal())->VDegree();
+      Nu = (*(occ::handle<Geom_BSplineSurface>*)&mySurface.GeomSurfaceOriginal())->UDegree();
       break;
     default:
       Nu = 2;
@@ -288,7 +292,7 @@ int BRepGProp_Face::SUIntSubs() const
       N = 2;
       break;
     case GeomAbs_BSplineSurface:
-      N = (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->NbUKnots();
+      N = (*(occ::handle<Geom_BSplineSurface>*)&mySurface.GeomSurfaceOriginal())->NbUKnots();
       break;
     default:
       N = 2;
@@ -323,7 +327,7 @@ int BRepGProp_Face::SVIntSubs() const
       N = 2;
       break;
     case GeomAbs_BSplineSurface:
-      N = (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->NbVKnots();
+      N = (*(occ::handle<Geom_BSplineSurface>*)&mySurface.GeomSurfaceOriginal())->NbVKnots();
       break;
     default:
       N = 2;
@@ -353,7 +357,7 @@ void BRepGProp_Face::UKnots(NCollection_Array1<double>& Knots) const
       break;
     case GeomAbs_BSplineSurface: {
       const NCollection_Array1<double>& aSrcKnots =
-        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->UKnots();
+        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.GeomSurfaceOriginal()))))->UKnots();
       for (int i = Knots.Lower(); i <= Knots.Upper(); i++)
         Knots(i) = aSrcKnots(i);
     }
@@ -390,7 +394,7 @@ void BRepGProp_Face::VKnots(NCollection_Array1<double>& Knots) const
       break;
     case GeomAbs_BSplineSurface: {
       const NCollection_Array1<double>& aSrcKnots =
-        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.Surface()).Surface())))->VKnots();
+        (*((occ::handle<Geom_BSplineSurface>*)&((mySurface.GeomSurfaceOriginal()))))->VKnots();
       for (int i = Knots.Lower(); i <= Knots.Upper(); i++)
         Knots(i) = aSrcKnots(i);
     }
@@ -640,20 +644,19 @@ static void GetCurveKnots(const double                              theMin,
 
 //=================================================================================================
 
-void BRepGProp_Face::GetUKnots(const double                              theUMin,
-                               const double                              theUMax,
-                               occ::handle<NCollection_HArray1<double>>& theUKnots) const
+occ::handle<NCollection_HArray1<double>> BRepGProp_Face::GetUKnots(const double theUMin,
+                                                                   const double theUMax) const
 {
+  occ::handle<NCollection_HArray1<double>> theUKnots;
   bool isSBSpline = mySurface.GetType() == GeomAbs_BSplineSurface;
   bool isCBSpline = false;
 
   if (!isSBSpline)
   {
-    // Check the basis curve of the surface of linear extrusion.
     if (mySurface.GetType() == GeomAbs_SurfaceOfExtrusion)
     {
       GeomAdaptor_Curve         aCurve;
-      occ::handle<Geom_Surface> aSurf = mySurface.Surface().Surface();
+      occ::handle<Geom_Surface> aSurf = mySurface.GeomSurfaceOriginal();
 
       aCurve.Load(occ::down_cast<Geom_SurfaceOfLinearExtrusion>(aSurf)->BasisCurve());
       isCBSpline = aCurve.GetType() == GeomAbs_BSplineCurve;
@@ -662,13 +665,11 @@ void BRepGProp_Face::GetUKnots(const double                              theUMin
 
   if (myIsUseSpan && (isSBSpline || isCBSpline))
   {
-    // Using span decomposition for BSpline.
     occ::handle<NCollection_HArray1<double>> aKnots;
 
     if (isSBSpline)
     {
-      // Get U knots of BSpline surface.
-      occ::handle<Geom_Surface>        aSurf = mySurface.Surface().Surface();
+      occ::handle<Geom_Surface>        aSurf = mySurface.GeomSurfaceOriginal();
       occ::handle<Geom_BSplineSurface> aBSplSurf;
 
       aBSplSurf = occ::down_cast<Geom_BSplineSurface>(aSurf);
@@ -676,10 +677,8 @@ void BRepGProp_Face::GetUKnots(const double                              theUMin
     }
     else
     {
-      // Get U knots of BSpline curve - basis curve of
-      // the surface of linear extrusion.
       GeomAdaptor_Curve              aCurve;
-      occ::handle<Geom_Surface>      aSurf = mySurface.Surface().Surface();
+      occ::handle<Geom_Surface>      aSurf = mySurface.GeomSurfaceOriginal();
       occ::handle<Geom_BSplineCurve> aBSplCurve;
 
       aCurve.Load(occ::down_cast<Geom_SurfaceOfLinearExtrusion>(aSurf)->BasisCurve());
@@ -687,42 +686,42 @@ void BRepGProp_Face::GetUKnots(const double                              theUMin
       aKnots     = new NCollection_HArray1<double>(aBSplCurve->Knots());
     }
 
-    // Compute number of knots inside theUMin and theUMax.
     GetRealKnots(theUMin, theUMax, aKnots, theUKnots);
   }
   else
   {
-    // No span decomposition.
     theUKnots = new NCollection_HArray1<double>(1, 2);
     theUKnots->SetValue(1, theUMin);
     theUKnots->SetValue(2, theUMax);
   }
+  return theUKnots;
 }
 
 //=================================================================================================
 
-void BRepGProp_Face::GetTKnots(const double                              theTMin,
-                               const double                              theTMax,
-                               occ::handle<NCollection_HArray1<double>>& theTKnots) const
+void BRepGProp_Face::GetUKnots(const double                              theUMin,
+                               const double                              theUMax,
+                               occ::handle<NCollection_HArray1<double>>& theUKnots) const
 {
+  theUKnots = GetUKnots(theUMin, theUMax);
+}
+
+//=================================================================================================
+
+occ::handle<NCollection_HArray1<double>> BRepGProp_Face::GetTKnots(const double theTMin,
+                                                                   const double theTMax) const
+{
+  occ::handle<NCollection_HArray1<double>> theTKnots;
   bool isBSpline = mySurface.GetType() == GeomAbs_BSplineSurface;
 
   if (myIsUseSpan && isBSpline)
   {
-    // Using span decomposition for BSpline.
     occ::handle<NCollection_HArray1<double>> aSurfKnots;
-
-    // Get V knots of BSpline surface.
-    occ::handle<Geom_Surface>        aSurf = mySurface.Surface().Surface();
-    occ::handle<Geom_BSplineSurface> aBSplSurf;
+    occ::handle<Geom_Surface>                aSurf = mySurface.GeomSurfaceOriginal();
+    occ::handle<Geom_BSplineSurface>         aBSplSurf;
 
     aBSplSurf  = occ::down_cast<Geom_BSplineSurface>(aSurf);
     aSurfKnots = new NCollection_HArray1<double>(aBSplSurf->VKnots());
-
-    //     occ::handle<NCollection_HArray1<double>> aCurveKnots;
-
-    //     GetCurveKnots(theTMin, theTMax, myCurve, aCurveKnots);
-    //    GetRealCurveKnots(aCurveKnots, aSurfKnots, myCurve, theTKnots);
     GetCurveKnots(theTMin, theTMax, myCurve, theTKnots);
   }
   else
@@ -731,4 +730,14 @@ void BRepGProp_Face::GetTKnots(const double                              theTMin
     theTKnots->SetValue(1, theTMin);
     theTKnots->SetValue(2, theTMax);
   }
+  return theTKnots;
+}
+
+//=================================================================================================
+
+void BRepGProp_Face::GetTKnots(const double                              theTMin,
+                               const double                              theTMax,
+                               occ::handle<NCollection_HArray1<double>>& theTKnots) const
+{
+  theTKnots = GetTKnots(theTMin, theTMax);
 }

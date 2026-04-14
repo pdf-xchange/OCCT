@@ -142,7 +142,7 @@ static int PointsForOBB(const TopoDS_Shape&         theS,
     const TopoDS_Face&        aF = TopoDS::Face(anExpF.Current());
     const BRepAdaptor_Surface anAS(aF, false);
 
-    if (!IsPlanar(anAS.Surface()))
+    if (!IsPlanar(anAS))
     {
       if (!theIsTriangulationUsed)
         // not planar and triangulation usage disabled
@@ -311,10 +311,8 @@ static bool CheckPoints(const TopoDS_Shape& theS,
   return (!theOBB.IsVoid());
 }
 
-//=======================================================================
-// Function : ComputeProperties
-// purpose : Computes properties of theS.
-//=======================================================================
+//=================================================================================================
+
 static void ComputeProperties(const TopoDS_Shape& theS, GProp_GProps& theGCommon)
 {
   TopExp_Explorer anExp;

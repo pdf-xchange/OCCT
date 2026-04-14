@@ -150,10 +150,10 @@ void PerformBounds(const CurveType&           theCurve,
             double u1 = TabW.Value(i);
             double u2 = TabW.Value(i + 1);
 
-            occ::handle<NCollection_HArray1<double>> aPars;
             double                                   defl  = 0.1;
             int                                      NbMin = 10;
-            CurveTool::SamplePars(theCurve, u1, u2, defl, NbMin, aPars);
+            occ::handle<NCollection_HArray1<double>> aPars =
+              CurveTool::SamplePars(theCurve, u1, u2, defl, NbMin);
 
             PolygonType polygon(theCurve, aPars->Array1());
             theInternalPerform(theCurve, polygon, theSurface, UU1, VV1, UU2, VV2);
@@ -164,10 +164,10 @@ void PerformBounds(const CurveType&           theCurve,
           double u1 = CurveTool::FirstParameter(theCurve);
           double u2 = CurveTool::LastParameter(theCurve);
 
-          occ::handle<NCollection_HArray1<double>> aPars;
           double                                   defl  = 0.1;
           int                                      NbMin = 10;
-          CurveTool::SamplePars(theCurve, u1, u2, defl, NbMin, aPars);
+          occ::handle<NCollection_HArray1<double>> aPars =
+            CurveTool::SamplePars(theCurve, u1, u2, defl, NbMin);
 
           PolygonType polygon(theCurve, aPars->Array1());
           theInternalPerform(theCurve, polygon, theSurface, UU1, VV1, UU2, VV2);
@@ -591,6 +591,10 @@ void PerformConicSurfLine(const gp_Lin&           theLine,
   {
     int nbsu = SurfaceTool::NbSamplesU(theSurface, theU1, theU2);
     int nbsv = SurfaceTool::NbSamplesV(theSurface, theV1, theV2);
+    if (nbsu < 1)
+      nbsu = 1;
+    if (nbsv < 1)
+      nbsv = 1;
 
     bool U1inf = Precision::IsInfinite(theU1);
     bool U2inf = Precision::IsInfinite(theU2);

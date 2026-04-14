@@ -55,8 +55,7 @@
 
 #include <GeomLProp.hxx>
 #include <GeomLProp_CLProps.hxx>
-#include <Geom2dLProp_CLProps2d.hxx>
-#include <Geom2dLProp_CurAndInf2d.hxx>
+#include <GeomLProp_CurAndInf2d.hxx>
 
 #include <gp_Pnt.hxx>
 #include <NCollection_Array1.hxx>
@@ -1217,8 +1216,8 @@ static int minmaxcurandinf(Draw_Interpretor& di, int argc, const char** argv)
   if (C1.IsNull())
     return 1;
 
-  Draw_Color              Couleur;
-  Geom2dLProp_CurAndInf2d Sommets;
+  Draw_Color            Couleur;
+  GeomLProp_CurAndInf2d Sommets;
 
   Sommets.PerformCurExt(C1);
   if (Sommets.IsDone() && !Sommets.IsEmpty())
@@ -1242,7 +1241,7 @@ static int minmaxcurandinf(Draw_Interpretor& di, int argc, const char** argv)
     dout.Flush();
   }
 
-  Geom2dLProp_CurAndInf2d Sommets2;
+  GeomLProp_CurAndInf2d Sommets2;
   Sommets2.PerformInf(C1);
 
   if (Sommets2.IsDone() && !Sommets2.IsEmpty())
@@ -1259,10 +1258,8 @@ static int minmaxcurandinf(Draw_Interpretor& di, int argc, const char** argv)
   return 0;
 }
 
-//=======================================================================
-// function :  shcurvature
-// purpose  :  affiche le peigne de courbure
-//=======================================================================
+//=================================================================================================
+
 static int shcurvature(Draw_Interpretor&, int argc, const char** argv)
 {
   if (argc < 2)
@@ -1285,10 +1282,8 @@ static int shcurvature(Draw_Interpretor&, int argc, const char** argv)
   return 0;
 }
 
-//=======================================================================
-// function :  clcurvature
-// purpose  :  efface le peigne de courbure
-//=======================================================================
+//=================================================================================================
+
 static int clcurvature(Draw_Interpretor&, int argc, const char** argv)
 {
   if (argc < 2)
@@ -1411,7 +1406,7 @@ static int localprop(Draw_Interpretor& di, int argc, const char** argv)
   }
   else
   {
-    Geom2dLProp_CLProps2d Prop(C2d, 2, Precision::Confusion());
+    GeomLProp_CLProps2d Prop(C2d, 2, Precision::Confusion());
     Prop.SetParameter(U);
     occ::handle<Draw_Marker2D> drp = new Draw_Marker2D(Prop.Value(), Draw_Plus, Draw_vert);
     dout << drp;
@@ -1967,10 +1962,7 @@ static int canceldenom(Draw_Interpretor&, int n, const char** c)
   return 0;
 }
 
-//=======================================================================
-// function : length
-// purpose  : eval curve's length
-//=======================================================================
+//=================================================================================================
 
 static int length(Draw_Interpretor& di, int n, const char** a)
 {

@@ -173,52 +173,6 @@ public:
 
   Standard_EXPORT double Period() const override;
 
-  //! Computes the point of parameter U on the curve
-  Standard_EXPORT gp_Pnt Value(const double U) const final;
-
-  //! Computes the point of parameter U.
-  Standard_EXPORT void D0(const double U, gp_Pnt& P) const final;
-
-  //! Computes the point of parameter U on the curve
-  //! with its first derivative.
-  //!
-  //! Warning : On the specific case of BSplineCurve:
-  //! if the curve is cut in interval of continuity at least C1, the
-  //! derivatives are computed on the current interval.
-  //! else the derivatives are computed on the basis curve.
-  Standard_EXPORT void D1(const double U, gp_Pnt& P, gp_Vec& V) const final;
-
-  //! Returns the point P of parameter U, the first and second
-  //! derivatives V1 and V2.
-  //!
-  //! Warning : On the specific case of BSplineCurve:
-  //! if the curve is cut in interval of continuity at least C2, the
-  //! derivatives are computed on the current interval.
-  //! else the derivatives are computed on the basis curve.
-  Standard_EXPORT void D2(const double U, gp_Pnt& P, gp_Vec& V1, gp_Vec& V2) const final;
-
-  //! Returns the point P of parameter U, the first, the second
-  //! and the third derivative.
-  //!
-  //! Warning : On the specific case of BSplineCurve:
-  //! if the curve is cut in interval of continuity at least C3, the
-  //! derivatives are computed on the current interval.
-  //! else the derivatives are computed on the basis curve.
-  Standard_EXPORT void D3(const double U,
-                          gp_Pnt&      P,
-                          gp_Vec&      V1,
-                          gp_Vec&      V2,
-                          gp_Vec&      V3) const final;
-
-  //! The returned vector gives the value of the derivative for the
-  //! order of derivation N.
-  //! Warning : On the specific case of BSplineCurve:
-  //! if the curve is cut in interval of continuity CN, the
-  //! derivatives are computed on the current interval.
-  //! else the derivatives are computed on the basis curve.
-  //! Raised if N < 1.
-  Standard_EXPORT gp_Vec DN(const double U, const int N) const final;
-
   //! returns the parametric resolution
   Standard_EXPORT double Resolution(const double R3d) const override;
 
@@ -271,19 +225,19 @@ public:
   Standard_EXPORT occ::handle<Geom_OffsetCurve> OffsetCurve() const override;
 
   //! Point evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT gp_Pnt EvalD0(double U) const final;
+  [[nodiscard]] Standard_EXPORT gp_Pnt EvalD0(const double theU) const final;
 
   //! D1 evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT Geom_Curve::ResD1 EvalD1(double U) const final;
+  [[nodiscard]] Standard_EXPORT Geom_Curve::ResD1 EvalD1(const double theU) const final;
 
   //! D2 evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT Geom_Curve::ResD2 EvalD2(double U) const final;
+  [[nodiscard]] Standard_EXPORT Geom_Curve::ResD2 EvalD2(const double theU) const final;
 
   //! D3 evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT Geom_Curve::ResD3 EvalD3(double U) const final;
+  [[nodiscard]] Standard_EXPORT Geom_Curve::ResD3 EvalD3(const double theU) const final;
 
   //! DN evaluation. Raises an exception on failure.
-  [[nodiscard]] Standard_EXPORT gp_Vec EvalDN(double U, int N) const final;
+  [[nodiscard]] Standard_EXPORT gp_Vec EvalDN(const double theU, const int theN) const final;
 
   friend class GeomAdaptor_Surface;
 

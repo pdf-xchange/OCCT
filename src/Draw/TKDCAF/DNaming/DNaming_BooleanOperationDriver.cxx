@@ -70,7 +70,7 @@ DNaming_BooleanOperationDriver::DNaming_BooleanOperationDriver() = default;
 // function : Validate
 // purpose  : Validates labels of a function in <log>.
 //=======================================================================
-void DNaming_BooleanOperationDriver::Validate(occ::handle<TFunction_Logbook>&) const {}
+void DNaming_BooleanOperationDriver::Validate(const occ::handle<TFunction_Logbook>&) const {}
 
 //=======================================================================
 // function : MustExecute
@@ -421,10 +421,8 @@ bool DNaming_BooleanOperationDriver::CheckAndLoad(
   return false;
 }
 
-// ------------------------------------------------------------------------
-// static function: FixSameParameter
-// purpose:
-// ------------------------------------------------------------------------
+//=================================================================================================
+
 bool FixSameParameter(const TopoDS_Shape& theShape,
                       BRepCheck_Analyzer& theAnalyzer,
                       const bool          bIgnoreNotSPErrors)
@@ -462,10 +460,8 @@ bool FixSameParameter(const TopoDS_Shape& theShape,
   return false;
 }
 
-// ------------------------------------------------------------------------
-// static function: FindSPErrorEdges
-// purpose:
-// ------------------------------------------------------------------------
+//=================================================================================================
+
 void FindSPErrorEdges(const TopoDS_Shape&                                            theShape,
                       const BRepCheck_Analyzer&                                      theAnalyzer,
                       NCollection_IndexedMap<TopoDS_Shape, TopTools_ShapeMapHasher>& theMap)
@@ -527,10 +523,8 @@ void FindSPErrorEdges(const TopoDS_Shape&                                       
   }
 }
 
-// ------------------------------------------------------------------------
-// static function: FindOtherErrors
-// purpose:
-// ------------------------------------------------------------------------
+//=================================================================================================
+
 bool FindOtherErrors(const TopoDS_Shape&       theShape,
                      const BRepCheck_Analyzer& theAnalyzer,
                      const NCollection_IndexedMap<TopoDS_Shape, TopTools_ShapeMapHasher>& theMap)

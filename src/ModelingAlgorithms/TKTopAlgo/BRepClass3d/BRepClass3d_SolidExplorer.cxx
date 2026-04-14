@@ -82,15 +82,16 @@ bool BRepClass3d_SolidExplorer::FindAPointInTheFace(const TopoDS_Face& _face,
   TopoDS_Face face = _face;
   face.Orientation(TopAbs_FORWARD);
 
-  TopExp_Explorer     faceexplorer;
-  BRepAdaptor_Curve2d c;
-  gp_Vec2d            T;
-  gp_Pnt2d            P;
+  gp_Vec2d T;
+  gp_Pnt2d P;
 
-  for (faceexplorer.Init(face, TopAbs_EDGE); faceexplorer.More(); faceexplorer.Next())
+  for (TopExp_Explorer faceexplorer(face, TopAbs_EDGE); faceexplorer.More(); faceexplorer.Next())
   {
-    TopoDS_Edge Edge = TopoDS::Edge(faceexplorer.Current());
-    c.Initialize(Edge, face);
+    TopoDS_Edge         Edge = TopoDS::Edge(faceexplorer.Current());
+    BRepAdaptor_Curve2d c(Edge, face);
+    if (c.Curve().IsNull())
+      continue;
+
     c.D1((c.LastParameter() - c.FirstParameter()) * param_ + c.FirstParameter(), P, T);
 
     double x = T.X();
@@ -405,10 +406,8 @@ bool BRepClass3d_SolidExplorer::PointInTheFace(const TopoDS_Face&               
                                                          theVecD1V);
 }
 
-//=======================================================================
-// function : LimitInfiniteUV
-// purpose  : Limit infinite parameters
-//=======================================================================
+//=================================================================================================
+
 static void LimitInfiniteUV(double& U1, double& V1, double& U2, double& V2)
 {
   bool infU1 = Precision::IsNegativeInfinite(U1), infV1 = Precision::IsNegativeInfinite(V1),
@@ -971,10 +970,7 @@ void BRepClass3d_SolidExplorer::NextShell()
   myShellExplorer.Next();
 }
 
-//=======================================================================
-// function : CurrentShell
-// purpose  : Returns the current shell.
-//=======================================================================
+//=================================================================================================
 
 TopoDS_Shell BRepClass3d_SolidExplorer::CurrentShell() const
 {
@@ -1021,10 +1017,7 @@ void BRepClass3d_SolidExplorer::NextFace()
   myFaceExplorer.Next();
 }
 
-//=======================================================================
-// function : CurrentFace
-// purpose  : Returns the current face.
-//=======================================================================
+//=================================================================================================
 
 TopoDS_Face BRepClass3d_SolidExplorer::CurrentFace() const
 {

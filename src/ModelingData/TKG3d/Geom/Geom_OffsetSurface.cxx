@@ -45,7 +45,6 @@
 #include <Geom_UndefinedValue.hxx>
 #include <GeomAbs_Shape.hxx>
 #include <GeomAdaptor_Surface.hxx>
-#include <GeomLProp_SLProps.hxx>
 #include <gp_Dir.hxx>
 #include <gp_GTrsf2d.hxx>
 #include <gp_Pnt.hxx>
@@ -502,9 +501,9 @@ gp_Vec Geom_OffsetSurface::EvalDN(const double U, const double V, const int Nu, 
 class Geom_OffsetSurface_UIsoEvaluator : public AdvApprox_EvaluatorFunction
 {
 public:
-  Geom_OffsetSurface_UIsoEvaluator(const occ::handle<Geom_Surface>& theSurface, const double theU)
-      : CurrentSurface(theSurface),
-        IsoPar(theU)
+  Geom_OffsetSurface_UIsoEvaluator(const Geom_Surface& theSurface, const double theU)
+      : mySurface(theSurface),
+        myIsoPar(theU)
   {
   }
 
@@ -516,8 +515,8 @@ public:
                 int*    ErrorCode) override;
 
 private:
-  GeomAdaptor_Surface CurrentSurface;
-  double              IsoPar;
+  const Geom_Surface& mySurface;
+  double              myIsoPar;
 };
 
 void Geom_OffsetSurface_UIsoEvaluator::Evaluate(int*, /*Dimension*/
@@ -530,7 +529,7 @@ void Geom_OffsetSurface_UIsoEvaluator::Evaluate(int*, /*Dimension*/
   gp_Pnt P;
   if (*DerivativeRequest == 0)
   {
-    P         = CurrentSurface.Value(IsoPar, *Parameter);
+    P         = mySurface.Value(myIsoPar, *Parameter);
     Result[0] = P.X();
     Result[1] = P.Y();
     Result[2] = P.Z();
@@ -538,7 +537,7 @@ void Geom_OffsetSurface_UIsoEvaluator::Evaluate(int*, /*Dimension*/
   else
   {
     gp_Vec DU, DV;
-    CurrentSurface.D1(IsoPar, *Parameter, P, DU, DV);
+    mySurface.D1(myIsoPar, *Parameter, P, DU, DV);
     Result[0] = DV.X();
     Result[1] = DV.Y();
     Result[2] = DV.Z();
@@ -549,9 +548,9 @@ void Geom_OffsetSurface_UIsoEvaluator::Evaluate(int*, /*Dimension*/
 class Geom_OffsetSurface_VIsoEvaluator : public AdvApprox_EvaluatorFunction
 {
 public:
-  Geom_OffsetSurface_VIsoEvaluator(const occ::handle<Geom_Surface>& theSurface, const double theV)
-      : CurrentSurface(theSurface),
-        IsoPar(theV)
+  Geom_OffsetSurface_VIsoEvaluator(const Geom_Surface& theSurface, const double theV)
+      : mySurface(theSurface),
+        myIsoPar(theV)
   {
   }
 
@@ -563,8 +562,8 @@ public:
                 int*    ErrorCode) override;
 
 private:
-  occ::handle<Geom_Surface> CurrentSurface;
-  double                    IsoPar;
+  const Geom_Surface& mySurface;
+  double              myIsoPar;
 };
 
 void Geom_OffsetSurface_VIsoEvaluator::Evaluate(int*, /*Dimension*/
@@ -577,7 +576,7 @@ void Geom_OffsetSurface_VIsoEvaluator::Evaluate(int*, /*Dimension*/
   gp_Pnt P;
   if (*DerivativeRequest == 0)
   {
-    P         = CurrentSurface->Value(*Parameter, IsoPar);
+    P         = mySurface.Value(*Parameter, myIsoPar);
     Result[0] = P.X();
     Result[1] = P.Y();
     Result[2] = P.Z();
@@ -585,7 +584,7 @@ void Geom_OffsetSurface_VIsoEvaluator::Evaluate(int*, /*Dimension*/
   else
   {
     gp_Vec DU, DV;
-    CurrentSurface->D1(*Parameter, IsoPar, P, DU, DV);
+    mySurface.D1(*Parameter, myIsoPar, P, DU, DV);
     Result[0] = DU.X();
     Result[1] = DU.Y();
     Result[2] = DU.Z();
@@ -604,10 +603,16 @@ occ::handle<Geom_Curve> Geom_OffsetSurface::UIso(const double UU) const
     if (aGAsurf.GetType() == GeomAbs_SurfaceOfExtrusion)
     {
       occ::handle<Geom_Curve> aL = basisSurf->UIso(UU);
-      GeomLProp_SLProps       aSurfProps(basisSurf, UU, 0., 2, Precision::Confusion());
 
-      gp_Vec aDir;
-      aDir = aSurfProps.Normal();
+      gp_Pnt aP;
+      gp_Vec aD1U, aD1V;
+      basisSurf->D1(UU, 0., aP, aD1U, aD1V);
+      gp_Vec aDir = aD1U.Crossed(aD1V);
+      if (aDir.SquareMagnitude() < gp::Resolution())
+      {
+        return aL;
+      }
+      aDir.Normalize();
       aDir *= offsetValue;
 
       aL->Translate(aDir);
@@ -621,8 +626,7 @@ occ::handle<Geom_Curve> Geom_OffsetSurface::UIso(const double UU) const
     const GeomAbs_Shape Cont   = GeomAbs_C1;
     const int           MaxSeg = 100, MaxDeg = 14;
 
-    occ::handle<Geom_OffsetSurface>  me(this);
-    Geom_OffsetSurface_UIsoEvaluator ev(me, UU);
+    Geom_OffsetSurface_UIsoEvaluator ev(*this, UU);
     AdvApprox_ApproxAFunction
       Approx(Num1, Num2, Num3, T1, T2, T3, V1, V2, Cont, MaxDeg, MaxSeg, ev);
 
@@ -659,8 +663,7 @@ occ::handle<Geom_Curve> Geom_OffsetSurface::VIso(const double VV) const
     const GeomAbs_Shape Cont   = GeomAbs_C1;
     const int           MaxSeg = 100, MaxDeg = 14;
 
-    occ::handle<Geom_OffsetSurface>  me(this);
-    Geom_OffsetSurface_VIsoEvaluator ev(me, VV);
+    Geom_OffsetSurface_VIsoEvaluator ev(*this, VV);
     AdvApprox_ApproxAFunction
       Approx(Num1, Num2, Num3, T1, T2, T3, U1, U2, Cont, MaxDeg, MaxSeg, ev);
 

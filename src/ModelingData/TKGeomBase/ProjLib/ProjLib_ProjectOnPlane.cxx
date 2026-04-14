@@ -26,6 +26,7 @@
 #include <Geom_BezierCurve.hxx>
 #include <ElCLib.hxx>
 #include <Adaptor3d_Curve.hxx>
+#include <Geom_Curve.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <Geom_Line.hxx>
 #include <GeomConvert.hxx>
@@ -39,7 +40,7 @@
 #include <math_Matrix.hxx>
 #include <gce_MakeParab.hxx>
 #include <gce_MakeDir.hxx>
-#include <LProp3d_CLProps.hxx>
+#include <LProp_CLProps3d.hxx>
 #include <math_Function.hxx>
 #include <math_BrentMinimum.hxx>
 
@@ -267,7 +268,7 @@ class ProjLib_MaxCurvature : public math_Function
 {
 
 public:
-  ProjLib_MaxCurvature(LProp3d_CLProps& theProps)
+  ProjLib_MaxCurvature(LProp_CLProps3d& theProps)
       : myProps(&theProps)
   {
   }
@@ -280,7 +281,7 @@ public:
   }
 
 private:
-  LProp3d_CLProps* myProps;
+  LProp_CLProps3d* myProps;
 };
 
 //=====================================================================//
@@ -1081,85 +1082,80 @@ double ProjLib_ProjectOnPlane::Period() const
 
 //=================================================================================================
 
-gp_Pnt ProjLib_ProjectOnPlane::Value(const double U) const
+gp_Pnt ProjLib_ProjectOnPlane::EvalD0(const double theU) const
 {
   if (myType != GeomAbs_OtherCurve)
   {
-    return myResult->Value(U);
+    return myResult->EvalD0(theU);
   }
   else
   {
-    return OnPlane_Value(U, myCurve, myPlane, myDirection);
+    return OnPlane_Value(theU, myCurve, myPlane, myDirection);
   }
 }
 
 //=================================================================================================
 
-void ProjLib_ProjectOnPlane::D0(const double U, gp_Pnt& P) const
+Geom_Curve::ResD1 ProjLib_ProjectOnPlane::EvalD1(const double theU) const
 {
   if (myType != GeomAbs_OtherCurve)
   {
-    myResult->D0(U, P);
+    return myResult->EvalD1(theU);
   }
   else
   {
-    P = OnPlane_Value(U, myCurve, myPlane, myDirection);
+    gp_Pnt aP;
+    gp_Vec aV;
+    OnPlane_D1(theU, aP, aV, myCurve, myPlane, myDirection);
+    return {aP, aV};
   }
 }
 
 //=================================================================================================
 
-void ProjLib_ProjectOnPlane::D1(const double U, gp_Pnt& P, gp_Vec& V) const
+Geom_Curve::ResD2 ProjLib_ProjectOnPlane::EvalD2(const double theU) const
 {
   if (myType != GeomAbs_OtherCurve)
   {
-    myResult->D1(U, P, V);
+    return myResult->EvalD2(theU);
   }
   else
   {
-    OnPlane_D1(U, P, V, myCurve, myPlane, myDirection);
+    gp_Pnt aP;
+    gp_Vec aV1, aV2;
+    OnPlane_D2(theU, aP, aV1, aV2, myCurve, myPlane, myDirection);
+    return {aP, aV1, aV2};
   }
 }
 
 //=================================================================================================
 
-void ProjLib_ProjectOnPlane::D2(const double U, gp_Pnt& P, gp_Vec& V1, gp_Vec& V2) const
+Geom_Curve::ResD3 ProjLib_ProjectOnPlane::EvalD3(const double theU) const
 {
   if (myType != GeomAbs_OtherCurve)
   {
-    myResult->D2(U, P, V1, V2);
+    return myResult->EvalD3(theU);
   }
   else
   {
-    OnPlane_D2(U, P, V1, V2, myCurve, myPlane, myDirection);
+    gp_Pnt aP;
+    gp_Vec aV1, aV2, aV3;
+    OnPlane_D3(theU, aP, aV1, aV2, aV3, myCurve, myPlane, myDirection);
+    return {aP, aV1, aV2, aV3};
   }
 }
 
 //=================================================================================================
 
-void ProjLib_ProjectOnPlane::D3(const double U, gp_Pnt& P, gp_Vec& V1, gp_Vec& V2, gp_Vec& V3) const
+gp_Vec ProjLib_ProjectOnPlane::EvalDN(const double theU, const int theN) const
 {
   if (myType != GeomAbs_OtherCurve)
   {
-    myResult->D3(U, P, V1, V2, V3);
+    return myResult->EvalDN(theU, theN);
   }
   else
   {
-    OnPlane_D3(U, P, V1, V2, V3, myCurve, myPlane, myDirection);
-  }
-}
-
-//=================================================================================================
-
-gp_Vec ProjLib_ProjectOnPlane::DN(const double U, const int DerivativeRequest) const
-{
-  if (myType != GeomAbs_OtherCurve)
-  {
-    return myResult->DN(U, DerivativeRequest);
-  }
-  else
-  {
-    return OnPlane_DN(U, DerivativeRequest, myCurve, myPlane, myDirection);
+    return OnPlane_DN(theU, theN, myCurve, myPlane, myDirection);
   }
 }
 
@@ -1385,7 +1381,7 @@ bool ProjLib_ProjectOnPlane::BuildParabolaByApex(occ::handle<Geom_Curve>& theGeo
                                // copy of instance;
   occ::handle<Adaptor3d_Curve> aProjCrv = ShallowCopy();
   myType                                = aCurType;
-  LProp3d_CLProps      aProps(aProjCrv, 2, Precision::Confusion());
+  LProp_CLProps3d      aProps(aProjCrv, 2, Precision::Confusion());
   ProjLib_MaxCurvature aMaxCur(aProps);
   math_BrentMinimum    aSolver(Precision::PConfusion());
   aSolver.Perform(aMaxCur, -10. * aF, 0., 10. * aF);
@@ -1443,7 +1439,7 @@ bool ProjLib_ProjectOnPlane::BuildHyperbolaByApex(occ::handle<Geom_Curve>& theGe
   occ::handle<Adaptor3d_Curve> aProjCrv = ShallowCopy();
   myType                                = aCurType;
   // Searching hyperbola apex as point with maximal curvature
-  LProp3d_CLProps      aProps(aProjCrv, 2, Precision::Confusion());
+  LProp_CLProps3d      aProps(aProjCrv, 2, Precision::Confusion());
   ProjLib_MaxCurvature aMaxCur(aProps);
   math_BrentMinimum    aSolver(Precision::PConfusion());
   aSolver.Perform(aMaxCur, -5., 0., 5.);

@@ -30,6 +30,7 @@
 #include <Standard_Integer.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_Iterator.hxx>
 #include <Bnd_Box.hxx>
 #include <BRepExtrema_ExtPC.hxx>
 #include <BRepExtrema_ExtPF.hxx>
@@ -686,10 +687,8 @@ void BRepExtrema_DistanceSS::Perform(const TopoDS_Shape& theS1,
   }
 }
 
-//=======================================================================
-// function : Perform
-// purpose  : Vertex-Vertex
-//=======================================================================
+//=================================================================================================
+
 void BRepExtrema_DistanceSS::Perform(
   const TopoDS_Vertex&                            theS1,
   const TopoDS_Vertex&                            theS2,
@@ -712,10 +711,8 @@ void BRepExtrema_DistanceSS::Perform(
   }
 }
 
-//=======================================================================
-// function : Perform
-// purpose  : Vertex-Edge
-//=======================================================================
+//=================================================================================================
+
 void BRepExtrema_DistanceSS::Perform(
   const TopoDS_Vertex&                            theS1,
   const TopoDS_Edge&                              theS2,
@@ -770,10 +767,8 @@ void BRepExtrema_DistanceSS::Perform(
   }
 }
 
-//=======================================================================
-// function : Perform
-// purpose  : Vertex-Face
-//=======================================================================
+//=================================================================================================
+
 void BRepExtrema_DistanceSS::Perform(
   const TopoDS_Vertex&                            theS1,
   const TopoDS_Face&                              theS2,
@@ -829,10 +824,8 @@ void BRepExtrema_DistanceSS::Perform(
   }
 }
 
-//=======================================================================
-// function : Perform
-// purpose  : Edge-Edge
-//=======================================================================
+//=================================================================================================
+
 void BRepExtrema_DistanceSS::Perform(
   const TopoDS_Edge&                              theS1,
   const TopoDS_Edge&                              theS2,
@@ -920,10 +913,8 @@ void BRepExtrema_DistanceSS::Perform(
   }
 }
 
-//=======================================================================
-// function : Perform
-// purpose  : Edge-Face
-//=======================================================================
+//=================================================================================================
+
 void BRepExtrema_DistanceSS::Perform(
   const TopoDS_Edge&                              theS1,
   const TopoDS_Face&                              theS2,
@@ -1075,10 +1066,8 @@ void BRepExtrema_DistanceSS::Perform(
   }
 }
 
-//=======================================================================
-// function : Perform
-// purpose  : Face-Face
-//=======================================================================
+//=================================================================================================
+
 void BRepExtrema_DistanceSS::Perform(
   const TopoDS_Face&                              theS1,
   const TopoDS_Face&                              theS2,
