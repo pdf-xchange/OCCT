@@ -55,13 +55,13 @@ Standard_GUID BRepGraph_VersionStamp::ToGUID(const Standard_GUID& theGraphGUID) 
   anOff += sizeof(myGeneration);
 
   // Two independent hashes fill the 128-bit GUID.
-  const size_t aHash1   = opencascade::hashBytes(aBuffer, static_cast<int>(anOff));
-  const size_t aHalfOff = sizeof(aGraphUUID);
-  const size_t aHash2 =
+  const uint64_t aHash1   = opencascade::hashBytes(aBuffer, static_cast<int>(anOff));
+  const uint64_t aHalfOff = sizeof(aGraphUUID);
+  const uint64_t aHash2 =
     opencascade::hashBytes(aBuffer + aHalfOff, static_cast<int>(anOff - aHalfOff));
 
   Standard_UUID aResultUUID;
-  static_assert(sizeof(size_t) >= 8, "Expected 64-bit size_t");
+  static_assert(sizeof(uint64_t) >= 8, "Expected 64-bit size_t");
   std::memcpy(&aResultUUID, &aHash1, 8);
   std::memcpy(reinterpret_cast<uint8_t*>(&aResultUUID) + 8, &aHash2, 8);
   return Standard_GUID(aResultUUID);
