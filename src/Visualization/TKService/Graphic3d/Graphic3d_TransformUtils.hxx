@@ -16,6 +16,7 @@
 #define _Graphic3d_TransformUtils_HeaderFile
 
 #include <gp_Trsf.hxx>
+#include <gp_GTrsf.hxx>
 #include <NCollection_Vec2.hxx>
 #include <Standard_TypeDef.hxx>
 #include <NCollection_Vec3.hxx>
@@ -66,6 +67,10 @@ struct VectorType<float>
 //! Converts gp_Trsf to NCollection_Mat4<float>.
 template <class T>
 static void Convert(const gp_Trsf& theTransformation, typename MatrixType<T>::Mat4& theOut);
+
+//! Converts gp_GTrsf to NCollection_Mat4<float>.
+template <class T>
+static void Convert(const gp_GTrsf& theTransformation, typename MatrixType<T>::Mat4& theOut);
 
 //! Constructs a 3D orthographic projection matrix.
 template <class T>
@@ -158,6 +163,14 @@ void Graphic3d_TransformUtils::Convert(const gp_Trsf&                theTransfor
   theOut.ChangeValue(0, 3) = theTransformation.TranslationPart().X();
   theOut.ChangeValue(1, 3) = theTransformation.TranslationPart().Y();
   theOut.ChangeValue(2, 3) = theTransformation.TranslationPart().Z();
+}
+
+template <class T>
+void Graphic3d_TransformUtils::Convert(const gp_GTrsf&                theTransformation,
+                                       typename MatrixType<T>::Mat4& theOut)
+{
+  theOut.InitIdentity();
+  theTransformation.GetMat4(theOut);
 }
 
 // =======================================================================

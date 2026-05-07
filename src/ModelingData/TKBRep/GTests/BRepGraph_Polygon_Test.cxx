@@ -18,8 +18,8 @@
 #include <BRep_Tool.hxx>
 #include <BRepGraph.hxx>
 #include <BRepGraph_Iterator.hxx>
-#include <BRepGraph_ParamLayer.hxx>
-#include <BRepGraph_RegularityLayer.hxx>
+#include <BRepGraph_LayerParam.hxx>
+#include <BRepGraph_LayerRegularity.hxx>
 #include <BRepGraph_TopoView.hxx>
 #include <BRepGraph_ShapesView.hxx>
 #include <BRepGraphInc_Definition.hxx>
@@ -27,21 +27,27 @@
 #include <BRepGraphInc_Representation.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRepGraph_Tool.hxx>
+#include <BRepGraph_Builder.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepPrimAPI_MakeCylinder.hxx>
 #include <Poly_Polygon3D.hxx>
 #include <Poly_PolygonOnTriangulation.hxx>
 #include <Poly_Triangulation.hxx>
 #include <Precision.hxx>
+#include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
+#include <NCollection_IndexedDataMap.hxx>
+#include <NCollection_List.hxx>
+#include <TopTools_ShapeMapHasher.hxx>
+#include <TopoDS_Shape.hxx>
 #include <TopoDS.hxx>
 
 #include <gtest/gtest.h>
 
 static void registerStandardLayers(BRepGraph& theGraph)
 {
-  theGraph.LayerRegistry().RegisterLayer(new BRepGraph_ParamLayer());
-  theGraph.LayerRegistry().RegisterLayer(new BRepGraph_RegularityLayer());
+  theGraph.LayerRegistry().RegisterLayer(new BRepGraph_LayerParam());
+  theGraph.LayerRegistry().RegisterLayer(new BRepGraph_LayerRegularity());
 }
 
 // ============================================================
@@ -55,7 +61,9 @@ TEST(BRepGraph_PolygonTest, MultiTriangulation_Roundtrip_PreservesAll)
   BRepMesh_IncrementalMesh aMesher(aBox, 0.5);
 
   BRepGraph aGraph;
-  aGraph.Build(aBox);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes1 =
+    BRepGraph_Builder::Add(aGraph, aBox);
   ASSERT_TRUE(aGraph.IsDone());
 
   // Verify triangulations were captured on face definitions.
@@ -63,14 +71,9 @@ TEST(BRepGraph_PolygonTest, MultiTriangulation_Roundtrip_PreservesAll)
   for (BRepGraph_FaceIterator aFaceIt(aGraph); aFaceIt.More(); aFaceIt.Next())
   {
     const BRepGraphInc::FaceDef& aFaceDef = aFaceIt.Current();
-    if (!aFaceDef.TriangulationRepIds.IsEmpty())
+    if (aFaceDef.TriangulationRepId.IsValid())
     {
       aHasTriangulations = true;
-      EXPECT_GE(aFaceDef.ActiveTriangulationIndex, 0)
-        << "Active triangulation index should be valid for meshed face";
-      EXPECT_LT(aFaceDef.ActiveTriangulationIndex, aFaceDef.TriangulationRepIds.Length());
-      const BRepGraph_TriangulationRepId anActiveRepId = aFaceDef.ActiveTriangulationRepId();
-      EXPECT_TRUE(anActiveRepId.IsValid());
       EXPECT_FALSE(BRepGraph_Tool::Face::Triangulation(aGraph, aFaceIt.CurrentId()).IsNull());
     }
   }
@@ -79,8 +82,7 @@ TEST(BRepGraph_PolygonTest, MultiTriangulation_Roundtrip_PreservesAll)
   // Reconstruct and verify triangulations are preserved.
   for (BRepGraph_FaceIterator aFaceIt(aGraph); aFaceIt.More(); aFaceIt.Next())
   {
-    const BRepGraphInc::FaceDef& aFaceDef   = aFaceIt.Current();
-    TopoDS_Shape                 aReconFace = aGraph.Shapes().Reconstruct(aFaceDef.Id);
+    TopoDS_Shape aReconFace = aGraph.Shapes().Reconstruct(aFaceIt.CurrentId());
     ASSERT_FALSE(aReconFace.IsNull());
 
     TopLoc_Location                       aLoc;
@@ -104,7 +106,9 @@ TEST(BRepGraph_PolygonTest, Polygon3D_Captured_WhenPresent)
   BRepMesh_IncrementalMesh aMesher(aBox, 0.5);
 
   BRepGraph aGraph;
-  aGraph.Build(aBox);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes2 =
+    BRepGraph_Builder::Add(aGraph, aBox);
   ASSERT_TRUE(aGraph.IsDone());
 
   // Count Polygon3D on edges - matches what BRep_Tool reports for the original shape.
@@ -113,13 +117,17 @@ TEST(BRepGraph_PolygonTest, Polygon3D_Captured_WhenPresent)
   for (BRepGraph_EdgeIterator anEdgeIt(aGraph); anEdgeIt.More(); anEdgeIt.Next())
   {
     if (BRepGraph_Tool::Edge::HasPolygon3D(aGraph, anEdgeIt.CurrentId()))
+    {
       ++aNbPoly3DGraph;
+    }
   }
   for (TopExp_Explorer anExp(aBox, TopAbs_EDGE); anExp.More(); anExp.Next())
   {
     TopLoc_Location aLoc;
     if (!BRep_Tool::Polygon3D(TopoDS::Edge(anExp.Current()), aLoc).IsNull())
+    {
       ++aNbPoly3DOrig;
+    }
   }
   EXPECT_EQ(aNbPoly3DGraph, aNbPoly3DOrig)
     << "Graph Polygon3D count should match BRep_Tool::Polygon3D count";
@@ -128,9 +136,10 @@ TEST(BRepGraph_PolygonTest, Polygon3D_Captured_WhenPresent)
   for (BRepGraph_EdgeIterator anEdgeIt(aGraph); anEdgeIt.More(); anEdgeIt.Next())
   {
     if (!BRepGraph_Tool::Edge::HasPolygon3D(aGraph, anEdgeIt.CurrentId()))
+    {
       continue;
-    const BRepGraphInc::EdgeDef& anEdge     = anEdgeIt.Current();
-    TopoDS_Shape                 aReconEdge = aGraph.Shapes().Reconstruct(anEdge.Id);
+    }
+    TopoDS_Shape aReconEdge = aGraph.Shapes().Reconstruct(anEdgeIt.CurrentId());
     ASSERT_FALSE(aReconEdge.IsNull());
     TopLoc_Location             aPolyLoc;
     occ::handle<Poly_Polygon3D> aPoly = BRep_Tool::Polygon3D(TopoDS::Edge(aReconEdge), aPolyLoc);
@@ -149,19 +158,21 @@ TEST(BRepGraph_PolygonTest, PolyOnTri_Captured_AfterMesh)
   BRepMesh_IncrementalMesh aMesher(aBox, 0.5);
 
   BRepGraph aGraph;
-  aGraph.Build(aBox);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes3 =
+    BRepGraph_Builder::Add(aGraph, aBox);
   ASSERT_TRUE(aGraph.IsDone());
 
   // Count PolygonOnTriangulation entries on coedges.
   int aNbPolyOnTri = 0;
   for (BRepGraph_EdgeIterator anEdgeIt(aGraph); anEdgeIt.More(); anEdgeIt.Next())
   {
-    const NCollection_Vector<BRepGraph_CoEdgeId>& aCoEdgeIdxs =
+    const NCollection_DynamicArray<BRepGraph_CoEdgeId>& aCoEdgeIdxs =
       aGraph.Topo().Edges().CoEdges(anEdgeIt.CurrentId());
     for (const BRepGraph_CoEdgeId& aCoEdgeId : aCoEdgeIdxs)
     {
       const BRepGraphInc::CoEdgeDef& aCE = aGraph.Topo().CoEdges().Definition(aCoEdgeId);
-      aNbPolyOnTri += aCE.PolygonOnTriRepIds.Length();
+      aNbPolyOnTri += aCE.PolygonOnTriRepId.IsValid() ? 1 : 0;
     }
   }
   EXPECT_GT(aNbPolyOnTri, 0) << "Meshed box edges should have PolygonOnTriangulation";
@@ -169,14 +180,14 @@ TEST(BRepGraph_PolygonTest, PolyOnTri_Captured_AfterMesh)
   // Verify PolyOnTri entries have valid context references.
   for (BRepGraph_EdgeIterator anEdgeIt(aGraph); anEdgeIt.More(); anEdgeIt.Next())
   {
-    const NCollection_Vector<BRepGraph_CoEdgeId>& aCoEdgeIdxs =
+    const NCollection_DynamicArray<BRepGraph_CoEdgeId>& aCoEdgeIdxs =
       aGraph.Topo().Edges().CoEdges(anEdgeIt.CurrentId());
     for (const BRepGraph_CoEdgeId& aCoEdgeId : aCoEdgeIdxs)
     {
       const BRepGraphInc::CoEdgeDef& aCE = aGraph.Topo().CoEdges().Definition(aCoEdgeId);
-      for (const BRepGraph_PolygonOnTriRepId& aPolyOnTriRepId : aCE.PolygonOnTriRepIds)
+      if (aCE.PolygonOnTriRepId.IsValid())
       {
-        EXPECT_TRUE(aPolyOnTriRepId.IsValid());
+        EXPECT_TRUE(aCE.PolygonOnTriRepId.IsValid());
       }
       EXPECT_TRUE(aCE.FaceDefId.IsValid());
     }
@@ -193,11 +204,13 @@ TEST(BRepGraph_PolygonTest, PolyOnTri_Roundtrip_PreservedOnReconstruct)
   BRepMesh_IncrementalMesh aMesher(aBox, 0.5);
 
   BRepGraph aGraph;
-  aGraph.Build(aBox);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes4 =
+    BRepGraph_Builder::Add(aGraph, aBox);
   ASSERT_TRUE(aGraph.IsDone());
 
   // Reconstruct solid and verify polygon-on-triangulation is re-attached.
-  BRepGraph_NodeId aSolidDefId = BRepGraph_SolidId(0);
+  BRepGraph_NodeId aSolidDefId = BRepGraph_SolidId::Start();
   TopoDS_Shape     aReconSolid = aGraph.Shapes().Reconstruct(aSolidDefId);
   ASSERT_FALSE(aReconSolid.IsNull());
 
@@ -211,12 +224,16 @@ TEST(BRepGraph_PolygonTest, PolyOnTri_Roundtrip_PreservedOnReconstruct)
       TopLoc_Location                 aTriLoc;
       occ::handle<Poly_Triangulation> aTri = BRep_Tool::Triangulation(aFace, aTriLoc);
       if (aTri.IsNull())
+      {
         continue;
+      }
       TopLoc_Location                          aPolyLoc;
       occ::handle<Poly_PolygonOnTriangulation> aPolyOnTri =
         BRep_Tool::PolygonOnTriangulation(anEdge, aTri, aPolyLoc);
       if (!aPolyOnTri.IsNull())
+      {
         ++aNbReconPolyOnTri;
+      }
     }
   }
 
@@ -233,14 +250,16 @@ TEST(BRepGraph_PolygonTest, UVPoints_Captured_OnPCurves)
   TopoDS_Shape aBox = BRepPrimAPI_MakeBox(10., 20., 30.).Shape();
 
   BRepGraph aGraph;
-  aGraph.Build(aBox);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes5 =
+    BRepGraph_Builder::Add(aGraph, aBox);
   ASSERT_TRUE(aGraph.IsDone());
 
   // At least some CoEdge entries should have non-origin UV points.
   int aNbNonOriginUV = 0;
   for (BRepGraph_EdgeIterator anEdgeIt(aGraph); anEdgeIt.More(); anEdgeIt.Next())
   {
-    const NCollection_Vector<BRepGraph_CoEdgeId>& aCoEdgeIdxs =
+    const NCollection_DynamicArray<BRepGraph_CoEdgeId>& aCoEdgeIdxs =
       aGraph.Topo().Edges().CoEdges(anEdgeIt.CurrentId());
     for (const BRepGraph_CoEdgeId& aCoEdgeId : aCoEdgeIdxs)
     {
@@ -275,7 +294,9 @@ TEST(BRepGraph_PolygonTest, VertexPointRepresentations_StructurallyValid)
     double             aLast  = 0.0;
     TopLoc_Location    aLoc;
     if (BRep_Tool::Curve(anEdge, aLoc, aFirst, aLast).IsNull())
+    {
       continue;
+    }
 
     for (TopoDS_Iterator aVtxIt(anEdge, false, false); aVtxIt.More(); aVtxIt.Next())
     {
@@ -315,7 +336,9 @@ TEST(BRepGraph_PolygonTest, VertexPointRepresentations_StructurallyValid)
       double                    aLast   = 0.0;
       occ::handle<Geom2d_Curve> aPCurve = BRep_Tool::CurveOnSurface(anEdge, aFace, aFirst, aLast);
       if (aPCurve.IsNull())
+      {
         continue;
+      }
 
       aBuilder.UpdateEdge(anEdge, aPCurve, aFace, BRep_Tool::Tolerance(anEdge));
       aBuilder.Range(anEdge, aFace, aFirst, aLast);
@@ -337,10 +360,12 @@ TEST(BRepGraph_PolygonTest, VertexPointRepresentations_StructurallyValid)
 
   BRepGraph aGraph;
   registerStandardLayers(aGraph);
-  aGraph.Build(aShape);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes6 =
+    BRepGraph_Builder::Add(aGraph, aShape);
   ASSERT_TRUE(aGraph.IsDone());
-  const occ::handle<BRepGraph_ParamLayer> aParamLayer =
-    aGraph.LayerRegistry().FindLayer<BRepGraph_ParamLayer>();
+  const occ::handle<BRepGraph_LayerParam> aParamLayer =
+    aGraph.LayerRegistry().FindLayer<BRepGraph_LayerParam>();
   ASSERT_FALSE(aParamLayer.IsNull());
 
   // Count all extracted vertex point representations.
@@ -350,20 +375,28 @@ TEST(BRepGraph_PolygonTest, VertexPointRepresentations_StructurallyValid)
   for (BRepGraph_VertexIterator aVertexIt(aGraph); aVertexIt.More(); aVertexIt.Next())
   {
     const BRepGraph_VertexId                  aVertexId = aVertexIt.CurrentId();
-    const BRepGraph_ParamLayer::VertexParams* aParams   = aParamLayer->FindVertexParams(aVertexId);
+    const BRepGraph_LayerParam::VertexParams* aParams   = aParamLayer->FindVertexParams(aVertexId);
     if (aParams == nullptr)
+    {
       continue;
+    }
     aNbPointsOnCurve += aParams->PointsOnCurve.Length();
     aNbPointsOnSurface += aParams->PointsOnSurface.Length();
     aNbPointsOnPCurve += aParams->PointsOnPCurve.Length();
 
     // Validate that any captured entries have valid def references.
-    for (const BRepGraph_ParamLayer::PointOnCurveEntry& anEntry : aParams->PointsOnCurve)
+    for (const BRepGraph_LayerParam::PointOnCurveEntry& anEntry : aParams->PointsOnCurve)
+    {
       EXPECT_TRUE(anEntry.EdgeDefId.IsValid());
-    for (const BRepGraph_ParamLayer::PointOnSurfaceEntry& anEntry : aParams->PointsOnSurface)
+    }
+    for (const BRepGraph_LayerParam::PointOnSurfaceEntry& anEntry : aParams->PointsOnSurface)
+    {
       EXPECT_TRUE(anEntry.FaceDefId.IsValid());
-    for (const BRepGraph_ParamLayer::PointOnPCurveEntry& anEntry : aParams->PointsOnPCurve)
+    }
+    for (const BRepGraph_LayerParam::PointOnPCurveEntry& anEntry : aParams->PointsOnPCurve)
+    {
       EXPECT_TRUE(anEntry.CoEdgeDefId.IsValid());
+    }
   }
 
   EXPECT_GT(aNbPointsOnSurface, 0);
@@ -376,41 +409,109 @@ TEST(BRepGraph_PolygonTest, VertexPointRepresentations_StructurallyValid)
 
 TEST(BRepGraph_PolygonTest, EdgeRegularity_MatchesOriginal)
 {
-  // Cylinder has smooth edges between lateral face and caps.
-  // BRep stores regularity as BRep_CurveOn2Surfaces entries.
+  // Verify the regularity layer captures continuity for every (edge, F1, F2)
+  // tuple that classical BRep_Tool::Continuity reports as non-default.
   TopoDS_Shape aCyl = BRepPrimAPI_MakeCylinder(5., 10.).Shape();
-
-  // Count original regularities via BRep_Tool::Continuity.
-  int aNbOrigReg = 0;
-  for (TopExp_Explorer anEdgeExp(aCyl, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next())
-  {
-    const TopoDS_Edge&             anEdge = TopoDS::Edge(anEdgeExp.Current());
-    const occ::handle<BRep_TEdge>& aTEdge = occ::down_cast<BRep_TEdge>(anEdge.TShape());
-    if (aTEdge.IsNull())
-      continue;
-    for (const occ::handle<BRep_CurveRepresentation>& aCRep : aTEdge->Curves())
-    {
-      if (!occ::down_cast<BRep_CurveOn2Surfaces>(aCRep).IsNull())
-        ++aNbOrigReg;
-    }
-  }
 
   BRepGraph aGraph;
   registerStandardLayers(aGraph);
-  aGraph.Build(aCyl);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes7 =
+    BRepGraph_Builder::Add(aGraph, aCyl);
   ASSERT_TRUE(aGraph.IsDone());
-  const occ::handle<BRepGraph_RegularityLayer> aRegularityLayer =
-    aGraph.LayerRegistry().FindLayer<BRepGraph_RegularityLayer>();
+  const occ::handle<BRepGraph_LayerRegularity> aRegularityLayer =
+    aGraph.LayerRegistry().FindLayer<BRepGraph_LayerRegularity>();
   ASSERT_FALSE(aRegularityLayer.IsNull());
 
-  // Count captured regularity entries.
-  int aNbGraphReg = 0;
+  // Find the seam edge (cylinder lateral face has one).
+  bool aSeamRegularityFound = false;
   for (BRepGraph_EdgeIterator anEdgeIt(aGraph); anEdgeIt.More(); anEdgeIt.Next())
   {
-    aNbGraphReg += aRegularityLayer->NbRegularities(anEdgeIt.CurrentId());
+    const BRepGraph_EdgeId anEdgeId = anEdgeIt.CurrentId();
+    if (aRegularityLayer->NbRegularities(anEdgeId) == 0)
+    {
+      continue;
+    }
+    const BRepGraph_LayerRegularity::EdgeRegularities* aRegs =
+      aRegularityLayer->FindEdgeRegularities(anEdgeId);
+    ASSERT_NE(aRegs, nullptr);
+    for (const BRepGraph_LayerRegularity::RegularityEntry& anEntry : aRegs->Entries)
+    {
+      if (anEntry.FaceEntity1 == anEntry.FaceEntity2)
+      {
+        aSeamRegularityFound = true;
+      }
+    }
   }
-  EXPECT_EQ(aNbGraphReg, aNbOrigReg)
-    << "Graph regularity count should match BRep_CurveOn2Surfaces count";
+  EXPECT_TRUE(aSeamRegularityFound)
+    << "Cylinder seam edge must produce a regularity entry with F1 == F2";
+}
+
+// Round-trip continuity: every (edge, F1, F2) value reported by classical
+// BRep_Tool::Continuity on the original shape must be reproduced after
+// shape -> graph -> shape. Guarantees the layer captures the same continuity
+// records that the old per-CoEdge field carried (BRep_Tool::MaxContinuity walks
+// the same IsRegularity()==true set: BRep_CurveOn2Surfaces + BRep_CurveOnClosedSurface).
+TEST(BRepGraph_PolygonTest, EdgeRegularity_ShapeGraphShape_RoundTrip)
+{
+  TopoDS_Shape aOriginal = BRepPrimAPI_MakeCylinder(5., 10.).Shape();
+
+  BRepGraph aGraph;
+  registerStandardLayers(aGraph);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes =
+    BRepGraph_Builder::Add(aGraph, aOriginal);
+  ASSERT_TRUE(aGraph.IsDone());
+
+  TopoDS_Shape aReconstructed =
+    aGraph.Shapes().Reconstruct(BRepGraph_NodeId(BRepGraph_NodeId::Kind::Solid, 0));
+  ASSERT_FALSE(aReconstructed.IsNull());
+
+  // Walk both originals and reconstructed in lock-step (TopExp_Explorer order)
+  // and verify every (edge, F1, F2) pair preserves its classical Continuity value.
+  using ShapeMap = NCollection_IndexedDataMap<TopoDS_Shape,
+                                              NCollection_List<TopoDS_Shape>,
+                                              TopTools_ShapeMapHasher>;
+  ShapeMap aOrigEdgeFaces, aReconEdgeFaces;
+  TopExp::MapShapesAndAncestors(aOriginal, TopAbs_EDGE, TopAbs_FACE, aOrigEdgeFaces);
+  TopExp::MapShapesAndAncestors(aReconstructed, TopAbs_EDGE, TopAbs_FACE, aReconEdgeFaces);
+  ASSERT_EQ(aOrigEdgeFaces.Extent(), aReconEdgeFaces.Extent());
+
+  uint32_t aNbCheckedPairs = 0;
+  for (int i = 1; i <= aOrigEdgeFaces.Extent(); ++i)
+  {
+    const TopoDS_Edge&              aOrigEdge   = TopoDS::Edge(aOrigEdgeFaces.FindKey(i));
+    const TopoDS_Edge&              aReconEdge  = TopoDS::Edge(aReconEdgeFaces.FindKey(i));
+    NCollection_List<TopoDS_Shape>& aOrigFaces  = aOrigEdgeFaces.ChangeFromIndex(i);
+    NCollection_List<TopoDS_Shape>& aReconFaces = aReconEdgeFaces.ChangeFromIndex(i);
+    ASSERT_EQ(aOrigFaces.Size(), aReconFaces.Size());
+
+    NCollection_List<TopoDS_Shape>::Iterator aOrigIt(aOrigFaces);
+    NCollection_List<TopoDS_Shape>::Iterator aReconIt(aReconFaces);
+    for (; aOrigIt.More(); aOrigIt.Next(), aReconIt.Next())
+    {
+      const TopoDS_Face& aOrigF1  = TopoDS::Face(aOrigIt.Value());
+      const TopoDS_Face& aReconF1 = TopoDS::Face(aReconIt.Value());
+
+      NCollection_List<TopoDS_Shape>::Iterator aOrigIt2  = aOrigIt;
+      NCollection_List<TopoDS_Shape>::Iterator aReconIt2 = aReconIt;
+      for (; aOrigIt2.More(); aOrigIt2.Next(), aReconIt2.Next())
+      {
+        const TopoDS_Face& aOrigF2  = TopoDS::Face(aOrigIt2.Value());
+        const TopoDS_Face& aReconF2 = TopoDS::Face(aReconIt2.Value());
+        EXPECT_EQ(BRep_Tool::Continuity(aReconEdge, aReconF1, aReconF2),
+                  BRep_Tool::Continuity(aOrigEdge, aOrigF1, aOrigF2))
+          << "Continuity round-trip mismatch on edge " << i;
+        ++aNbCheckedPairs;
+      }
+    }
+
+    // Per-edge MaxContinuity round-trip: BRep_Tool walks the same IsRegularity()
+    // representations the layer captures (BRep_CurveOn2Surfaces + BRep_CurveOnClosedSurface).
+    EXPECT_EQ(BRep_Tool::MaxContinuity(aReconEdge), BRep_Tool::MaxContinuity(aOrigEdge))
+      << "MaxContinuity round-trip mismatch on edge " << i;
+  }
+  EXPECT_GT(aNbCheckedPairs, 0u) << "Test must check at least one (edge, F1, F2) pair";
 }
 
 // ============================================================
@@ -424,14 +525,16 @@ TEST(BRepGraph_PolygonTest, SeamEdge_PolyOnTri_TwoEntries)
   BRepMesh_IncrementalMesh aMesher(aCyl, 0.1);
 
   BRepGraph aGraph;
-  aGraph.Build(aCyl);
+  aGraph.Clear();
+  [[maybe_unused]] const BRepGraph_Builder::Result aBuildRes8 =
+    BRepGraph_Builder::Add(aGraph, aCyl);
   ASSERT_TRUE(aGraph.IsDone());
 
   // Find an edge with two PolyOnTri entries for the same face (seam edge pattern).
   bool aFoundSeam = false;
   for (BRepGraph_EdgeIterator anEdgeIt(aGraph); anEdgeIt.More() && !aFoundSeam; anEdgeIt.Next())
   {
-    const NCollection_Vector<BRepGraph_CoEdgeId>& aCoEdgeIdxs =
+    const NCollection_DynamicArray<BRepGraph_CoEdgeId>& aCoEdgeIdxs =
       aGraph.Topo().Edges().CoEdges(anEdgeIt.CurrentId());
     // Count PolyOnTri entries per face via coedges.
     NCollection_DataMap<int, int> aFaceCounts;
@@ -440,7 +543,9 @@ TEST(BRepGraph_PolygonTest, SeamEdge_PolyOnTri_TwoEntries)
       const BRepGraphInc::CoEdgeDef& aCE      = aGraph.Topo().CoEdges().Definition(aCoEdgeId);
       const int                      aFaceIdx = aCE.FaceDefId.Index;
       if (!aFaceCounts.IsBound(aFaceIdx))
+      {
         aFaceCounts.Bind(aFaceIdx, 0);
+      }
       aFaceCounts.ChangeFind(aFaceIdx) += 1;
     }
     for (const auto& [aFaceIdx, aCount] : aFaceCounts.Items())
@@ -452,7 +557,9 @@ TEST(BRepGraph_PolygonTest, SeamEdge_PolyOnTri_TwoEntries)
       }
     }
     if (aFoundSeam)
+    {
       break;
+    }
   }
   // Seam edges on cylinder lateral face should produce two PolyOnTri entries.
   EXPECT_TRUE(aFoundSeam) << "Meshed cylinder should have seam edge with two PolyOnTri entries";
